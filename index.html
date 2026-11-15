@@ -42,8 +42,18 @@ textarea{height:74px;font-size:12px;resize:vertical}
 details{border-top:1px solid var(--line);padding-top:8px;color:var(--muted)}
 summary{padding:8px 0;cursor:pointer}
 #msg{color:var(--accent);font-size:13px;min-height:18px}
-#game{display:none;position:fixed;inset:0;width:100%;height:100vh;height:100dvh;background:#0c131c}
-#c{width:100%;height:100%;object-fit:contain;display:block}
+#game{display:none;position:fixed;inset:0;width:100%;height:100vh;height:100dvh;background:#0c131c;overflow:hidden}
+/* 原始遊戲座標維持 400×600；將畫布順時針旋轉，讓每位玩家看到自己的橫向半場 */
+#c{position:absolute;left:50%;top:50%;width:100dvh;height:150dvh;display:block;transform:translate(-50%,-50%) rotate(90deg);transform-origin:center center;touch-action:none}
+#controls{position:fixed;inset:0;z-index:4;pointer-events:none}
+#joyBase{position:absolute;left:calc(18px + env(safe-area-inset-left,0px));bottom:calc(14px + env(safe-area-inset-bottom,0px));width:clamp(104px,23vw,142px);height:clamp(104px,23vw,142px);border:2px solid rgba(220,235,245,.25);border-radius:50%;background:radial-gradient(circle,rgba(95,125,145,.24),rgba(18,29,40,.72));box-shadow:0 8px 28px #0008;pointer-events:auto;touch-action:none;display:none}
+#joyBase:before{content:"";position:absolute;inset:22%;border:1px solid rgba(220,235,245,.13);border-radius:50%}
+#joyBase:after{content:'移動';position:absolute;left:50%;bottom:5px;transform:translateX(-50%);font-size:10px;letter-spacing:2px;color:#d5e0e5aa;pointer-events:none}
+#joyStick{position:absolute;left:50%;top:50%;width:42%;height:42%;border-radius:50%;transform:translate(-50%,-50%);background:linear-gradient(145deg,#d8e3e8,#718b9a);border:2px solid rgba(255,255,255,.55);box-shadow:0 5px 15px #0009;pointer-events:none}
+#act{position:absolute;right:calc(24px + env(safe-area-inset-right,0px));bottom:calc(28px + env(safe-area-inset-bottom,0px));width:clamp(68px,15vw,94px);height:clamp(68px,15vw,94px);border-radius:50%;background:linear-gradient(145deg,#e9b65f,#a66b31);color:#17212a;border:2px solid rgba(255,255,255,.5);font-size:14px;font-weight:900;box-shadow:0 7px 22px #0009;pointer-events:auto;display:none;touch-action:none}
+#rotateHint{display:none;position:fixed;inset:0;z-index:20;background:#101923ee;color:#f2f5f6;align-items:center;justify-content:center;text-align:center;padding:30px;font-size:18px;font-weight:800;letter-spacing:1px;pointer-events:none}
+@media (orientation:portrait){#rotateHint{display:flex}}
+
 .tb{position:fixed;top:calc(10px + env(safe-area-inset-top,0px));width:42px;height:42px;padding:0;
  font-size:17px;background:rgba(17,27,37,.78);border:1px solid rgba(255,255,255,.18);
  border-radius:12px;backdrop-filter:blur(12px);z-index:5}
@@ -67,17 +77,20 @@ summary{padding:8px 0;cursor:pointer}
 #pkg p{grid-column:1/-1;color:#d7b77d!important;text-align:left!important;font-size:11px!important;
  letter-spacing:2px;border-bottom:1px solid #34424e;padding:14px 2px 7px}
 #pc{background:#394653!important;min-height:46px}
-body[data-f] .tb{transform:rotate(90deg)}body[data-f=R] .tb{transform:rotate(-90deg)}
-body[data-f] #go{left:48px;top:50%;bottom:auto;transform:translate(-50%,-50%) rotate(90deg)}
-body[data-f=R] #go{left:calc(100% - 48px);transform:translate(-50%,-50%) rotate(-90deg)}
-body[data-f] #st{left:16px;right:auto;top:50%;width:300px;transform:translate(-50%,-50%) rotate(90deg)}
-body[data-f=R] #st{left:calc(100% - 16px);transform:translate(-50%,-50%) rotate(-90deg)}
-body[data-f=L] #pk{inset:auto;left:50%;top:50%;width:100vh;width:100dvh;height:100vw;box-sizing:border-box;transform:translate(-50%,-50%) rotate(90deg)}
-@media(min-width:700px){#menu{padding-top:42px}#pkg{grid-template-columns:repeat(3,minmax(0,1fr))}}
+#tb{z-index:6}
+#st{top:calc(9px + env(safe-area-inset-top,0px));font-size:11px;letter-spacing:1px}
+#go{bottom:calc(12px + env(safe-area-inset-bottom,0px));min-width:112px;padding:10px 20px}
+#pk{padding:calc(18px + env(safe-area-inset-top,0px)) 18px calc(14px + env(safe-area-inset-bottom,0px));gap:10px}
+#pk h2{margin:0!important;text-align:left;font-size:20px}
+#pkg{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+#pkg button{min-height:52px;font-size:13px;padding:9px 9px 9px 42px}
+#pc{margin:0;min-height:42px}
+@media(max-height:430px){#pkg{grid-template-columns:repeat(5,minmax(0,1fr))}#pkg button{min-height:44px;font-size:12px}}
+@media(min-width:700px){#menu{padding-top:42px}#pkg{grid-template-columns:repeat(4,minmax(0,1fr))}}
 </style></head><body>
 <div id="menu">
   <div class="brand"><h1>雙屏對戰</h1><p class="eyebrow">DUAL SCREEN ARCADE</p></div>
-  <p>兩支手機並排連線，合併成一個完整遊戲場地。建議使用相同 Wi-Fi。</p>
+  <p>兩位玩家面對面，各自橫拿一支手機。每人操作自己的畫面，兩個半場同步連線。建議使用相同 Wi-Fi。</p>
   <div class="row" id="pick"><button id="oh">我建立房間</button><button id="og">我加入房間</button></div>
   <div id="pr" style="display:none;flex-direction:column;gap:10px"><p>把這組房間代碼告訴朋友,等他輸入就會自動連線</p><div id="rc" style="font-size:52px;letter-spacing:8px;text-align:center;font-weight:bold">…</div></div>
   <div id="pj" style="display:none;flex-direction:column;gap:10px"><p>輸入朋友手機上的 4 位數房間代碼</p><input id="ci" inputmode="numeric" maxlength="4" placeholder="0000"><button id="cj">加入</button></div>
@@ -93,11 +106,10 @@ body[data-f=L] #pk{inset:auto;left:50%;top:50%;width:100vh;width:100dvh;height:1
   <p id="msg"></p>
 </div>
 <div id="game">
-  <canvas id="c" width="400" height="600"></canvas><div id="st"></div>
+  <canvas id="c" width="400" height="600"></canvas><div id="st"></div><div id="controls"><div id="joyBase"><div id="joyStick"></div></div><button id="act">動作</button></div><div id="rotateHint">請將手機旋轉為橫向使用</div>
   <button class="tb" id="ex" style="left:8px">✕</button>
   <button class="tb" id="mn" style="left:60px">☰</button>
   <button class="tb" id="fs" style="right:8px;display:none">⛶</button>
-  <button class="tb" id="rt" style="right:60px">⟲</button>
   <button id="go">開始</button>
   <div id="pk"><h2>選一個遊戲</h2>
     <div id="pkg"><button data-index="01" data-g="pong">乒乓對決</button><button data-index="02" data-g="hockey">冰球競技</button>
@@ -171,41 +183,69 @@ $('cj').onclick=()=>{const code=$('ci').value.trim(),p=new Peer();say('連線中
   p.on('open',()=>pjsetup(p.connect('dsg'+code,{reliable:false})));
   p.on('error',e=>say(e.type==='peer-unavailable'?'找不到這個房間代碼':'連線錯誤:'+e.type))};
 /* ---------- 流程 ---------- */
-let began=false;function begin(){if(began)return;began=true;$('menu').style.display='none';$('game').style.display='block';document.body.dataset.f=host?'L':'R';
-  $('st').textContent=host?'左屏(主機)':'右屏';
+let began=false;function begin(){if(began)return;began=true;$('menu').style.display='none';$('game').style.display='block';
+  $('st').textContent=host?'主機玩家':'加入玩家';
   if(document.documentElement.requestFullscreen)$('fs').style.display='block';
   if(host){$('pk').style.display='flex';setInterval(()=>cid&&send({t:'st',G}),33)}
   last=performance.now();requestAnimationFrame(loop)}
-function setGame(id){cid=id;cur=GAMES[id];cur.init();$('pk').style.display='none'}
+function setGame(id){cid=id;cur=GAMES[id];cur.init();$('pk').style.display='none';configureControls()}
+const JOY_GAMES=new Set(['pong','hockey','tank','snake','plane','bomb','brick','sumo','space','catch','paint','kitchen']);
+const ACTION_LABEL={tug:'連點',flap:'跳躍',react:'搶按',bomb:'放置'};
+function configureControls(){const show=!!cur&&JOY_GAMES.has(cid);$('joyBase').style.display=show?'block':'none';$('act').style.display=cur&&ACTION_LABEL[cid]?'block':'none';if(cur&&ACTION_LABEL[cid])$('act').textContent=ACTION_LABEL[cid]}
+
 function onMsg(m){
   if(m.t==='st'&&!host){G=m.G}
   else if(m.t==='g'&&!host)setGame(m.g);
   else if(m.t==='in'&&host&&cur)cur.touch('R',m.x,m.y,m.ph);
+  else if(m.t==='joyKitchen'&&host&&G.c&&G.c.R){G.c.R.gl=-1;G.c.R.tx=m.x;G.c.R.ty=m.y}
+  else if(m.t==='joyKitchenEnd'&&host&&G.c&&G.c.R){G.c.R.tx=-1;G.c.R.gl=-1}
   else if(m.t==='go'&&host&&cur)goHost();
   else if(m.t==='ev')fx(m.k,m.x,m.y);else if(m.t==='cd')startCount()}
 document.querySelectorAll('#pk [data-g]').forEach(b=>b.onclick=()=>{setGame(b.dataset.g);send({t:'g',g:cid})});
 $('pc').onclick=()=>$('pk').style.display='none';
 $('mn').onclick=()=>{if(host)$('pk').style.display='flex';else $('st').textContent='請房主(左屏)按 ☰ 選遊戲'};
-$('rt').onclick=()=>{FACE=!FACE;FACE?document.body.dataset.f=host?'L':'R':document.body.removeAttribute('data-f')};
 $('ex').onclick=()=>location.reload();
 $('fs').onclick=()=>{const d=document.documentElement;try{document.fullscreenElement?document.exitFullscreen():d.requestFullscreen()}catch(e){}};
 $('go').onclick=()=>host?cur&&goHost():send({t:'go'});
 
 /* ---------- 觸控(轉成全場座標) ---------- */
-function pt(e,ph){const t=e.changedTouches?e.changedTouches[0]:e,r=cv.getBoundingClientRect(),sc=Math.min(r.width/W,r.height/H);
-  const x=(t.clientX-r.left-(r.width-W*sc)/2)/sc+off,y=(t.clientY-r.top-(r.height-H*sc)/2)/sc;
-  if(host){cur&&cur.touch('L',x,y,ph)}else send({t:'in',x,y,ph})}
+function screenToWorld(clientX,clientY){const r=cv.getBoundingClientRect(),sc=r.height/W;const lx=(clientY-(r.top+r.height/2))/sc+W/2;const ly=-(clientX-(r.left+r.width/2))/sc+H/2;return {x:clamp(lx,0,W)+off,y:clamp(ly,0,H)}}
+function dispatchTouch(x,y,ph){if(!cur)return;if(host)cur.touch('L',x,y,ph);else send({t:'in',x,y,ph})}
+function pt(e,ph){const t=e.changedTouches?e.changedTouches[0]:e,{x,y}=screenToWorld(t.clientX,t.clientY);dispatchTouch(x,y,ph)}
 let down=false;
-for(const [n,p] of [['touchstart','s'],['touchmove','m'],['touchend','e'],['touchcancel','e']])cv.addEventListener(n,e=>{e.preventDefault();pt(e,p)},{passive:false});
-cv.addEventListener('mousedown',e=>{down=true;pt(e,'s')});addEventListener('mousemove',e=>down&&pt(e,'m'));addEventListener('mouseup',e=>{if(down){down=false;pt(e,'e')}});
+for(const [n,p] of [['pointerdown','s'],['pointermove','m'],['pointerup','e'],['pointercancel','e']])cv.addEventListener(n,e=>{if(n==='pointermove'&&!down)return;if(n==='pointerdown'){down=true;try{cv.setPointerCapture(e.pointerId)}catch(_){}}if(n==='pointerup'||n==='pointercancel')down=false;e.preventDefault();pt(e,p)},{passive:false});
+
+/* ---------- 虛擬搖桿：每支手機只送出自己的玩家輸入 ---------- */
+const joy=$('joyBase'),stick=$('joyStick');let joyId=null,joyVec={x:0,y:0},joyActive=false,joyLast=null;
+function playerKey(){return host?'L':'R'}
+function joystickPoint(){const s=playerKey(),o=s==='L'?0:400;
+  if(cid==='tank')return {x:clamp((s==='L'?70:730)+joyVec.y*250,20,780),y:clamp(506-joyVec.x*250,30,570)};
+  if(cid==='kitchen'){const c=G.c&&G.c[s]||{x:o+200,y:300};return {x:clamp(c.x+joyVec.y*145,s==='L'?20:420,s==='L'?380:780),y:clamp(c.y-joyVec.x*190,25,490)}}
+  if(cid==='sumo'||cid==='paint'){const c=s==='L'?G.a:G.b;return {x:clamp(c.x+joyVec.y*145,s==='L'?20:420,s==='L'?380:780),y:clamp(c.y-joyVec.x*190,20,570)}}
+  if(cid==='hockey'||cid==='plane'){const px=cid==='hockey'?(s==='L'?G.ax:G.bx):(s==='L'?G.ax:G.bx),py=cid==='hockey'?(s==='L'?G.ay:G.by):(s==='L'?G.ay:G.by);return {x:clamp(px+joyVec.y*165,s==='L'?28:412,s==='L'?388:772),y:clamp(py-joyVec.x*220,28,572)}}
+  if(cid==='pong')return {x:o+200,y:clamp((s==='L'?G.lp:G.rp)-joyVec.x*235,45,555)};
+  if(cid==='brick')return {x:o+200,y:clamp((s==='L'?G.pl:G.pr)-joyVec.x*235,62,538)};
+  if(cid==='space')return {x:o+200,y:clamp((s==='L'?G.pl:G.pr)-joyVec.x*235,30,570)};
+  if(cid==='catch')return {x:clamp(G.x[s]+joyVec.y*165,o+12,o+388),y:300};
+  return {x:clamp(o+200+joyVec.y*165,o+12,o+388),y:clamp(300-joyVec.x*235,18,582)};
+}
+function sendJoy(phase){if(!cur)return;const s=playerKey();
+  if(cid==='kitchen'){const c=G.c&&G.c[s];if(c){if(phase==='e'){if(host){c.tx=-1;c.gl=-1}else send({t:'joyKitchenEnd'})}else{const p=joystickPoint();if(host){c.gl=-1;c.tx=p.x;c.ty=p.y}else send({t:'joyKitchen',x:p.x,y:p.y})}}return}
+  if(cid==='tank'&&phase==='s'){const p=joystickPoint();dispatchTouch(p.x,p.y,'s');return}
+  const p=joystickPoint();dispatchTouch(p.x,p.y,phase);
+}
+function updateStick(e){const r=joy.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2,dx=e.clientX-cx,dy=e.clientY-cy,max=r.width*.31,d=Math.hypot(dx,dy),k=d>max?max/d:1;joyVec={x:dx*k/max,y:dy*k/max};stick.style.left=`calc(50% + ${joyVec.x*max}px)`;stick.style.top=`calc(50% + ${joyVec.y*max}px)`;sendJoy(joyActive?'m':'s');joyActive=true}
+function resetStick(){if(!joyActive)return;sendJoy('e');joyActive=false;joyVec={x:0,y:0};stick.style.left='50%';stick.style.top='50%';joyId=null}
+joy.addEventListener('pointerdown',e=>{e.preventDefault();joyId=e.pointerId;joy.setPointerCapture(joyId);joyActive=false;updateStick(e)});
+joy.addEventListener('pointermove',e=>{if(e.pointerId===joyId){e.preventDefault();updateStick(e)}});
+joy.addEventListener('pointerup',e=>{if(e.pointerId===joyId){e.preventDefault();resetStick()}});
+joy.addEventListener('pointercancel',resetStick);
+$('act').addEventListener('pointerdown',e=>{e.preventDefault();const s=playerKey(),o=s==='L'?0:400,x=o+200,y=300;if(cid==='bomb'){dispatchTouch(x,y,'s');dispatchTouch(x,y,'e')}else dispatchTouch(x,y,'s')});
+
 
 /* ---------- 遊戲 ---------- */
 const GAMES={};
-let FACE=true;
-const txt=(s,x,y,sz,c)=>{ctx.save();ctx.fillStyle=c||'#fff';ctx.font='700 '+sz+'px ui-sans-serif,system-ui,sans-serif';ctx.textAlign='center';ctx.textBaseline='alphabetic';ctx.shadowColor='rgba(0,0,0,.38)';ctx.shadowBlur=4;ctx.shadowOffsetY=2;
- if(!FACE){ctx.fillText(s,x,y);ctx.restore();return}
- const one=(px,r)=>{ctx.save();ctx.translate(px,y);ctx.rotate(r);ctx.fillText(s,0,0);ctx.restore()};
- if(x<396)one(x,Math.PI/2);else if(x>404)one(x,-Math.PI/2);else{one(x-110,Math.PI/2);one(x+110,-Math.PI/2)}ctx.restore()};
+const txt=(s,x,y,sz,c)=>{ctx.save();ctx.fillStyle=c||'#fff';ctx.font='700 '+sz+'px ui-sans-serif,system-ui,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.shadowColor='rgba(0,0,0,.38)';ctx.shadowBlur=4;ctx.shadowOffsetY=2;ctx.translate(x,y);ctx.rotate(-Math.PI/2);ctx.fillText(s,0,0);ctx.restore()};
 const circ=(x,y,r,c)=>{ctx.save();ctx.shadowColor='rgba(0,0,0,.32)';ctx.shadowBlur=Math.max(3,r*.25);ctx.shadowOffsetY=3;const g=ctx.createRadialGradient(x-r*.35,y-r*.4,r*.08,x,y,r);g.addColorStop(0,'rgba(255,255,255,.32)');g.addColorStop(.28,c);g.addColorStop(1,c);ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();ctx.restore()};
 
 GAMES.pong={init(){G={bx:400,by:300,vx:0,vy:0,lp:300,rp:300,ls:0,rs:0,run:false,over:0,msg:'先得 5 分獲勝'}},
@@ -680,7 +720,7 @@ GAMES.kitchen={init(){G={c:{L:{x:200,y:300,tx:-1,ty:0,gl:-1},R:{x:600,y:300,tx:-
   for(let x=0;x<FW;x+=80){ctx.fillStyle='rgba(255,255,255,.035)';ctx.fillRect(x,516,2,84)}
   const rounded=(x,y,w,h,r,c)=>{ctx.fillStyle=c;ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fill()};
   const panel=(x,y,w,h,top,base)=>{rounded(x,y+6,w,h,10,'rgba(0,0,0,.22)');rounded(x,y,w,h,10,base);rounded(x+3,y+3,w-6,12,5,top)};
-  const label=(t,x,y)=>{ctx.fillStyle='#e6e1d4';ctx.font='bold 11px sans-serif';ctx.textAlign='center';ctx.fillText(t,x,y)};
+  const label=(t,x,y)=>txt(t,x,y,11,'#e6e1d4');
   const drawFood=(key,x,y,scale=1)=>{
     ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);
     const colors={T:'#c65a42',L:'#7e9d5c',B:'#d7b77c',M:'#a95745',t:'#b84b3c',l:'#88a967',m:'#9b5540',x:'#292d30'};
@@ -731,8 +771,8 @@ GAMES.kitchen={init(){G={c:{L:{x:200,y:300,tx:-1,ty:0,gl:-1},R:{x:600,y:300,tx:-
   // counters and order tickets
   for(const side of [0,400]){rounded(side+8,518,384,70,9,'#303e43');}
   G.o.forEach((r,j)=>{const side=j%2?400:0,x=side+18+Math.floor(j/2)*180;
-    rounded(x,526,160,54,7,'#e3d6bb');ctx.fillStyle='#3b4544';ctx.font='bold 12px sans-serif';ctx.textAlign='left';ctx.fillText('訂單 '+(j+1),x+9,541);
-    ctx.fillStyle='#8b6a4a';ctx.font='bold 18px sans-serif';ctx.textAlign='center';ctx.fillText(KR[r[0]][0],x+80,565);
+    rounded(x,526,160,54,7,'#e3d6bb');txt('訂單 '+(j+1),x+80,541,12,'#3b4544');
+    txt(KR[r[0]][0],x+80,565,18,'#8b6a4a');
     ctx.fillStyle='#6e8d72';ctx.fillRect(x+7,576,146*Math.max(0,r[1])/60,3)
   });
   // illustrated cooks, no facial stickers
@@ -747,13 +787,12 @@ GAMES.kitchen={init(){G={c:{L:{x:200,y:300,tx:-1,ty:0,gl:-1},R:{x:600,y:300,tx:-
     ctx.fillStyle=blue?'#4b7891':'#9b5d49';ctx.fillRect(-13,-23,26,3);
     ctx.fillStyle='#d5b88b';ctx.fillRect(-5,-8,10,9);
     ctx.restore();
-    if(G.h[side]){rounded(c.x-31,c.y-53,62,19,7,'#eee5d2');ctx.fillStyle='#344047';ctx.font='bold 10px sans-serif';ctx.textAlign='center';ctx.fillText(KI[G.h[side]]||'餐點',c.x,c.y-40)}
+    if(G.h[side]){rounded(c.x-31,c.y-53,62,19,7,'#eee5d2');txt(KI[G.h[side]]||'餐點',c.x,c.y-40,10,'#344047')}
   }
   // HUD
-  rounded(332,8,136,34,9,'rgba(12,20,25,.78)');
-  ctx.fillStyle='#f0d49e';ctx.font='bold 14px sans-serif';ctx.textAlign='center';ctx.fillText('剩餘 '+Math.max(0,Math.ceil(G.t))+' 秒',400,30);
-  rounded(474,8,112,34,9,'rgba(12,20,25,.78)');ctx.fillStyle='#b8d6b2';ctx.fillText('得分 '+G.sc,530,30);
-  if(G.msg)G.msg.split('|').forEach((l,j)=>{rounded(95,190+j*35,610,28,8,'rgba(8,14,18,.82)');ctx.fillStyle='#f2d49a';ctx.font='bold 15px sans-serif';ctx.textAlign='center';ctx.fillText(l,400,209+j*35)});
+  rounded(332,8,136,34,9,'rgba(12,20,25,.78)');txt('剩餘 '+Math.max(0,Math.ceil(G.t))+' 秒',400,25,14,'#f0d49e');
+  rounded(474,8,112,34,9,'rgba(12,20,25,.78)');txt('得分 '+G.sc,530,25,14,'#b8d6b2');
+  if(G.msg)G.msg.split('|').forEach((l,j)=>{rounded(95,190+j*35,610,28,8,'rgba(8,14,18,.82)');txt(l,400,204+j*35,15,'#f2d49a')});
  }};;
 
 /* ---------- 主迴圈 ---------- */
@@ -773,8 +812,7 @@ function loop(now){
    PT.forEach(p=>{ctx.globalAlpha=Math.min(1,p[4]*2);ctx.fillStyle=p[5];ctx.fillRect(p[0]-2,p[1]-2,5,5)});ctx.globalAlpha=1;
    const rem=Math.ceil((cdEnd-now)/800);if(rem>0&&rem<=3){txt(rem,200,330,140,'rgba(255,255,255,.85)');txt(rem,600,330,140,'rgba(255,255,255,.85)')}
    ctx.restore();
-   const gx=host?W-30:0,g=ctx.createLinearGradient(gx,0,gx+30,0);
-   g.addColorStop(host?0:1,'rgba(232,89,12,0)');g.addColorStop(host?1:0,'rgba(232,89,12,.35)');ctx.fillStyle=g;ctx.fillRect(gx,0,30,H)}
+}
   $('go').style.display=cur&&!G.run&&now>cdEnd?'block':'none';
   requestAnimationFrame(loop)}
 </script></body></html>
