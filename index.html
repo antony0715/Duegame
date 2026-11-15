@@ -3,6 +3,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
 <title>雙屏對戰</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js"></script>
 <style>
 :root{--bg:#f6f6f4;--fg:#1a1a1a;--ac:#e8590c;--card:#fff;--bd:#d8d8d4}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1118;--fg:#f0f0ee;--card:#181c26;--bd:#2c3140}}
@@ -19,13 +20,17 @@ button{flex:1;font-size:17px;padding:13px;border:0;border-radius:10px;background
 .tb{position:fixed;top:calc(8px + env(safe-area-inset-top,0px));flex:none;width:44px;height:44px;padding:0;font-size:20px;background:rgba(255,255,255,.18);z-index:5}
 #st{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));left:0;right:0;text-align:center;font-size:12px;color:#9aa3b8;pointer-events:none}
 #go{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);flex:none;padding:12px 28px;z-index:5}
-#pk{position:fixed;inset:0;display:none;flex-direction:column;justify-content:center;gap:12px;padding:30px;background:rgba(8,10,20,.92);z-index:9}
+#pkg{display:grid;grid-template-columns:1fr 1fr;gap:10px}input{font-size:28px;padding:12px;border:1px solid var(--bd);border-radius:10px;background:var(--card);color:var(--fg);text-align:center;letter-spacing:6px;-webkit-user-select:text;user-select:text}details{font-size:14px}summary{padding:6px 0;opacity:.8}
+#pk{overflow-y:auto;position:fixed;inset:0;display:none;flex-direction:column;justify-content:center;gap:12px;padding:30px;background:rgba(8,10,20,.92);z-index:9}
 #pk h2{color:#fff;margin:0;text-align:center;font-size:20px}
 </style></head><body>
 <div id="menu">
   <h1>雙屏對戰</h1>
   <p>兩支手機直放、並排貼緊,畫面接成一個大場地。建議連同一個 Wi‑Fi。iPhone 想全螢幕:Safari 分享 → 加入主畫面,再從主畫面開啟。</p>
-  <div class="row" id="pick"><button id="bh">我建立(左邊)</button><button id="bg">我加入(右邊)</button></div>
+  <div class="row" id="pick"><button id="oh">我建立房間</button><button id="og">我加入房間</button></div>
+  <div id="pr" style="display:none;flex-direction:column;gap:10px"><p>把這組房間代碼告訴朋友,等他輸入就會自動連線</p><div id="rc" style="font-size:52px;letter-spacing:8px;text-align:center;font-weight:bold">…</div></div>
+  <div id="pj" style="display:none;flex-direction:column;gap:10px"><p>輸入朋友手機上的 4 位數房間代碼</p><input id="ci" inputmode="numeric" maxlength="4" placeholder="0000"><button id="cj">加入</button></div>
+  <details id="mu"><summary>連不上?改用手動配對</summary><div class="row"><button id="bh">手動建立</button><button id="bg">手動加入</button></div></details>
   <div id="ph" style="display:none;flex-direction:column;gap:10px">
     <p>① 複製代碼傳給朋友</p><textarea id="o" readonly placeholder="產生中…"></textarea><button class="cp" data-t="o">複製代碼</button>
     <p>② 貼上朋友回傳的代碼</p><textarea id="a" placeholder="貼上回覆碼"></textarea><button id="cn">連線</button>
@@ -43,8 +48,10 @@ button{flex:1;font-size:17px;padding:13px;border:0;border-radius:10px;background
   <button class="tb" id="fs" style="right:8px;display:none">⛶</button>
   <button id="go">開始</button>
   <div id="pk"><h2>選一個遊戲</h2>
-    <button data-g="pong">🏓 乒乓</button><button data-g="hockey">🏒 冰球</button>
-    <button data-g="tank">💥 坦克砲戰</button><button data-g="snake">🐍 貪吃蛇對戰</button>
+    <div id="pkg"><button data-g="pong">🏓 乒乓</button><button data-g="hockey">🏒 冰球</button>
+    <button data-g="tank">💥 坦克砲戰</button><button data-g="snake">🐍 貪吃蛇</button>
+    <button data-g="plane">✈️ 飛機對戰</button><button data-g="bomb">💣 爆爆王</button>
+    <button data-g="brick">🧱 合作打磚塊</button><button data-g="tug">⚡ 狂點拔河</button></div>
     <button id="pc" style="background:#444">關閉</button></div>
 </div>
 <script>
@@ -58,7 +65,9 @@ document.addEventListener('gesturestart',e=>e.preventDefault());
 const cfg={iceServers:[{urls:'stun:stun.l.google.com:19302'}]};
 const enc=o=>btoa(JSON.stringify(o)),dec=t=>JSON.parse(atob(t.replace(/\s/g,'')));
 const say=t=>$('msg').textContent=t;
-const send=o=>{if(dc&&dc.readyState==='open')dc.send(JSON.stringify(o))};
+let P=null;
+const send=o=>{if(P){P.open&&P.send(JSON.stringify(o))}else if(dc&&dc.readyState==='open')dc.send(JSON.stringify(o))};
+const hidePick=()=>{$('pick').style.display='none';$('mu').style.display='none'};
 function waitIce(){return new Promise(r=>{if(pc.iceGatheringState==='complete')return r();const f=()=>{if(pc.iceGatheringState==='complete'){pc.removeEventListener('icegatheringstatechange',f);r()}};pc.addEventListener('icegatheringstatechange',f);setTimeout(r,3500)})}
 function pack(){const s=pc.localDescription.sdp,g=r=>(s.match(r)||[])[1];
   const c=[...s.matchAll(/a=candidate:\S+ 1 udp (\d+) (\S+) (\d+) typ (host|srflx)/g)].map(m=>[+m[1],m[2],+m[3],m[4]=='host'?0:1]).slice(0,4);
@@ -67,19 +76,29 @@ function unpack(code,type){const [u,p,f,c]=dec(code);
   const sdp=['v=0','o=- 1 2 IN IP4 127.0.0.1','s=-','t=0 0','a=group:BUNDLE 0','m=application 9 UDP/DTLS/SCTP webrtc-datachannel','c=IN IP4 0.0.0.0','a=ice-ufrag:'+u,'a=ice-pwd:'+p,'a=fingerprint:sha-256 '+f.match(/../g).join(':'),'a=setup:'+(type=='offer'?'actpass':'active'),'a=mid:0','a=sctp-port:5000','a=max-message-size:262144',...c.map((x,i)=>`a=candidate:${i+1} 1 udp ${x[0]} ${x[1]} ${x[2]} typ ${x[3]?'srflx raddr 0.0.0.0 rport 0':'host'}`),'a=end-of-candidates',''].join('\r\n');
   return {type,sdp}}
 function setup(ch){dc=ch;dc.onopen=begin;dc.onmessage=e=>onMsg(JSON.parse(e.data));dc.onclose=()=>{$('st').textContent='連線中斷,請按 ✕ 重來'}}
-$('bh').onclick=async()=>{side='L';host=true;$('pick').style.display='none';$('ph').style.display='flex';
+$('bh').onclick=async()=>{side='L';host=true;hidePick();$('ph').style.display='flex';
   pc=new RTCPeerConnection(cfg);setup(pc.createDataChannel('g',{ordered:false,maxRetransmits:0}));
   await pc.setLocalDescription(await pc.createOffer());await waitIce();$('o').value=pack()};
 $('cn').onclick=async()=>{try{await pc.setRemoteDescription(unpack($('a').value,'answer'));say('連線中…')}catch(e){say('回覆碼不對,請重新複製')}};
-$('bg').onclick=()=>{side='R';off=W;$('pick').style.display='none';$('pg').style.display='flex'};
+$('bg').onclick=()=>{side='R';off=W;hidePick();$('pg').style.display='flex'};
 $('mk').onclick=async()=>{try{pc=new RTCPeerConnection(cfg);pc.ondatachannel=e=>setup(e.channel);
   await pc.setRemoteDescription(unpack($('o2').value,'offer'));await pc.setLocalDescription(await pc.createAnswer());await waitIce();
   $('a2').value=pack();say('把回覆碼傳給朋友,等他按「連線」')}catch(e){say('代碼不對,請重新複製')}};
 document.querySelectorAll('.cp').forEach(b=>b.onclick=async()=>{const t=$(b.dataset.t);t.select();
   try{await navigator.clipboard.writeText(t.value)}catch(e){document.execCommand('copy')}say('已複製')});
 
+function pjsetup(c){P=c;c.on('open',begin);c.on('data',d=>onMsg(typeof d==='string'?JSON.parse(d):d));c.on('close',()=>{$('st').textContent='連線中斷,請按 ✕ 重來'})}
+$('oh').onclick=()=>{if(!window.Peer){say('載入連線元件失敗,請確認網路,或用下方手動配對');return}
+  side='L';host=true;hidePick();$('pr').style.display='flex';
+  const code=String(Math.floor(1000+Math.random()*9000)),p=new Peer('dsg'+code);
+  p.on('open',()=>$('rc').textContent=code);p.on('connection',pjsetup);
+  p.on('error',e=>say(e.type==='unavailable-id'?'代碼重複,請重新整理再試':'連線錯誤:'+e.type))};
+$('og').onclick=()=>{if(!window.Peer){say('載入連線元件失敗,請確認網路,或用下方手動配對');return}side='R';off=W;hidePick();$('pj').style.display='flex'};
+$('cj').onclick=()=>{const code=$('ci').value.trim(),p=new Peer();say('連線中…');
+  p.on('open',()=>pjsetup(p.connect('dsg'+code,{reliable:false})));
+  p.on('error',e=>say(e.type==='peer-unavailable'?'找不到這個房間代碼':'連線錯誤:'+e.type))};
 /* ---------- 流程 ---------- */
-function begin(){$('menu').style.display='none';$('game').style.display='block';
+let began=false;function begin(){if(began)return;began=true;$('menu').style.display='none';$('game').style.display='block';
   $('st').textContent=host?'左屏(主機)':'右屏';
   if(document.documentElement.requestFullscreen)$('fs').style.display='block';
   if(host){$('pk').style.display='flex';setInterval(()=>cid&&send({t:'st',G}),33)}
@@ -178,6 +197,68 @@ GAMES.snake={init(){G={a:[[6,15],[5,15],[4,15]],b:[[33,15],[34,15],[35,15]],da:[
   const dr=(arr,c)=>{ctx.fillStyle=c;arr.forEach(p=>ctx.fillRect(p[0]*CS+1,p[1]*CS+1,CS-2,CS-2))};
   dr(G.a,'#51cf66');dr(G.b,'#ffa94d');circ(G.f[0]*CS+10,G.f[1]*CS+10,8,'#ff6b6b');
   if(G.win)txt(G.win,400,300,40,'#ffd43b')}};
+
+GAMES.plane={init(){G={ax:80,ay:300,bx:720,by:300,hl:5,hr:5,bl:[],ro:[[400,100,90],[400,300,-90],[400,500,90]],ca:0,cb:0,run:false,msg:'手指拖曳移動,自動開火'}},
+ start(){this.init();G.run=true;G.msg=''},
+ step(dt){G.bl.forEach(b=>b[0]+=b[2]*dt);G.ro.forEach(r=>{r[1]+=r[2]*dt;if(r[1]<40||r[1]>560)r[2]*=-1});
+  if(!host||!G.run)return;G.ca-=dt;G.cb-=dt;
+  if(G.ca<=0){G.ca=.45;G.bl.push([G.ax+24,G.ay,520])}if(G.cb<=0){G.cb=.45;G.bl.push([G.bx-24,G.by,-520])}
+  G.bl=G.bl.filter(b=>{if(b[0]<-20||b[0]>FW+20)return false;if(G.ro.some(r=>Math.hypot(b[0]-r[0],b[1]-r[1])<30))return false;
+   if(b[2]>0&&Math.abs(b[0]-G.bx)<22&&Math.abs(b[1]-G.by)<20){G.hr--;return false}
+   if(b[2]<0&&Math.abs(b[0]-G.ax)<22&&Math.abs(b[1]-G.ay)<20){G.hl--;return false}return true});
+  if(G.hl<=0||G.hr<=0){G.run=false;G.msg=(G.hl<=0?'右':'左')+'邊獲勝!'}},
+ touch(s,x,y){const yy=clamp(y,30,570);if(s==='L'){G.ax=clamp(x,30,380);G.ay=yy}else{G.bx=clamp(x,420,770);G.by=yy}},
+ draw(){ctx.fillStyle='#14233f';ctx.fillRect(0,0,FW,H);G.ro.forEach(r=>circ(r[0],r[1],30,'#777'));
+  for(const [x,y,c,d] of [[G.ax,G.ay,'#4dabf7',1],[G.bx,G.by,'#ffa94d',-1]]){ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x+24*d,y);ctx.lineTo(x-18*d,y-18);ctx.lineTo(x-10*d,y);ctx.lineTo(x-18*d,y+18);ctx.fill()}
+  ctx.fillStyle='#ffe066';G.bl.forEach(b=>ctx.fillRect(b[0]-6,b[1]-2,12,4));
+  txt('♥'.repeat(Math.max(0,G.hl)),100,40,22,'#ff6b6b');txt('♥'.repeat(Math.max(0,G.hr)),700,40,22,'#ff6b6b');
+  if(G.msg)txt(G.msg,400,300,30,'#ffd43b')}};
+
+const BW=20,BH=15,BC=40;let cd={l:0,r:0},bw={};
+GAMES.bomb={init(){const m=[];for(let y=0;y<BH;y++)for(let x=0;x<BW;x++){let v=0;if(x%2&&y%2)v=1;else if(Math.random()<.55&&!((x<3&&y<3)||(x>BW-4&&y>BH-4)))v=2;m.push(v)}
+  G={m,l:{x:0,y:0,d:[0,0],a:1},r:{x:BW-1,y:BH-1,d:[0,0],a:1},bm:[],fx:[],run:false,msg:'拖曳移動,點一下放炸彈'};cd={l:0,r:0};bw={}},
+ start(){this.init();G.run=true;G.msg=''},
+ boom(b){G.fx.push([b.x,b.y,.4]);for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]])for(let i=1;i<=2;i++){const x=b.x+dx*i,y=b.y+dy*i;if(x<0||x>=BW||y<0||y>=BH)break;const v=G.m[y*BW+x];if(v===1)break;
+   G.fx.push([x,y,.4]);const o=G.bm.find(c=>c.x===x&&c.y===y);if(o)o.t=0;if(v===2){G.m[y*BW+x]=0;break}}},
+ step(dt){if(!host||!G.run)return;
+  for(const k of ['l','r']){const p=G[k];cd[k]-=dt;if(p.a&&(p.d[0]||p.d[1])&&cd[k]<=0){const nx=p.x+p.d[0],ny=p.y+p.d[1];
+   if(nx>=0&&nx<BW&&ny>=0&&ny<BH&&G.m[ny*BW+nx]===0&&!G.bm.some(b=>b.x===nx&&b.y===ny)){p.x=nx;p.y=ny;cd[k]=.14}}}
+  G.fx.forEach(f=>f[2]-=dt);G.fx=G.fx.filter(f=>f[2]>0);G.bm.forEach(b=>b.t-=dt);
+  let q;while((q=G.bm.find(b=>b.t<=0))){G.bm=G.bm.filter(b=>b!==q);this.boom(q)}
+  for(const k of ['l','r'])if(G.fx.some(f=>f[0]===G[k].x&&f[1]===G[k].y))G[k].a=0;
+  if(!G.l.a||!G.r.a){G.run=false;G.msg=!G.l.a&&!G.r.a?'平手':!G.l.a?'右邊獲勝!':'左邊獲勝!'}},
+ touch(s,x,y,ph){if(!G.run)return;const k=s==='L'?'l':'r',p=G[k];
+  if(ph==='s'){bw[s]={x,y,mv:0};return}const w=bw[s];if(!w)return;
+  if(ph==='m'){const dx=x-w.x,dy=y-w.y;if(Math.hypot(dx,dy)>14){w.mv=1;p.d=Math.abs(dx)>Math.abs(dy)?[Math.sign(dx),0]:[0,Math.sign(dy)]}else p.d=[0,0]}
+  if(ph==='e'){p.d=[0,0];if(!w.mv&&p.a&&G.bm.filter(b=>b.o===k).length<2&&!G.bm.some(b=>b.x===p.x&&b.y===p.y))G.bm.push({x:p.x,y:p.y,t:2,o:k})}},
+ draw(){ctx.fillStyle='#1d3326';ctx.fillRect(0,0,FW,H);
+  G.m.forEach((v,i)=>{if(v){ctx.fillStyle=v==1?'#5c6370':'#a0763c';ctx.fillRect(i%BW*BC+1,Math.floor(i/BW)*BC+1,BC-2,BC-2)}});
+  G.bm.forEach(b=>circ(b.x*BC+20,b.y*BC+20,13,'#111'));
+  G.fx.forEach(f=>{ctx.fillStyle='#ff922b';ctx.fillRect(f[0]*BC+4,f[1]*BC+4,BC-8,BC-8)});
+  if(G.l.a)circ(G.l.x*BC+20,G.l.y*BC+20,15,'#4dabf7');if(G.r.a)circ(G.r.x*BC+20,G.r.y*BC+20,15,'#ffa94d');
+  if(G.msg&&!G.run)txt(G.msg,400,300,28,'#ffd43b')}};
+
+GAMES.brick={init(){G={bx:400,by:450,vx:0,vy:0,pl:200,pr:600,lv:3,br:Array(80).fill(1),run:false,msg:'合作:兩人一起接球,打光磚塊'}},
+ start(){this.init();this.serve();G.run=true;G.msg=''},
+ serve(){G.bx=400;G.by=450;G.vx=(Math.random()<.5?-1:1)*120;G.vy=-340},
+ step(dt){if(!G.run)return;G.bx+=G.vx*dt;G.by+=G.vy*dt;if(!host)return;
+  if(G.bx<8){G.bx=8;G.vx=Math.abs(G.vx)}if(G.bx>FW-8){G.bx=FW-8;G.vx=-Math.abs(G.vx)}if(G.by<8){G.by=8;G.vy=Math.abs(G.vy)}
+  if(G.vy>0&&G.by>=548&&G.by<=566)for(const p of [G.pl,G.pr])if(Math.abs(G.bx-p)<64){const sp=Math.min(720,Math.hypot(G.vx,G.vy)*1.02);G.vx=clamp((G.bx-p)*7,-sp*.8,sp*.8);G.vy=-Math.sqrt(sp*sp-G.vx*G.vx);break}
+  const c=Math.floor(G.bx/50),r=Math.floor((G.by-60)/24);
+  if(r>=0&&r<5&&c>=0&&c<16&&G.br[r*16+c]){G.br[r*16+c]=0;G.vy*=-1;if(!G.br.some(v=>v)){G.run=false;G.msg='全部打光,合作成功!'}}
+  if(G.by>H+10){G.lv--;if(G.lv<=0){G.run=false;G.msg='失敗,再來一次'}else this.serve()}},
+ touch(s,x){if(s==='L')G.pl=clamp(x,60,390);else G.pr=clamp(x,410,740)},
+ draw(){ctx.fillStyle='#14182b';ctx.fillRect(0,0,FW,H);
+  G.br.forEach((v,i)=>{if(v){ctx.fillStyle=['#ff6b6b','#ffa94d','#ffe066','#69db7c','#4dabf7'][Math.floor(i/16)];ctx.fillRect(i%16*50+2,60+Math.floor(i/16)*24+2,46,20)}});
+  ctx.fillStyle='#4dabf7';ctx.fillRect(G.pl-60,556,120,10);ctx.fillStyle='#ffa94d';ctx.fillRect(G.pr-60,556,120,10);
+  circ(G.bx,G.by,8,'#fff');txt('♥'.repeat(G.lv),400,36,22,'#ff6b6b');if(G.msg)txt(G.msg,400,300,28,'#ffd43b')}};
+
+GAMES.tug={init(){G={p:0,run:false,msg:'狂點螢幕!把標記拉向自己這邊'}},
+ start(){this.init();G.run=true;G.msg=''},step(){},
+ touch(s,x,y,ph){if(!G.run||ph!=='s')return;G.p+=s==='L'?-3:3;if(G.p<=-100||G.p>=100){G.run=false;G.msg=(G.p<=-100?'左':'右')+'邊獲勝!'}},
+ draw(){ctx.fillStyle='#2a1f33';ctx.fillRect(0,0,FW,H);ctx.strokeStyle='#bbb';ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(100,300);ctx.lineTo(700,300);ctx.stroke();
+  ctx.fillStyle='#4dabf7';ctx.fillRect(90,260,12,80);ctx.fillStyle='#ffa94d';ctx.fillRect(698,260,12,80);circ(400+G.p*3,300,24,'#ff6b6b');
+  if(G.msg)txt(G.msg,400,160,28,'#ffd43b')}};
 
 /* ---------- 主迴圈 ---------- */
 function loop(now){
