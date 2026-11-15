@@ -5,28 +5,79 @@
 <title>雙屏對戰</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js"></script>
 <style>
-:root{--bg:#f6f6f4;--fg:#1a1a1a;--ac:#e8590c;--card:#fff;--bd:#d8d8d4}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1118;--fg:#f0f0ee;--card:#181c26;--bd:#2c3140}}
-:root[data-theme="dark"]{--bg:#0e1118;--fg:#f0f0ee;--card:#181c26;--bd:#2c3140}
+:root{
+ --bg:#10151d;--panel:#1b2430;--panel2:#222e3c;--line:#354454;
+ --ink:#edf3f5;--muted:#94a6b4;--accent:#e5a84b;--accent2:#6c9da0;
+ --blue:#6fa9d4;--red:#d88b67;--shadow:0 18px 50px rgba(0,0,0,.32);
+}
+*{box-sizing:border-box}
 html,body{height:100%;margin:0;overflow:hidden;overscroll-behavior:none}
-body{background:var(--bg);color:var(--fg);font-family:-apple-system,"PingFang TC","Noto Sans TC",sans-serif;touch-action:none;-webkit-user-select:none;user-select:none}
-#menu{display:flex;flex-direction:column;gap:10px;max-width:360px;margin:0 auto;padding:calc(20px + env(safe-area-inset-top,0px)) 20px 20px;height:100%;overflow-y:auto;box-sizing:border-box;touch-action:pan-y}
-h1{font-size:24px;margin:0}p{margin:0;line-height:1.5;font-size:14px;opacity:.8}
-textarea{width:100%;box-sizing:border-box;height:64px;font-size:12px;padding:8px;border:1px solid var(--bd);border-radius:10px;background:var(--card);color:var(--fg);-webkit-user-select:text;user-select:text}
+body{background:radial-gradient(ellipse at 50% -20%,#2a3948 0%,#121923 55%,#0c1118 100%);color:var(--ink);
+ font-family:ui-sans-serif,system-ui,-apple-system,"PingFang TC","Noto Sans TC",sans-serif;
+ touch-action:none;-webkit-user-select:none;user-select:none}
+button,input,textarea{font:inherit}
+#menu{display:flex;flex-direction:column;gap:14px;width:min(100%,520px);margin:0 auto;
+ padding:calc(26px + env(safe-area-inset-top,0px)) 22px calc(24px + env(safe-area-inset-bottom,0px));
+ height:100%;overflow-y:auto;touch-action:pan-y}
+#menu h1{font-size:clamp(30px,7vw,42px);letter-spacing:2px;line-height:1.1;margin:8px 0 0;font-weight:850}
+#menu h1:after{content:"";display:block;width:54px;height:4px;margin-top:13px;border-radius:4px;background:var(--accent)}
+.brand .eyebrow{margin:10px 0 0;color:#718696;font-size:10px;font-weight:800;letter-spacing:3px}
+.brand{padding:5px 0 8px}
+#menu>p{color:var(--muted);font-size:13px;line-height:1.7;margin:0}
 .row{display:flex;gap:10px}
-button{flex:1;font-size:17px;padding:13px;border:0;border-radius:10px;background:var(--ac);color:#fff}
-#game{display:none;position:fixed;left:0;top:0;width:100%;height:100vh;height:100dvh;background:#0b1020}
+button{cursor:pointer;border:1px solid rgba(255,255,255,.08);border-radius:13px;
+ background:linear-gradient(145deg,#334353,#25313f);color:var(--ink);font-weight:700;
+ box-shadow:0 5px 14px rgba(0,0,0,.18);transition:transform .14s,border-color .14s,filter .14s}
+button:active{transform:scale(.975);filter:brightness(1.16)}
+#menu button{min-height:48px;padding:12px 15px;font-size:15px}
+#oh,#og{min-height:62px;font-size:16px;flex:1}
+#oh{background:linear-gradient(135deg,#c98c3e,#9b672f);color:#151b20}
+#og{background:linear-gradient(135deg,#527f91,#365967)}
+#pr,#pj,#ph,#pg{background:rgba(27,36,48,.82);border:1px solid var(--line);border-radius:18px;padding:16px}
+#pr p,#pj p,#ph p,#pg p{color:#b5c2cc}
+#rc{color:var(--accent);font-weight:900;text-shadow:0 5px 25px rgba(229,168,75,.22)}
+input,textarea{width:100%;border:1px solid #465969;border-radius:12px;background:#101923;color:var(--ink);padding:13px}
+input{font-size:26px;letter-spacing:8px}
+textarea{height:74px;font-size:12px;resize:vertical}
+details{border-top:1px solid var(--line);padding-top:8px;color:var(--muted)}
+summary{padding:8px 0;cursor:pointer}
+#msg{color:var(--accent);font-size:13px;min-height:18px}
+#game{display:none;position:fixed;inset:0;width:100%;height:100vh;height:100dvh;background:#0c131c}
 #c{width:100%;height:100%;object-fit:contain;display:block}
-.tb{position:fixed;top:calc(8px + env(safe-area-inset-top,0px));flex:none;width:44px;height:44px;padding:0;font-size:20px;background:rgba(255,255,255,.18);z-index:5}
-#st{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));left:0;right:0;text-align:center;font-size:12px;color:#9aa3b8;pointer-events:none}
-#go{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);flex:none;padding:12px 28px;z-index:5}
-#pkg{display:grid;grid-template-columns:1fr 1fr;gap:10px}input{font-size:28px;padding:12px;border:1px solid var(--bd);border-radius:10px;background:var(--card);color:var(--fg);text-align:center;letter-spacing:6px;-webkit-user-select:text;user-select:text}details{font-size:14px}summary{padding:6px 0;opacity:.8}
-#pk{overflow-y:auto;position:fixed;inset:0;display:none;flex-direction:column;justify-content:center;gap:12px;padding:30px;background:rgba(8,10,20,.92);z-index:9}
-#pk h2{color:#fff;margin:0;text-align:center;font-size:20px}
+.tb{position:fixed;top:calc(10px + env(safe-area-inset-top,0px));width:42px;height:42px;padding:0;
+ font-size:17px;background:rgba(17,27,37,.78);border:1px solid rgba(255,255,255,.18);
+ border-radius:12px;backdrop-filter:blur(12px);z-index:5}
+#st{position:fixed;top:calc(17px + env(safe-area-inset-top,0px));left:0;right:0;text-align:center;
+ font-size:11px;letter-spacing:1.5px;color:#c1ccd4;pointer-events:none;text-transform:uppercase}
+#go{position:fixed;left:50%;bottom:calc(26px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);
+ min-width:150px;padding:14px 28px;z-index:5;background:linear-gradient(135deg,#e8b45e,#b87835);
+ color:#18212a;border:1px solid rgba(255,255,255,.35);font-size:16px;letter-spacing:1px}
+#pk{overflow-y:auto;position:fixed;inset:0;display:none;flex-direction:column;gap:14px;
+ padding:calc(24px + env(safe-area-inset-top,0px)) 18px calc(20px + env(safe-area-inset-bottom,0px));
+ background:rgba(7,12,18,.94);backdrop-filter:blur(18px);z-index:9}
+#pk h2{color:var(--ink);margin:0;text-align:left;font-size:23px;letter-spacing:1px}
+#pk h2:after{content:"選擇一款遊戲開始";display:block;margin-top:5px;color:var(--muted);font-size:12px;font-weight:500;letter-spacing:0}
+#pkg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+#pkg button{position:relative;min-height:66px;text-align:left;padding:12px 12px 12px 50px;
+ font-size:15px;background:linear-gradient(145deg,#263544,#1a2632);border:1px solid #35495a}
+#pkg button:before{content:attr(data-index);position:absolute;left:13px;top:50%;transform:translateY(-50%);
+ width:25px;height:25px;display:grid;place-items:center;border-radius:8px;
+ color:#e6b66c;background:#3a3a34;font-size:11px;font-weight:900}
+#pkg button[data-g="kitchen"]{grid-column:1/-1;background:linear-gradient(120deg,#66523d,#293d3e);border-color:#8e7958}
+#pkg p{grid-column:1/-1;color:#d7b77d!important;text-align:left!important;font-size:11px!important;
+ letter-spacing:2px;border-bottom:1px solid #34424e;padding:14px 2px 7px}
+#pc{background:#394653!important;min-height:46px}
+body[data-f] .tb{transform:rotate(90deg)}body[data-f=R] .tb{transform:rotate(-90deg)}
+body[data-f] #go{left:48px;top:50%;bottom:auto;transform:translate(-50%,-50%) rotate(90deg)}
+body[data-f=R] #go{left:calc(100% - 48px);transform:translate(-50%,-50%) rotate(-90deg)}
+body[data-f] #st{left:16px;right:auto;top:50%;width:300px;transform:translate(-50%,-50%) rotate(90deg)}
+body[data-f=R] #st{left:calc(100% - 16px);transform:translate(-50%,-50%) rotate(-90deg)}
+body[data-f=L] #pk{inset:auto;left:50%;top:50%;width:100vh;width:100dvh;height:100vw;box-sizing:border-box;transform:translate(-50%,-50%) rotate(90deg)}
+@media(min-width:700px){#menu{padding-top:42px}#pkg{grid-template-columns:repeat(3,minmax(0,1fr))}}
 </style></head><body>
 <div id="menu">
-  <h1>雙屏對戰</h1>
-  <p>兩支手機直放、並排貼緊,畫面接成一個大場地。建議連同一個 Wi‑Fi。iPhone 想全螢幕:Safari 分享 → 加入主畫面,再從主畫面開啟。</p>
+  <div class="brand"><h1>雙屏對戰</h1><p class="eyebrow">DUAL SCREEN ARCADE</p></div>
+  <p>兩支手機並排連線，合併成一個完整遊戲場地。建議使用相同 Wi-Fi。</p>
   <div class="row" id="pick"><button id="oh">我建立房間</button><button id="og">我加入房間</button></div>
   <div id="pr" style="display:none;flex-direction:column;gap:10px"><p>把這組房間代碼告訴朋友,等他輸入就會自動連線</p><div id="rc" style="font-size:52px;letter-spacing:8px;text-align:center;font-weight:bold">…</div></div>
   <div id="pj" style="display:none;flex-direction:column;gap:10px"><p>輸入朋友手機上的 4 位數房間代碼</p><input id="ci" inputmode="numeric" maxlength="4" placeholder="0000"><button id="cj">加入</button></div>
@@ -46,15 +97,25 @@ button{flex:1;font-size:17px;padding:13px;border:0;border-radius:10px;background
   <button class="tb" id="ex" style="left:8px">✕</button>
   <button class="tb" id="mn" style="left:60px">☰</button>
   <button class="tb" id="fs" style="right:8px;display:none">⛶</button>
+  <button class="tb" id="rt" style="right:60px">⟲</button>
   <button id="go">開始</button>
   <div id="pk"><h2>選一個遊戲</h2>
-    <div id="pkg"><button data-g="pong">🏓 乒乓</button><button data-g="hockey">🏒 冰球</button>
-    <button data-g="tank">💥 坦克砲戰</button><button data-g="snake">🐍 貪吃蛇</button>
-    <button data-g="plane">✈️ 飛機對戰</button><button data-g="bomb">💣 爆爆王</button>
-    <button data-g="brick">🧱 合作打磚塊</button><button data-g="tug">⚡ 狂點拔河</button>
-    <button data-g="sumo">🥊 碰碰相撲</button><button data-g="mole">🔨 打地鼠大賽</button><button data-g="space">👾 太空保衛</button>
-    <button data-g="td">🏰 塔防對戰</button><button data-g="rts">🌌 星球爭奪戰</button>
-    <button data-g="royal">👑 皇室對戰</button><button data-g="duel">🃏 卡牌決鬥</button></div>
+    <div id="pkg"><button data-index="01" data-g="pong">乒乓對決</button><button data-index="02" data-g="hockey">冰球競技</button>
+    <button data-index="03" data-g="tank">坦克砲戰</button><button data-index="04" data-g="snake">雙人貪食蛇</button>
+    <button data-index="05" data-g="plane">空戰對決</button><button data-index="06" data-g="bomb">爆破競技</button>
+    <button data-index="07" data-g="brick">合作打磚塊</button><button data-index="08" data-g="tug">力量拔河</button>
+    <button data-index="09" data-g="sumo">相撲擂台</button><button data-index="10" data-g="mole">打地鼠大賽</button><button data-index="11" data-g="space">太空防線</button>
+    <button data-index="12" data-g="td">塔防對戰</button><button data-index="13" data-g="rts">星球爭奪</button>
+    <button data-index="14" data-g="royal">皇室對戰</button><button data-index="15" data-g="duel">卡牌決鬥</button>
+    <button data-index="16" data-g="flap">雙鳥穿管</button><button data-index="17" data-g="catch">搶接物資</button>
+    <button data-index="18" data-g="c4">跨屏四子棋</button><button data-index="19" data-g="mem">記憶翻牌</button>
+    <button data-index="20" data-g="beat">節奏對決</button><button data-index="21" data-g="paint">領地爭奪</button>
+    <button data-index="22" data-g="react">反應競賽</button>
+    <p style="grid-column:1/-1;color:#9aa3b8;font-size:13px;text-align:center">策略棋類</p>
+    <button data-index="23" data-g="oth">黑白棋</button><button data-index="24" data-g="chk">跳棋</button>
+    <button data-index="25" data-g="ship">海戰棋</button><button data-index="26" data-g="dots">點格棋</button>
+    <p style="grid-column:1/-1;color:#9aa3b8;font-size:13px;text-align:center">雙人合作</p>
+    <button data-index="27" data-g="kitchen" style="grid-column:1/-1">雙人廚房</button></div>
     <button id="pc" style="background:#444">關閉</button></div>
 </div>
 <script>
@@ -110,7 +171,7 @@ $('cj').onclick=()=>{const code=$('ci').value.trim(),p=new Peer();say('連線中
   p.on('open',()=>pjsetup(p.connect('dsg'+code,{reliable:false})));
   p.on('error',e=>say(e.type==='peer-unavailable'?'找不到這個房間代碼':'連線錯誤:'+e.type))};
 /* ---------- 流程 ---------- */
-let began=false;function begin(){if(began)return;began=true;$('menu').style.display='none';$('game').style.display='block';
+let began=false;function begin(){if(began)return;began=true;$('menu').style.display='none';$('game').style.display='block';document.body.dataset.f=host?'L':'R';
   $('st').textContent=host?'左屏(主機)':'右屏';
   if(document.documentElement.requestFullscreen)$('fs').style.display='block';
   if(host){$('pk').style.display='flex';setInterval(()=>cid&&send({t:'st',G}),33)}
@@ -125,6 +186,7 @@ function onMsg(m){
 document.querySelectorAll('#pk [data-g]').forEach(b=>b.onclick=()=>{setGame(b.dataset.g);send({t:'g',g:cid})});
 $('pc').onclick=()=>$('pk').style.display='none';
 $('mn').onclick=()=>{if(host)$('pk').style.display='flex';else $('st').textContent='請房主(左屏)按 ☰ 選遊戲'};
+$('rt').onclick=()=>{FACE=!FACE;FACE?document.body.dataset.f=host?'L':'R':document.body.removeAttribute('data-f')};
 $('ex').onclick=()=>location.reload();
 $('fs').onclick=()=>{const d=document.documentElement;try{document.fullscreenElement?document.exitFullscreen():d.requestFullscreen()}catch(e){}};
 $('go').onclick=()=>host?cur&&goHost():send({t:'go'});
@@ -139,8 +201,12 @@ cv.addEventListener('mousedown',e=>{down=true;pt(e,'s')});addEventListener('mous
 
 /* ---------- 遊戲 ---------- */
 const GAMES={};
-const txt=(s,x,y,sz,c)=>{ctx.fillStyle=c||'#fff';ctx.font='bold '+sz+'px sans-serif';ctx.textAlign='center';ctx.fillText(s,x,y)};
-const circ=(x,y,r,c)=>{ctx.fillStyle=c;ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fill()};
+let FACE=true;
+const txt=(s,x,y,sz,c)=>{ctx.save();ctx.fillStyle=c||'#fff';ctx.font='700 '+sz+'px ui-sans-serif,system-ui,sans-serif';ctx.textAlign='center';ctx.textBaseline='alphabetic';ctx.shadowColor='rgba(0,0,0,.38)';ctx.shadowBlur=4;ctx.shadowOffsetY=2;
+ if(!FACE){ctx.fillText(s,x,y);ctx.restore();return}
+ const one=(px,r)=>{ctx.save();ctx.translate(px,y);ctx.rotate(r);ctx.fillText(s,0,0);ctx.restore()};
+ if(x<396)one(x,Math.PI/2);else if(x>404)one(x,-Math.PI/2);else{one(x-110,Math.PI/2);one(x+110,-Math.PI/2)}ctx.restore()};
+const circ=(x,y,r,c)=>{ctx.save();ctx.shadowColor='rgba(0,0,0,.32)';ctx.shadowBlur=Math.max(3,r*.25);ctx.shadowOffsetY=3;const g=ctx.createRadialGradient(x-r*.35,y-r*.4,r*.08,x,y,r);g.addColorStop(0,'rgba(255,255,255,.32)');g.addColorStop(.28,c);g.addColorStop(1,c);ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();ctx.restore()};
 
 GAMES.pong={init(){G={bx:400,by:300,vx:0,vy:0,lp:300,rp:300,ls:0,rs:0,run:false,over:0,msg:'先得 5 分獲勝'}},
  chk(){if(G.ls>=5||G.rs>=5){G.over=1;G.msg=(G.ls>=5?'左':'右')+'邊獲勝!'}},
@@ -185,7 +251,7 @@ GAMES.tank={init(){G={hl:3,hr:3,turn:'L',sh:null,aim:null,run:false,msg:'拖曳�
  draw(){ctx.fillStyle='#1b2a49';ctx.fillRect(0,0,FW,H);ctx.fillStyle='#2b6a3b';ctx.fillRect(0,GY,FW,H-GY);
   ctx.fillStyle='#6b5b4b';ctx.fillRect(380,GY-G.wh,40,G.wh);
   for(const s of ['L','R']){const x=TX[s];ctx.fillStyle=s==='L'?'#4dabf7':'#ffa94d';ctx.fillRect(x-22,GY-18,44,18);ctx.fillRect(x-10,GY-30,20,12);
-   txt('♥'.repeat(Math.max(0,s==='L'?G.hl:G.hr)),x,GY+40,22,'#ff6b6b')}
+   txt('HP '+Math.max(0,s==='L'?G.hl:G.hr),x,GY+40,22,'#ff6b6b')}
   txt((G.turn==='L'?'左':'右')+'邊回合',400,50,26,'rgba(255,255,255,.5)');if(G.msg)txt(G.msg,400,90,18,'#ffd43b');
   if(G.aim&&G.turn){ctx.strokeStyle='#fff';ctx.setLineDash([6,6]);ctx.beginPath();ctx.moveTo(TX[G.turn],GY-14);ctx.lineTo(G.aim.x,G.aim.y);ctx.stroke();ctx.setLineDash([])}
   if(G.sh)circ(G.sh.x,G.sh.y,7,'#fff')}};
@@ -226,7 +292,7 @@ GAMES.plane={init(){G={ax:80,ay:300,bx:720,by:300,hl:5,hr:5,bl:[],ro:[[400,100,9
  draw(){ctx.fillStyle='#14233f';ctx.fillRect(0,0,FW,H);G.ro.forEach(r=>circ(r[0],r[1],30,'#777'));
   for(const [x,y,c,d] of [[G.ax,G.ay,'#4dabf7',1],[G.bx,G.by,'#ffa94d',-1]]){ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x+24*d,y);ctx.lineTo(x-18*d,y-18);ctx.lineTo(x-10*d,y);ctx.lineTo(x-18*d,y+18);ctx.fill()}
   ctx.fillStyle='#ffe066';G.bl.forEach(b=>ctx.fillRect(b[0]-6,b[1]-2,12,4));
-  txt('♥'.repeat(Math.max(0,G.hl)),100,40,22,'#ff6b6b');txt('♥'.repeat(Math.max(0,G.hr)),700,40,22,'#ff6b6b');
+  txt('HP '+Math.max(0,G.hl),100,40,22,'#ff6b6b');txt('HP '+Math.max(0,G.hr),700,40,22,'#ff6b6b');
   if(G.msg)txt(G.msg,400,300,30,'#ffd43b')}};
 
 const BW=20,BH=15,BC=40;let cd={l:0,r:0},bw={};
@@ -266,7 +332,7 @@ GAMES.brick={init(){G={bx:200,by:300,vx:0,vy:0,pl:300,pr:300,lv:3,br:Array(48).f
  draw(){ctx.fillStyle='#14182b';ctx.fillRect(0,0,FW,H);
   G.br.forEach((v,i)=>{if(v){ctx.fillStyle=['#ff6b6b','#ffa94d','#69db7c','#4dabf7'][i%4];ctx.fillRect(300+i%4*50+2,Math.floor(i/4)*50+2,46,46)}});
   ctx.fillStyle='#4dabf7';ctx.fillRect(16,G.pl-60,12,120);ctx.fillStyle='#ffa94d';ctx.fillRect(FW-28,G.pr-60,12,120);
-  circ(G.bx,G.by,8,'#fff');txt('♥'.repeat(G.lv),400,36,22,'#ff6b6b');if(G.msg)txt(G.msg,400,300,26,'#ffd43b')}};
+  circ(G.bx,G.by,8,'#fff');txt('HP '+G.lv,400,36,22,'#ff6b6b');if(G.msg)txt(G.msg,400,300,26,'#ffd43b')}};
 
 GAMES.tug={init(){G={p:0,run:false,msg:'狂點螢幕!把標記拉向自己這邊'}},
  start(){this.init();G.run=true;G.msg=''},step(){},
@@ -312,29 +378,29 @@ GAMES.space={init(){G={pl:300,pr:300,bl:[],en:[],lv:5,sc:0,t:0,fl:0,fr:0,sp:0,ru
  draw(){ctx.fillStyle='#0b0f24';ctx.fillRect(0,0,FW,H);
   for(const [p,c,x,d] of [[G.pl,'#4dabf7',40,1],[G.pr,'#ffa94d',FW-40,-1]]){ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x+22*d,p);ctx.lineTo(x-18*d,p-20);ctx.lineTo(x-18*d,p+20);ctx.fill()}
   ctx.fillStyle='#ffe066';G.bl.forEach(b=>ctx.fillRect(b[0]-8,b[1]-2,16,4));G.en.forEach(e=>circ(e[0],e[1],16,'#c77dff'));
-  txt('♥'.repeat(Math.max(0,G.lv)),400,36,22,'#ff6b6b');txt(G.sc,400,70,30,'rgba(255,255,255,.5)');if(G.msg)txt(G.msg,400,300,26,'#ffd43b')}};
+  txt('HP '+Math.max(0,G.lv),400,36,22,'#ff6b6b');txt(G.sc,400,70,30,'rgba(255,255,255,.5)');if(G.msg)txt(G.msg,400,300,26,'#ffd43b')}};
 
-GAMES.td={init(){G={gl:70,gr:70,hl:30,hr:30,u:[],t:[],sh:[],ml:0,mr:0,run:false,msg:'下方按鈕出兵或建塔,攻破對方基地'}},
+GAMES.td={init(){G={gl:70,gr:70,hl:30,hr:30,u:[],t:[],sh:[],ml:0,mr:0,run:false,msg:'側邊按鈕出兵或建塔,攻破對方基地'}},
  start(){this.init();G.run=true;G.msg=''},
  step(dt){G.u.forEach(u=>u[0]+=(u[3]==='L'?1:-1)*u[5]*dt);G.sh.forEach(q=>q[4]-=dt);G.sh=G.sh.filter(q=>q[4]>0);
   if(!host||!G.run)return;G.gl+=6*dt;G.gr+=6*dt;
   for(const t of G.t){t[3]-=dt;if(t[3]>0)continue;let b=null,bd=150;for(const u of G.u)if(u[3]!==t[2]){const d=Math.hypot(u[0]-t[0],u[1]-t[1]);if(d<bd){bd=d;b=u}}
    if(b){b[2]-=10;t[3]=.45;G.sh.push([t[0],t[1],b[0],b[1],.1])}}
   G.u=G.u.filter(u=>{if(u[2]<=0){if(u[3]==='L')G.gr+=5;else G.gl+=5;ev('pop',u[0],u[1]);return false}
-   if(u[3]==='L'&&u[0]>=FW-50){G.hr-=u[4];ev('hit',u[0],u[1]);return false}
-   if(u[3]==='R'&&u[0]<=50){G.hl-=u[4];ev('hit',u[0],u[1]);return false}return true});
+   if(u[3]==='L'&&u[0]>=FW-120){G.hr-=u[4];ev('hit',u[0],u[1]);return false}
+   if(u[3]==='R'&&u[0]<=120){G.hl-=u[4];ev('hit',u[0],u[1]);return false}return true});
   if(G.hl<=0||G.hr<=0){G.run=false;ev('goal',G.hl<=0?40:760,300);G.msg=(G.hl<=0?'右':'左')+'邊獲勝!'}},
- touch(s,x,y,ph){if(!G.run||ph!=='s')return;const o=s==='L'?0:400,lx=x-o,k=s==='L'?'l':'r';
-  if(y>530){const i=Math.floor(lx/133);if(i<2){const c=[15,40][i];if(G['g'+k]>=c){G['g'+k]-=c;G.u.push([s==='L'?60:740,80+Math.random()*420,[30,110][i],s,[1,3][i],[75,42][i],i])}}else G['m'+k]=G['m'+k]?0:1;return}
-  if(G['m'+k]&&G['g'+k]>=50&&(s==='L'?x>100&&x<385:x>415&&x<700)&&!G.t.some(t=>Math.hypot(t[0]-x,t[1]-y)<30)){G['g'+k]-=50;G.t.push([x,y,s,0]);G['m'+k]=0;ev('hit',x,y)}},
- draw(){ctx.fillStyle='#16241c';ctx.fillRect(0,0,FW,H);ctx.fillStyle='#2a1e1e';ctx.fillRect(0,530,FW,70);
-  ctx.fillStyle='#1d4e7a';ctx.fillRect(0,0,50,530);ctx.fillStyle='#7a4a1d';ctx.fillRect(750,0,50,530);
+ touch(s,x,y,ph){if(!G.run||ph!=='s')return;const k=s==='L'?'l':'r';
+  if(s==='L'?x<96:x>704){const i=Math.floor((y-80)/150);if(y<80||i<0||i>2)return;
+   if(i<2){const c=[15,40][i];if(G['g'+k]>=c){G['g'+k]-=c;G.u.push([s==='L'?130:670,40+Math.random()*520,[30,110][i],s,[1,3][i],[75,42][i],i])}}else G['m'+k]=G['m'+k]?0:1;return}
+  if(G['m'+k]&&G['g'+k]>=50&&(s==='L'?x>140&&x<385:x>415&&x<660)&&!G.t.some(t=>Math.hypot(t[0]-x,t[1]-y)<30)){G['g'+k]-=50;G.t.push([x,y,s,0]);G['m'+k]=0;ev('hit',x,y)}},
+ draw(){ctx.fillStyle='#16241c';ctx.fillRect(0,0,FW,H);ctx.fillStyle='#1d4e7a';ctx.fillRect(96,0,24,H);ctx.fillStyle='#7a4a1d';ctx.fillRect(680,0,24,H);
   G.t.forEach(t=>{ctx.strokeStyle='rgba(255,255,255,.12)';ctx.beginPath();ctx.arc(t[0],t[1],150,0,7);ctx.stroke();circ(t[0],t[1],14,t[2]==='L'?'#4dabf7':'#ffa94d')});
   G.u.forEach(u=>circ(u[0],u[1],u[6]?11:7,u[3]==='L'?'#74c0fc':'#ffc078'));
   ctx.strokeStyle='#ffe066';ctx.lineWidth=2;G.sh.forEach(q=>{ctx.beginPath();ctx.moveTo(q[0],q[1]);ctx.lineTo(q[2],q[3]);ctx.stroke()});
-  txt(Math.max(0,G.hl),25,40,22,'#fff');txt(Math.max(0,G.hr),775,40,22,'#fff');
-  for(const [o,k,m] of [[0,'l',G.ml],[400,'r',G.mr]]){txt('💰'+Math.floor(G['g'+k]),o+200,505,24,'#ffd43b');
-   ['兵 15','重兵 40',m?'點地面建塔':'塔 50'].forEach((l,i)=>{ctx.fillStyle=i===2&&m?'#e8590c':'#3a3f55';ctx.fillRect(o+i*133+4,538,125,54);txt(l,o+i*133+66,573,18)})}
+  txt(Math.max(0,G.hl),108,40,20);txt(Math.max(0,G.hr),692,40,20);
+  for(const [sx,k,m] of [[0,'l',G.ml],[704,'r',G.mr]]){ctx.fillStyle='#1a1d2b';ctx.fillRect(sx,0,96,H);txt('資源 '+Math.floor(G['g'+k]),sx+48,50,20,'#ffd43b');
+   ['兵 15','重兵 40',m?'點場地建塔':'塔 50'].forEach((l,i)=>{const ok=G['g'+k]>=[15,40,50][i];ctx.fillStyle=i===2&&m?'#e8590c':ok?'#3a3f55':'#26293a';ctx.fillRect(sx+8,80+i*150,80,140);txt(l,sx+48,155+i*150,l.length>4?15:20,ok?'#fff':'#888')})}
   if(G.msg)txt(G.msg,400,260,26,'#ffd43b')}};
 
 GAMES.rts={init(){const P=[[190,140,28,10],[190,460,28,12],[330,300,34,18],[470,300,34,18],[610,140,28,10],[610,460,28,12],[400,70,30,14],[400,530,30,14]];
@@ -361,10 +427,10 @@ GAMES.rts={init(){const P=[[190,140,28,10],[190,460,28,12],[330,300,34,18],[470,
   G.f.forEach(f=>{circ(f[0],f[1],7,f[3]==='L'?'#74c0fc':'#ffc078');txt(f[4],f[0],f[1]-12,14)});
   if(G.msg)txt(G.msg,400,36,22,'#ffd43b')}};
 
-const CT=[{n:'騎士',c:3,hp:140,d:18,sp:55,r:24},{n:'弓手',c:3,hp:60,d:10,sp:48,r:120},{n:'巨人',c:5,hp:420,d:35,sp:32,r:24,tw:1},{n:'哥布林',c:2,hp:30,d:9,sp:95,r:20,k:3},{n:'火球',c:4,sp:1}];
+const CT=[{n:'騎士',c:3,hp:140,d:18,sp:55,r:24},{n:'弓手',c:3,hp:60,d:10,sp:48,r:120},{n:'巨人',c:5,hp:420,d:35,sp:32,r:24,tw:1},{n:'哥布林',c:2,hp:30,d:9,sp:95,r:20,k:3},{n:'火球',c:4,fb:1}];
 GAMES.royal={init(){const tw=[],rc=()=>Math.floor(Math.random()*5);
-  for(const [o,x,f] of [['L',40,1],['R',760,-1]])tw.push([x,300,600,o,0,1],[x+f*70,140,300,o,0,0],[x+f*70,460,300,o,0,0]);
-  G={tw,u:[],el:{L:5,R:5},hd:{L:[rc(),rc(),rc(),rc()],R:[rc(),rc(),rc(),rc()]},sl:{L:-1,R:-1},sh:[],t:0,run:false,msg:'選卡再點自己半場部署,摧毀國王塔獲勝'}},
+  for(const [o,x,f] of [['L',135,1],['R',665,-1]])tw.push([x,300,600,o,0,1],[x+f*70,140,300,o,0,0],[x+f*70,460,300,o,0,0]);
+  G={tw,u:[],el:{L:5,R:5},hd:{L:[rc(),rc(),rc(),rc()],R:[rc(),rc(),rc(),rc()]},sl:{L:-1,R:-1},sh:[],t:0,run:false,msg:'點側邊選卡,再點自己半場部署,摧毀國王塔獲勝'}},
  start(){this.init();G.run=true;G.msg=''},
  step(dt){G.sh.forEach(q=>q[4]-=dt);G.sh=G.sh.filter(q=>q[4]>0);G.u.forEach(u=>{u[0]+=u[6]*dt;u[1]+=u[7]*dt});
   if(!host||!G.run)return;G.t+=dt;const rate=G.t>60?1/.7:1/1.4;G.el.L=Math.min(10,G.el.L+rate*dt);G.el.R=Math.min(10,G.el.R+rate*dt);
@@ -380,19 +446,18 @@ GAMES.royal={init(){const tw=[],rc=()=>Math.floor(Math.random()*5);
    if(tg){tg[2]-=w[5]?20:15;w[4]=w[5]?1:.8;G.sh.push([w[0],w[1],tg[0],tg[1],.1])}}
   G.u=G.u.filter(u=>{if(u[2]>0)return true;ev('pop',u[0],u[1]);return false});
   const dl=G.tw[0][2]<=0,dr=G.tw[3][2]<=0;if(dl||dr){G.run=false;G.msg=(dl&&dr?'平手':dl?'右邊獲勝!':'左邊獲勝!')}},
- touch(s,x,y,ph){if(!G.run||ph!=='s')return;const o=s==='L'?0:400,lx=x-o;
-  if(y>530){const i=Math.floor(lx/100);if(i>=0&&i<4)G.sl[s]=G.sl[s]===i?-1:i;return}
-  const i=G.sl[s];if(i<0||(s==='L'?x>385:x<415))return;const ci=G.hd[s][i],m=CT[ci];if(G.el[s]<m.c)return;
-  if(m.sp){ev('boom',x,y);for(const u of G.u)if(u[3]!==s&&Math.hypot(u[0]-x,u[1]-y)<75)u[2]-=130;for(const w of G.tw)if(w[3]!==s&&Math.hypot(w[0]-x,w[1]-y)<75)w[2]-=80}
+ touch(s,x,y,ph){if(!G.run||ph!=='s')return;if(s==='L'?x<96:x>704){const i=Math.floor((y-60)/132);if(y>=60&&i>=0&&i<4)G.sl[s]=G.sl[s]===i?-1:i;return}
+  const i=G.sl[s];if(i<0||(s==='L'?x<100||x>385:x<415||x>700))return;const ci=G.hd[s][i],m=CT[ci];if(G.el[s]<m.c)return;
+  if(m.fb){ev('boom',x,y);for(const u of G.u)if(u[3]!==s&&Math.hypot(u[0]-x,u[1]-y)<75)u[2]-=130;for(const w of G.tw)if(w[3]!==s&&Math.hypot(w[0]-x,w[1]-y)<75)w[2]-=80}
   else if(G.u.length<60)for(let k=0;k<(m.k||1);k++)G.u.push([x+(k?(k-1)*14:0),y+(k?14:0),m.hp,s,ci,0,0,0]);
   G.el[s]-=m.c;G.hd[s][i]=Math.floor(Math.random()*5);G.sl[s]=-1},
- draw(){ctx.fillStyle='#2f5d3a';ctx.fillRect(0,0,FW,H);ctx.fillStyle='#2a6fa8';ctx.fillRect(385,0,30,520);ctx.fillStyle='#8a6d3b';ctx.fillRect(380,125,40,30);ctx.fillRect(380,445,40,30);
-  ctx.fillStyle='#222';ctx.fillRect(0,520,FW,80);
+ draw(){ctx.fillStyle='#2f5d3a';ctx.fillRect(0,0,FW,H);ctx.fillStyle='#2a6fa8';ctx.fillRect(385,0,30,H);ctx.fillStyle='#8a6d3b';ctx.fillRect(380,125,40,30);ctx.fillRect(380,445,40,30);
   G.tw.forEach(w=>{if(w[2]>0){ctx.fillStyle=w[3]==='L'?'#1c7ed6':'#e8590c';const z=w[5]?44:32;ctx.fillRect(w[0]-z/2,w[1]-z/2,z,z);txt(Math.ceil(w[2]),w[0],w[1]+z/2+14,13)}else{ctx.fillStyle='#333';ctx.fillRect(w[0]-16,w[1]-16,32,32)}});
   G.u.forEach(u=>{circ(u[0],u[1],u[4]===2?15:10,u[3]==='L'?'#74c0fc':'#ffc078');txt(CT[u[4]].n[0],u[0],u[1]+5,12,'#000')});
   ctx.strokeStyle='#fff';ctx.lineWidth=2;G.sh.forEach(q=>{ctx.beginPath();ctx.moveTo(q[0],q[1]);ctx.lineTo(q[2],q[3]);ctx.stroke()});
-  for(const [s,o] of [['L',0],['R',400]]){ctx.fillStyle='#555';ctx.fillRect(o+10,506,380,10);ctx.fillStyle='#c77dff';ctx.fillRect(o+10,506,380*G.el[s]/10,10);txt(Math.floor(G.el[s]),o+200,498,16);
-   G.hd[s].forEach((c,i)=>{const m=CT[c],ok=G.el[s]>=m.c;ctx.fillStyle=G.sl[s]===i?'#e8590c':ok?'#3a3f55':'#26293a';ctx.fillRect(o+i*100+4,534,92,60);txt(m.n,o+i*100+50,560,18,ok?'#fff':'#888');txt('💧'+m.c,o+i*100+50,584,15,'#c77dff')})}
+  for(const [s,sx,bx] of [['L',0,4],['R',704,788]]){ctx.fillStyle='#1a1d2b';ctx.fillRect(sx,0,96,H);ctx.fillStyle='#555';ctx.fillRect(bx,60,12,516);ctx.fillStyle='#c77dff';const hh=516*G.el[s]/10;ctx.fillRect(bx,576-hh,12,hh);
+   txt('能量 '+Math.floor(G.el[s]),sx+(s==='L'?58:38),38,20,'#c77dff');const cx=s==='L'?20:708;
+   G.hd[s].forEach((c,i)=>{const m=CT[c],ok=G.el[s]>=m.c,y=60+i*132;ctx.fillStyle=G.sl[s]===i?'#e8590c':ok?'#3a3f55':'#26293a';ctx.fillRect(cx,y,72,120);txt(m.n,cx+36,y+62,m.n.length>2?15:19,ok?'#fff':'#888');txt('能量 '+m.c,cx+36,y+98,15,'#c77dff')})}
   if(G.msg)txt(G.msg,400,260,24,'#ffd43b')}};
 
 const CD=[{n:'攻擊',c:1,s:'傷6',d:6},{n:'重擊',c:2,s:'傷13',d:13},{n:'連擊',c:1,s:'3×2',d:3,x:2},{n:'防禦',c:1,s:'擋7',b:7},{n:'吸血',c:2,s:'傷5回5',d:5,h:5},{n:'治療',c:2,s:'回9',h:9},{n:'充能',c:0,s:'+2能',e:2},{n:'抽牌',c:1,s:'抽2',dr:2}];
@@ -411,12 +476,285 @@ GAMES.duel={init(){const rc=()=>Math.floor(Math.random()*8),h=()=>[rc(),rc(),rc(
   if(y>=380&&y<=560){const i=Math.floor((lx-14)/62);if(i>=0&&i<G.hd[s].length)this.play(s,i)}},
  draw(){ctx.fillStyle='#1a1426';ctx.fillRect(0,0,FW,H);
   for(const [s,o] of [['L',0],['R',400]]){const e=s==='L'?'R':'L',my=G.tn===s;
-   txt('你 ♥'+Math.max(0,G.hp[s])+'  🛡'+G.bk[s],o+200,50,24,my?'#ffd43b':'#fff');txt('對手 ♥'+Math.max(0,G.hp[e])+' 🛡'+G.bk[e],o+200,90,18,'#adb5bd');
-   txt('⚡'.repeat(Math.max(0,G.en[s])),o+200,200,28,'#ffe066');txt(G.lg,o+200,250,16,'#adb5bd');
+   txt('我方 '+Math.max(0,G.hp[s])+'  護盾 '+G.bk[s],o+200,50,24,my?'#ffd43b':'#fff');txt('對手 '+Math.max(0,G.hp[e])+' 護盾 '+G.bk[e],o+200,90,18,'#adb5bd');
+   txt('能量 '+Math.max(0,G.en[s]),o+200,200,28,'#ffe066');txt(G.lg,o+200,250,16,'#adb5bd');
    ctx.fillStyle=my?'#e8590c':'#3a3f55';ctx.fillRect(o+110,310,180,48);txt(my?'結束回合':'對手回合',o+200,342,20);
    G.hd[s].forEach((ci,i)=>{const c=CD[ci],ok=my&&G.en[s]>=c.c;ctx.fillStyle=ok?'#3b5bdb':'#2a2d40';ctx.fillRect(o+14+i*62,380,58,180);
     txt(c.c,o+43+i*62,404,18,'#ffd43b');txt(c.n,o+43+i*62,470,16,ok?'#fff':'#777');txt(c.s,o+43+i*62,510,13,ok?'#c5f6fa':'#666')})}
   if(G.msg)txt(G.msg,400,160,22,'#ffd43b')}};
+
+/* ---------- 新增遊戲 ---------- */
+GAMES.flap={init(){G={by:{L:300,R:300},vy:{L:0,R:0},pp:[],sp:0,run:false,msg:'點一下拍翅膀,穿過水管,先撞到的輸'}},
+ start(){this.init();G.run=true;G.msg=''},
+ step(dt){if(!G.run)return;G.pp.forEach(p=>p[0]-=170*dt);for(const s of ['L','R']){G.vy[s]+=1100*dt;G.by[s]+=G.vy[s]*dt}if(!host)return;
+  G.sp-=dt;if(G.sp<=0){G.sp=1.5;G.pp.push([830,150+Math.random()*300])}G.pp=G.pp.filter(p=>p[0]>-60);
+  const d={};for(const s of ['L','R']){const bx=s==='L'?200:600,y=G.by[s];d[s]=y<10||y>590||G.pp.some(p=>Math.abs(p[0]-bx)<42&&Math.abs(y-p[1])>85)}
+  if(d.L||d.R){G.run=false;ev('die',d.L?200:600,G.by[d.L?'L':'R']);G.msg=d.L&&d.R?'平手':d.L?'右邊獲勝!':'左邊獲勝!'}},
+ touch(s,x,y,ph){if(G.run&&ph==='s')G.vy[s]=-380},
+ draw(){ctx.fillStyle='#0e2a3d';ctx.fillRect(0,0,FW,H);ctx.fillStyle='#51cf66';G.pp.forEach(p=>{ctx.fillRect(p[0]-30,0,60,p[1]-95);ctx.fillRect(p[0]-30,p[1]+95,60,H-p[1]-95)});
+  circ(200,G.by.L,14,'#4dabf7');circ(600,G.by.R,14,'#ffa94d');if(G.msg)txt(G.msg,400,300,28,'#ffd43b')}};
+
+GAMES.catch={init(){G={x:{L:200,R:600},it:[],sc:{L:0,R:0},t:30,sp:0,run:false,msg:'左右移動籃子接水果,別接炸彈,30 秒'}},
+ start(){this.init();G.run=true;G.msg=''},
+ step(dt){if(G.run)G.it.forEach(i=>i[1]+=i[3]*dt);if(!host||!G.run)return;G.t-=dt;G.sp-=dt;
+  if(G.sp<=0){G.sp=.35;const r=Math.random();G.it.push([40+Math.random()*720,-20,r<.18?2:r<.3?1:0,200+Math.random()*140])}
+  G.it=G.it.filter(i=>{for(const s of ['L','R'])if(i[1]>510&&i[1]<580&&Math.abs(i[0]-G.x[s])<48){G.sc[s]=Math.max(0,G.sc[s]+[1,3,-3][i[2]]);ev(i[2]===2?'boom':'pop',i[0],i[1]);return false}return i[1]<640});
+  if(G.t<=0){G.run=false;G.msg=G.sc.L===G.sc.R?'平手':(G.sc.L>G.sc.R?'左':'右')+'邊獲勝!'}},
+ touch(s,x){G.x[s]=x},
+ draw(){ctx.fillStyle='#1b2b2a';ctx.fillRect(0,0,FW,H);G.it.forEach(i=>txt(['果實','星核','爆彈'][i[2]],i[0],i[1]+10,30));
+  ctx.fillStyle='#4dabf7';ctx.fillRect(G.x.L-45,545,90,22);ctx.fillStyle='#ffa94d';ctx.fillRect(G.x.R-45,545,90,22);
+  txt(G.sc.L,300,60,40,'#4dabf7');txt(G.sc.R,500,60,40,'#ffa94d');txt(Math.max(0,Math.ceil(G.t)),400,60,30);if(G.msg)txt(G.msg,400,300,26,'#ffd43b')}};
+
+GAMES.c4={init(){G={b:Array(60).fill(0),tn:'L',run:false,msg:'輪流點欄位落子,連成四顆獲勝'}},
+ start(){this.init();G.run=true;G.msg=''},step(){},
+ touch(s,x,y,ph){if(!G.run||ph!=='s'||G.tn!==s)return;const c=Math.floor((x-80)/64);if(c<0||c>9)return;
+  let r=5;while(r>=0&&G.b[r*10+c])r--;if(r<0)return;const v=s==='L'?1:2;G.b[r*10+c]=v;ev('hit',112+c*64,152+r*64);
+  const run=(dx,dy)=>{let n=0,a=c+dx,b=r+dy;while(a>=0&&a<10&&b>=0&&b<6&&G.b[b*10+a]===v){n++;a+=dx;b+=dy}return n};
+  if([[1,0],[0,1],[1,1],[1,-1]].some(([a,b])=>run(a,b)+run(-a,-b)>=3)){G.run=false;G.msg=(s==='L'?'左':'右')+'邊獲勝!';ev('goal',400,300)}
+  else if(!G.b.includes(0)){G.run=false;G.msg='平手'}else G.tn=s==='L'?'R':'L'},
+ draw(){ctx.fillStyle='#161a33';ctx.fillRect(0,0,FW,H);ctx.fillStyle='#2b4acb';ctx.fillRect(80,120,640,384,);
+  G.b.forEach((v,i)=>circ(112+i%10*64,152+Math.floor(i/10)*64,26,['#0e1230','#4dabf7','#ffa94d'][v]));
+  txt(G.tn==='L'?'◀ 左邊落子':'右邊落子 ▶',400,70,26,G.tn==='L'?'#4dabf7':'#ffa94d');if(G.msg)txt(G.msg,400,560,26,'#ffd43b')}};
+
+const MS=['蘋果','香蕉','葡萄','犬','貓','飛船','足球','吉他','仙人掌','披薩','章魚','晶石'];
+GAMES.mem={init(){G={c:[...Array(24)].map((_,i)=>i>>1).sort(()=>Math.random()-.5),dn:Array(24).fill(0),up:[],tm:0,tn:'L',sc:{L:0,R:0},run:false,msg:'輪流翻兩張,配對成功得分並再翻一次'}},
+ start(){this.init();G.run=true;G.msg=''},
+ step(dt){if(!host||!G.run||G.tm<=0)return;G.tm-=dt;if(G.tm<=0){G.up=[];G.tn=G.tn==='L'?'R':'L'}},
+ touch(s,x,y,ph){if(!G.run||ph!=='s'||G.tn!==s||G.tm>0)return;const c=Math.floor((x-70)/110),r=Math.floor((y-110)/110);if(c<0||c>5||r<0||r>3)return;
+  const i=r*6+c;if(G.dn[i]||G.up.includes(i))return;G.up.push(i);ev('hit',125+c*110,165+r*110);if(G.up.length<2)return;
+  const [a,b]=G.up;if(G.c[a]===G.c[b]){G.dn[a]=G.dn[b]=1;G.sc[s]++;G.up=[];ev('pop',125+c*110,165+r*110);
+   if(G.dn.every(v=>v)){G.run=false;G.msg=G.sc.L===G.sc.R?'平手':(G.sc.L>G.sc.R?'左':'右')+'邊獲勝!'}}else G.tm=.9},
+ draw(){ctx.fillStyle='#1a1426';ctx.fillRect(0,0,FW,H);
+  G.c.forEach((v,i)=>{const x=70+i%6*110,y=110+Math.floor(i/6)*110,f=G.dn[i]||G.up.includes(i);ctx.fillStyle=G.dn[i]?'#2b3a2f':f?'#3b5bdb':'#3a3f55';ctx.fillRect(x+4,y+4,102,102);if(f)txt(MS[v],x+55,y+72,52)});
+  txt('左 '+G.sc.L,150,65,30,G.tn==='L'?'#4dabf7':'#667');txt('右 '+G.sc.R,650,65,30,G.tn==='R'?'#ffa94d':'#667');if(G.msg)txt(G.msg,400,575,24,'#ffd43b')}};
+
+GAMES.beat={init(){G={nt:[],sc:{L:0,R:0},cb:{L:0,R:0},t:30,sp:0,run:false,msg:'音符落到白線時點該軌道,連擊加分'}},
+ start(){this.init();G.run=true;G.msg=''},
+ step(dt){if(G.run)G.nt.forEach(n=>n[1]+=330*dt);if(!host||!G.run)return;G.t-=dt;G.sp-=dt;
+  if(G.sp<=0){G.sp=.42+Math.random()*.3;const k=Math.floor(Math.random()*4);G.nt.push([k,-20],[k+4,-20])}
+  G.nt=G.nt.filter(n=>{if(n[1]<590)return true;G.cb[n[0]<4?'L':'R']=0;return false});
+  if(G.t<=0){G.run=false;G.msg=G.sc.L===G.sc.R?'平手':(G.sc.L>G.sc.R?'左':'右')+'邊獲勝!'}},
+ touch(s,x,y,ph){if(!G.run||ph!=='s')return;const k=Math.floor(x/100);let bi=-1,bd=60;G.nt.forEach((n,i)=>{const d=Math.abs(n[1]-500);if(n[0]===k&&d<bd){bd=d;bi=i}});
+  if(bi<0){G.cb[s]=0;return}G.nt.splice(bi,1);G.cb[s]++;G.sc[s]+=(bd<25?2:1)+Math.floor(G.cb[s]/5);ev('pop',k*100+50,500)},
+ draw(){for(let k=0;k<8;k++){ctx.fillStyle=k%2?'#1a1f36':'#141830';ctx.fillRect(k*100,0,100,H)}ctx.fillStyle='#fff';ctx.fillRect(0,498,FW,4);
+  G.nt.forEach(n=>{ctx.fillStyle=n[0]<4?'#4dabf7':'#ffa94d';ctx.fillRect(n[0]*100+10,n[1]-12,80,24)});
+  txt(G.sc.L,200,60,40,'#4dabf7');txt(G.sc.R,600,60,40,'#ffa94d');txt(G.cb.L>1?G.cb.L+' 連擊':'',200,100,20,'#ffd43b');txt(G.cb.R>1?G.cb.R+' 連擊':'',600,100,20,'#ffd43b');
+  txt(Math.max(0,Math.ceil(G.t)),400,60,28);if(G.msg)txt(G.msg,400,300,26,'#ffd43b')}};
+
+GAMES.paint={init(){G={m:Array(300).fill(0),a:{x:60,y:300},b:{x:740,y:300},ta:null,tb:null,t:30,run:false,msg:'手指帶著角色跑,把地板塗成自己的顏色,30 秒'}},
+ start(){this.init();G.run=true;G.msg=''},
+ step(dt){if(!G.run)return;for(const [p,t] of [[G.a,G.ta],[G.b,G.tb]])if(t){const dx=t[0]-p.x,dy=t[1]-p.y,d=Math.hypot(dx,dy);if(d>4){const st=Math.min(d,270*dt);p.x+=dx/d*st;p.y+=dy/d*st}}
+  if(!host)return;G.t-=dt;
+  for(const [p,v] of [[G.a,1],[G.b,2]])for(const [ox,oy] of [[-14,-14],[14,-14],[-14,14],[14,14]])G.m[Math.floor(clamp(p.y+oy,0,599)/40)*20+Math.floor(clamp(p.x+ox,0,799)/40)]=v;
+  if(G.t<=0){G.run=false;const l=G.m.filter(v=>v===1).length,q=G.m.filter(v=>v===2).length;G.msg=l===q?'平手':(l>q?'左':'右')+'邊獲勝!'}},
+ touch(s,x,y,ph){const v=ph==='e'?null:[x,y];if(s==='L')G.ta=v;else G.tb=v},
+ draw(){ctx.fillStyle='#1a1d2b';ctx.fillRect(0,0,FW,H);let l=0,q=0;
+  G.m.forEach((v,i)=>{if(!v)return;v===1?l++:q++;ctx.fillStyle=v===1?'#1c5f9c':'#a4541c';ctx.fillRect(i%20*40,Math.floor(i/20)*40,40,40)});
+  circ(G.a.x,G.a.y,18,'#74c0fc');circ(G.b.x,G.b.y,18,'#ffc078');
+  txt(Math.round(l/3)+'%',300,60,36,'#74c0fc');txt(Math.round(q/3)+'%',500,60,36,'#ffc078');txt(Math.max(0,Math.ceil(G.t)),400,60,28);if(G.msg)txt(G.msg,400,300,26,'#ffd43b')}};
+
+GAMES.react={init(){G={st:'i',wt:0,rt:0,ls:0,rs:0,run:false,msg:'畫面變綠立刻點!太早點就輸,搶先 3 分'}},
+ start(){this.init();G.run=true;this.nx()},
+ nx(){G.st='w';G.wt=1.5+Math.random()*3;G.msg='等綠燈…'},
+ step(dt){if(!host||!G.run)return;if(G.st==='w'){G.wt-=dt;if(G.wt<=0){G.st='g';G.msg='點!';ev('hit',400,300)}}else if(G.st==='r'){G.rt-=dt;if(G.rt<=0)this.nx()}},
+ touch(s,x,y,ph){if(!G.run||ph!=='s'||(G.st!=='w'&&G.st!=='g'))return;const w=G.st==='g'?s:s==='L'?'R':'L';G[w==='L'?'ls':'rs']++;
+  G.msg=(w==='L'?'左':'右')+(G.st==='g'?'邊搶到!':'邊得分(對方偷跑)');G.st='r';G.rt=1.6;
+  if(G.ls>=3||G.rs>=3){G.run=false;G.msg=(G.ls>=3?'左':'右')+'邊拿下比賽!'}},
+ draw(){ctx.fillStyle=G.st==='w'?'#c92a2a':G.st==='g'?'#2b8a3e':'#2a2d40';ctx.fillRect(0,0,FW,H);txt(G.ls+' : '+G.rs,400,90,44,'rgba(255,255,255,.6)');txt(G.msg,400,320,40)}};
+
+/* ---------- 燒腦回合制 ---------- */
+const OD=[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]];
+const othF=(b,i,v)=>{if(b[i])return[];const c=i%8,r=i>>3,f=[];for(const [dx,dy] of OD){const t=[];let x=c+dx,y=r+dy;while(x>=0&&x<8&&y>=0&&y<8&&b[y*8+x]&&b[y*8+x]!==v){t.push(y*8+x);x+=dx;y+=dy}if(t.length&&x>=0&&x<8&&y>=0&&y<8&&b[y*8+x]===v)f.push(...t)}return f};
+const othM=(b,v)=>b.some((_,i)=>othF(b,i,v).length);
+GAMES.oth={init(){const b=Array(64).fill(0);b[27]=2;b[28]=1;b[35]=1;b[36]=2;G={b,tn:'L',run:false,msg:'夾住對方棋子就能翻面,棋盤跨兩屏,最後子多的贏'}},
+ start(){this.init();G.run=true;G.msg=''},step(){},
+ touch(s,x,y,ph){if(!G.run||ph!=='s'||G.tn!==s)return;const c=Math.floor((x-144)/64),r=Math.floor((y-44)/64);if(c<0||c>7||r<0||r>7)return;
+  const v=s==='L'?1:2,i=r*8+c,f=othF(G.b,i,v);if(!f.length)return;G.b[i]=v;f.forEach(j=>G.b[j]=v);ev('hit',176+c*64,76+r*64);G.msg='';
+  const o=3-v;if(othM(G.b,o))G.tn=o===1?'L':'R';else if(othM(G.b,v))G.msg='對手無棋可下,跳過';
+  else{G.run=false;const l=G.b.filter(p=>p===1).length,q=G.b.filter(p=>p===2).length;G.msg=l===q?'平手':(l>q?'左':'右')+'邊獲勝!';ev('goal',400,300)}},
+ draw(){ctx.fillStyle='#10201a';ctx.fillRect(0,0,FW,H);const v=G.tn==='L'?1:2;let l=0,q=0;
+  for(let i=0;i<64;i++){const x=144+i%8*64,y=44+(i>>3)*64,p=G.b[i];ctx.fillStyle='#2b7a4b';ctx.fillRect(x+1,y+1,62,62);
+   if(p){p===1?l++:q++;circ(x+32,y+32,26,p===1?'#4dabf7':'#ffa94d')}else if(G.run&&othF(G.b,i,v).length)circ(x+32,y+32,6,'rgba(255,255,255,.5)')}
+  txt(l,72,300,56,'#4dabf7');txt(q,728,300,56,'#ffa94d');txt((G.tn==='L'?'◀ 左邊':'右邊 ▶')+'落子',400,28,22,G.tn==='L'?'#4dabf7':'#ffa94d');if(G.msg)txt(G.msg,400,584,22,'#ffd43b')}};
+
+const shipR=()=>{const a=Array(64).fill(0);[4,3,3,2,2].forEach((n,k)=>{for(;;){const h=Math.random()<.5,c=Math.floor(Math.random()*(h?9-n:8)),r=Math.floor(Math.random()*(h?8:9-n)),cs=[...Array(n)].map((_,j)=>h?r*8+c+j:(r+j)*8+c);if(cs.every(i=>!a[i])){cs.forEach(i=>a[i]=k+1);break}}});return a};
+GAMES.ship={init(){G={ph:'p',sp:{L:shipR(),R:shipR()},rd:{L:0,R:0},hit:{L:Array(64).fill(0),R:Array(64).fill(0)},tn:'L',lg:'',run:false,msg:'各自在自己螢幕重排艦隊,按「準備」;命中可再射一次'}},
+ start(){this.init();G.run=true;G.msg=''},step(){},
+ touch(s,x,y,ph){if(!G.run||ph!=='s')return;const o=s==='L'?0:400,lx=x-o,e=s==='L'?'R':'L',nm=s==='L'?'左':'右';
+  if(G.ph==='p'){if(G.rd[s]||y<470||y>526)return;if(lx>30&&lx<190)G.sp[s]=shipR();else if(lx>210&&lx<370){G.rd[s]=1;if(G.rd.L&&G.rd.R){G.ph='b';G.tn='L'}}return}
+  if(G.tn!==s)return;const c=Math.floor((lx-24)/44),r=Math.floor((y-80)/44),i=r*8+c;if(c<0||c>7||r<0||r>7||G.hit[s][i])return;
+  const id=G.sp[e][i];if(!id){G.hit[s][i]=1;G.tn=e;G.lg=nm+'邊:落空';return}
+  G.hit[s][i]=2;ev('boom',o+46+c*44,102+r*44);const sk=G.sp[e].every((q,j)=>q!==id||G.hit[s][j]===2);G.lg=nm+'邊:'+(sk?'擊沉一艘!':'命中!');
+  if(G.sp[e].every((q,j)=>!q||G.hit[s][j]===2)){G.run=false;G.msg=nm+'邊獲勝!'}},
+ draw(){ctx.fillStyle='#0a1a2e';ctx.fillRect(0,0,FW,H);ctx.fillStyle='#e8590c';ctx.fillRect(398,0,4,H);
+  for(const s of ['L','R']){const o=s==='L'?0:400,e=s==='L'?'R':'L',my=G.tn===s;
+   txt(G.ph==='p'?(G.rd[s]?'已準備,等對手…':'擺放你的艦隊'):my?'輪到你射擊!':'等對手…',o+200,52,22,G.ph==='b'&&my?'#ffd43b':'#fff');
+   for(let i=0;i<64;i++){const x=o+24+i%8*44,y=80+(i>>3)*44,sh=G.ph==='p'?G.sp[s][i]:0,h=G.ph==='p'?0:G.hit[s][i];
+    ctx.fillStyle=sh?'#2f9e44':h===2?'#c92a2a':'#1c3a5e';ctx.fillRect(x+1,y+1,42,42);if(h===1)circ(x+22,y+22,5,'#fff')}
+   if(G.ph==='p')[[30,'重排'],[210,'準備']].forEach(([b,l])=>{ctx.fillStyle=G.rd[s]?'#2a2d40':'#3b5bdb';ctx.fillRect(o+b,470,160,56);txt(l,o+b+80,506,22)});
+   else{for(let i=0;i<64;i++){const x=o+24+i%8*16,y=460+(i>>3)*16,h=G.hit[e][i];ctx.fillStyle=h===2?'#c92a2a':G.sp[s][i]?'#2f9e44':'#1c3a5e';ctx.fillRect(x,y,15,15);if(h===1)circ(x+7,y+7,2,'#fff')}
+    txt('我方艦隊',o+280,500,16,'#9aa3b8');txt('剩 '+G.sp[s].filter((q,j)=>q&&G.hit[e][j]!==2).length+' 格',o+280,530,20)}
+   txt(G.lg,o+200,452,14,'#9aa3b8')}
+  if(G.msg)txt(G.msg,400,24,20,'#ffd43b')}};
+
+const DX=120,DY=100,DS=80;
+GAMES.dots={init(){G={h:Array(42).fill(0),v:Array(40).fill(0),bx:Array(35).fill(0),tn:'L',run:false,msg:'輪流畫線,圍成格子得分並再畫一次,格子多的贏'}},
+ start(){this.init();G.run=true;G.msg=''},step(){},
+ touch(s,x,y,ph){if(!G.run||ph!=='s'||G.tn!==s)return;let bd=34,bk=null;
+  for(let r=0;r<6;r++)for(let c=0;c<7;c++)if(!G.h[r*7+c]){const d=Math.hypot(x-(DX+c*DS+40),y-(DY+r*DS));if(d<bd){bd=d;bk=['h',r*7+c]}}
+  for(let r=0;r<5;r++)for(let c=0;c<8;c++)if(!G.v[r*8+c]){const d=Math.hypot(x-(DX+c*DS),y-(DY+r*DS+40));if(d<bd){bd=d;bk=['v',r*8+c]}}
+  if(!bk)return;const v=s==='L'?1:2,[t,i]=bk;G[t][i]=v;let n=0;ev('hit',x,y);
+  for(let r=0;r<5;r++)for(let c=0;c<7;c++)if(!G.bx[r*7+c]&&G.h[r*7+c]&&G.h[(r+1)*7+c]&&G.v[r*8+c]&&G.v[r*8+c+1]){G.bx[r*7+c]=v;n++;ev('pop',DX+c*DS+40,DY+r*DS+40)}
+  if(!G.bx.includes(0)){G.run=false;G.msg=(G.bx.filter(q=>q===1).length>17?'左':'右')+'邊獲勝!';ev('goal',400,300)}else if(!n)G.tn=s==='L'?'R':'L'},
+ draw(){ctx.fillStyle='#14182b';ctx.fillRect(0,0,FW,H);let l=0,q=0;
+  G.bx.forEach((v,i)=>{if(v){v===1?l++:q++;ctx.fillStyle=v===1?'rgba(77,171,247,.4)':'rgba(255,169,77,.4)';ctx.fillRect(DX+i%7*DS+6,DY+Math.floor(i/7)*DS+6,DS-12,DS-12)}});
+  ctx.lineWidth=7;ctx.lineCap='round';const cl=v=>v===1?'#4dabf7':v===2?'#ffa94d':'#2a2f4a';
+  for(let r=0;r<6;r++)for(let c=0;c<7;c++){ctx.strokeStyle=cl(G.h[r*7+c]);ctx.beginPath();ctx.moveTo(DX+c*DS,DY+r*DS);ctx.lineTo(DX+c*DS+DS,DY+r*DS);ctx.stroke()}
+  for(let r=0;r<5;r++)for(let c=0;c<8;c++){ctx.strokeStyle=cl(G.v[r*8+c]);ctx.beginPath();ctx.moveTo(DX+c*DS,DY+r*DS);ctx.lineTo(DX+c*DS,DY+r*DS+DS);ctx.stroke()}
+  ctx.lineCap='butt';for(let r=0;r<6;r++)for(let c=0;c<8;c++)circ(DX+c*DS,DY+r*DS,6,'#fff');
+  txt('左 '+l,150,60,30,G.tn==='L'?'#4dabf7':'#667');txt('右 '+q,650,60,30,G.tn==='R'?'#ffa94d':'#667');if(G.msg)txt(G.msg,400,570,24,'#ffd43b')}};
+
+const chkM=(b,i)=>{const p=b[i],o=p%2?1:2,c=i%8,r=i>>3,m=[],ds=p>2?[[1,1],[1,-1],[-1,1],[-1,-1]]:o===1?[[1,1],[1,-1]]:[[-1,1],[-1,-1]];
+ for(const [dx,dy] of ds){const x=c+dx,y=r+dy;if(x<0||x>7||y<0||y>7)continue;const q=b[y*8+x];
+  if(!q)m.push([y*8+x,-1]);else if((q%2?1:2)!==o){const x2=x+dx,y2=y+dy;if(x2>=0&&x2<8&&y2>=0&&y2<8&&!b[y2*8+x2])m.push([y2*8+x2,y*8+x])}}return m};
+const chkL=(b,v,ct)=>{const a=[];b.forEach((p,i)=>{if(p&&(p%2?1:2)===v&&(ct<0||i===ct))chkM(b,i).forEach(m=>a.push([i,...m]))});const j=a.filter(m=>m[2]>=0);return j.length?j:ct<0?a:[]};
+GAMES.chk={init(){const b=Array(64).fill(0);for(let i=0;i<64;i++){const c=i%8;if((c+(i>>3))%2){if(c<3)b[i]=1;else if(c>4)b[i]=2}}G={b,tn:'L',sel:-1,ct:-1,run:false,msg:'斜著走,對角可吃子且必須吃;到對岸升王。左邊往右、右邊往左'}},
+ start(){this.init();G.run=true;G.msg=''},step(){},
+ touch(s,x,y,ph){if(!G.run||ph!=='s'||G.tn!==s)return;const c=Math.floor((x-144)/64),r=Math.floor((y-44)/64);if(c<0||c>7||r<0||r>7)return;
+  const v=s==='L'?1:2,i=r*8+c,L=chkL(G.b,v,G.ct);
+  if(G.ct<0&&G.b[i]&&(G.b[i]%2?1:2)===v&&L.some(m=>m[0]===i)){G.sel=i;return}
+  const mv=L.find(m=>m[0]===G.sel&&m[1]===i);if(!mv)return;let p=G.b[G.sel],pr=false;G.b[G.sel]=0;G.b[i]=p;
+  if(mv[2]>=0){G.b[mv[2]]=0;ev('pop',176+(mv[2]%8)*64,76+(mv[2]>>3)*64)}else ev('hit',176+c*64,76+r*64);
+  if(p<3&&((v===1&&c===7)||(v===2&&c===0))){G.b[i]=p+2;pr=true}
+  if(mv[2]>=0&&!pr&&chkL(G.b,v,i).length){G.ct=i;G.sel=i;return}
+  G.ct=-1;G.sel=-1;const o=3-v;G.tn=o===1?'L':'R';if(!chkL(G.b,o,-1).length){G.run=false;G.msg=(s==='L'?'左':'右')+'邊獲勝!';ev('goal',400,300)}},
+ draw(){ctx.fillStyle='#161a33';ctx.fillRect(0,0,FW,H);const v=G.tn==='L'?1:2,L=G.run?chkL(G.b,v,G.ct):[];ctx.lineWidth=3;
+  for(let i=0;i<64;i++){const c=i%8,r=i>>3,x=144+c*64,y=44+r*64,p=G.b[i];ctx.fillStyle=(r+c)%2?'#6d4c2f':'#e0c9a6';ctx.fillRect(x,y,64,64);
+   if(G.sel===i){ctx.fillStyle='rgba(255,212,59,.45)';ctx.fillRect(x,y,64,64)}
+   if(G.sel>=0&&L.some(m=>m[0]===G.sel&&m[1]===i))circ(x+32,y+32,10,'#69db7c');
+   if(p){circ(x+32,y+32,25,p%2?'#4dabf7':'#ffa94d');ctx.strokeStyle='#fff';ctx.beginPath();ctx.arc(x+32,y+32,25,0,7);ctx.stroke();if(p>2)txt('王',x+32,y+44,22,'#fff');
+    if(G.sel<0&&(p%2?1:2)===v&&L.some(m=>m[0]===i)){ctx.strokeStyle='#ffd43b';ctx.beginPath();ctx.arc(x+32,y+32,30,0,7);ctx.stroke()}}}
+  txt((G.tn==='L'?'◀ 左邊':'右邊 ▶')+'走棋'+(G.ct>=0?'(必須連跳)':''),400,28,22,G.tn==='L'?'#4dabf7':'#ffa94d');if(G.msg)txt(G.msg,400,584,20,'#ffd43b')}};
+
+/* ---------- 雙人廚房 ---------- */
+const KR=[['沙拉','沙','lt'],['漢堡','堡','Bm'],['豪華堡','豪','Blm']];
+const KI={T:'番茄',L:'生菜',B:'麵包',M:'肉排',t:'切番茄',l:'切生菜',m:'熟肉',x:'焦肉'};
+const kie=h=>h?h[0]==='d'?KR[+h[1]][1]:KI[h]:'';
+const kmat=a=>KR.findIndex(r=>r[2]===[...a].sort().join(''));
+const KS=[{t:'c',k:'T',x:30,y:40},{t:'c',k:'L',x:110,y:40},{t:'c',k:'B',x:190,y:40},{t:'c',k:'M',x:270,y:40},
+ {t:'k',x:40,y:200},{t:'k',x:40,y:330},{t:'h',x:365,y:100},{t:'a',x:365,y:210},{t:'a',x:365,y:320},{t:'h',x:365,y:430},
+ {t:'s',x:540,y:50},{t:'s',x:620,y:50},{t:'s',x:700,y:50},{t:'w',x:730,y:250,h:110},{t:'r',x:730,y:400}].map(a=>({w:70,h:70,...a}));
+GAMES.kitchen={init(){G={c:{L:{x:200,y:300,tx:-1,ty:0,gl:-1},R:{x:600,y:300,tx:-1,ty:0,gl:-1}},h:{L:'',R:''},st:KS.map(a=>a.t==='a'?{a:[]}:{it:'',p:0}),o:[],sp:0,t:150,sc:0,run:false,
+  msg:'合作備餐：分工收集食材與出餐|將番茄或生菜放到砧板旁，角色靠近即可處理|肉排放上爐台，約 6 秒熟成，注意不要燒焦|傳遞台可交換物品；組裝台完成餐點後送至出餐口|完成更多訂單以取得高分'}},
+ start(){this.init();G.run=true;G.msg=''},
+ inter(s,i){const a=KS[i],q=G.st[i],h=G.h[s],b=h;
+  if(a.t==='c'){if(!h)G.h[s]=a.k}
+  else if(a.t==='k'){if(!h){if(q.it&&q.it!=='T'&&q.it!=='L'){G.h[s]=q.it;q.it='';q.p=0}}else if(!q.it&&(h==='T'||h==='L')){q.it=h;q.p=0;G.h[s]=''}}
+  else if(a.t==='s'){if(!h){if(q.it){G.h[s]=q.it;q.it='';q.p=0}}else if(!q.it&&h==='M'){q.it='M';q.p=0;G.h[s]=''}}
+  else if(a.t==='h'){if(!h){if(q.it){G.h[s]=q.it;q.it=''}}else if(!q.it){q.it=h;G.h[s]=''}}
+  else if(a.t==='a'){if(!h){const k=kmat(q.a);if(k>=0){G.h[s]='d'+k;q.a=[]}else if(q.a.length)G.h[s]=q.a.pop()}else if(q.a.length<3&&h.length===1&&'tlBm'.includes(h)){q.a.push(h);G.h[s]=''}}
+  else if(a.t==='w'){if(h&&h[0]==='d'){const j=G.o.findIndex(o=>o[0]===+h[1]);if(j>=0){G.sc+=20+Math.floor(G.o[j][1]/3);G.o.splice(j,1);G.h[s]='';ev('goal',a.x+35,a.y+55)}}}
+  else if(a.t==='r')G.h[s]='';
+  if(G.h[s]!==b&&a.t!=='w')ev('hit',a.x+a.w/2,a.y+a.h/2)},
+ step(dt){if(!G.run)return;
+  for(const s of ['L','R']){const c=G.c[s];if(c.tx>=0){const dx=c.tx-c.x,dy=c.ty-c.y,d=Math.hypot(dx,dy);if(d>3){const m=Math.min(d,230*dt);c.x+=dx/d*m;c.y+=dy/d*m}}c.x=clamp(c.x,s==='L'?20:370,s==='L'?430:780);c.y=clamp(c.y,20,500)}
+  if(!host)return;G.t-=dt;
+  for(const s of ['L','R']){const c=G.c[s];if(c.gl>=0){const a=KS[c.gl];if(Math.hypot(a.x+a.w/2-c.x,a.y+a.h/2-c.y)<60){const g=c.gl;c.gl=-1;c.tx=-1;this.inter(s,g)}}}
+  KS.forEach((a,i)=>{const q=G.st[i],cx=a.x+a.w/2,cy=a.y+a.h/2;
+   if(a.t==='k'&&(q.it==='T'||q.it==='L')&&['L','R'].some(s=>Math.hypot(G.c[s].x-cx,G.c[s].y-cy)<85)){q.p+=dt/2.2;if(q.p>=1){q.it=q.it==='T'?'t':'l';q.p=0;ev('pop',cx,cy)}}
+   if(a.t==='s'&&q.it&&q.it!=='x'){q.p+=dt;if(q.it==='M'&&q.p>=6){q.it='m';ev('pop',cx,cy)}else if(q.it==='m'&&q.p>=12){q.it='x';ev('boom',cx,cy)}}});
+  G.o.forEach(o=>o[1]-=dt);G.o=G.o.filter(o=>{if(o[1]>0)return true;G.sc=Math.max(0,G.sc-5);ev('die',400,540);return false});
+  G.sp-=dt;if(G.sp<=0&&G.o.length<4){G.sp=12;G.o.push([Math.floor(Math.random()*3),60])}
+  if(G.t<=0){G.run=false;G.msg='時間到!|團隊得分 '+G.sc}},
+ touch(s,x,y,ph){if(!G.run)return;const c=G.c[s];
+  if(ph==='s'){const i=KS.findIndex(a=>x>a.x-8&&x<a.x+a.w+8&&y>a.y-8&&y<a.y+a.h+8);if(i>=0){c.gl=i;c.tx=KS[i].x+KS[i].w/2;c.ty=KS[i].y+KS[i].h/2}else{c.gl=-1;c.tx=x;c.ty=y}}
+  else if(ph==='m'){if(c.gl<0){c.tx=x;c.ty=y}}else if(c.gl<0)c.tx=-1},
+ draw(){
+  // warm, illustrated kitchen environment
+  const bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#26363a');bg.addColorStop(.58,'#344447');bg.addColorStop(.59,'#28343a');bg.addColorStop(1,'#1b252c');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,FW,H);
+  // tiled back wall
+  for(let y=0;y<510;y+=48)for(let x=0;x<FW;x+=64){ctx.fillStyle=(Math.floor(x/64+y/48)%2)?'rgba(215,222,207,.035)':'rgba(215,222,207,.065)';ctx.fillRect(x+1,y+1,62,46)}
+  ctx.fillStyle='#1c282e';ctx.fillRect(0,510,FW,90);
+  ctx.fillStyle='#46575a';ctx.fillRect(0,506,FW,7);
+  for(let x=0;x<FW;x+=80){ctx.fillStyle='rgba(255,255,255,.035)';ctx.fillRect(x,516,2,84)}
+  const rounded=(x,y,w,h,r,c)=>{ctx.fillStyle=c;ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fill()};
+  const panel=(x,y,w,h,top,base)=>{rounded(x,y+6,w,h,10,'rgba(0,0,0,.22)');rounded(x,y,w,h,10,base);rounded(x+3,y+3,w-6,12,5,top)};
+  const label=(t,x,y)=>{ctx.fillStyle='#e6e1d4';ctx.font='bold 11px sans-serif';ctx.textAlign='center';ctx.fillText(t,x,y)};
+  const drawFood=(key,x,y,scale=1)=>{
+    ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);
+    const colors={T:'#c65a42',L:'#7e9d5c',B:'#d7b77c',M:'#a95745',t:'#b84b3c',l:'#88a967',m:'#9b5540',x:'#292d30'};
+    const col=colors[key]||'#aaa';
+    if(key==='T'||key==='t'){ctx.fillStyle=col;ctx.beginPath();ctx.arc(0,0,15,0,Math.PI*2);ctx.fill();ctx.fillStyle='#526d45';ctx.beginPath();ctx.moveTo(0,-12);ctx.lineTo(-6,-20);ctx.lineTo(2,-16);ctx.lineTo(8,-20);ctx.lineTo(6,-10);ctx.fill();ctx.strokeStyle='rgba(255,255,255,.3)';ctx.lineWidth=2;ctx.beginPath();ctx.arc(-4,-4,6,3.5,5.2);ctx.stroke()}
+    else if(key==='L'||key==='l'){ctx.fillStyle=col;ctx.beginPath();ctx.ellipse(0,0,17,12,-.4,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#d0d8a2';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-12,5);ctx.quadraticCurveTo(0,-2,13,-8);ctx.stroke()}
+    else if(key==='B'){rounded(-16,-10,32,20,5,col);ctx.strokeStyle='#f0d9a9';ctx.strokeRect(-12,-6,24,12)}
+    else if(key==='M'||key==='m'||key==='x'){rounded(-17,-12,34,24,8,col);ctx.strokeStyle='rgba(255,230,205,.5)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-9,-4);ctx.lineTo(8,4);ctx.stroke()}
+    else{rounded(-14,-14,28,28,5,col)}
+    ctx.restore()
+  };
+  const prop=(a,i)=>{
+    const q=G.st[i],cx=a.x+a.w/2,cy=a.y+a.h/2;
+    const base={c:'#526c66',k:'#7b6550',h:'#49616a',a:'#657a67',s:'#5b4b43',w:'#8d7651',r:'#49565d'}[a.t];
+    panel(a.x,a.y,a.w,a.h,'rgba(255,255,255,.13)',base);
+    if(a.t==='c'){
+      drawFood(a.k,cx,cy-2,.9);label(a.k==='T'?'番茄':a.k==='L'?'生菜':a.k==='B'?'麵包':'肉排',cx,a.y+a.h-7);
+    }else if(a.t==='k'){
+      // cutting board and knife
+      rounded(a.x+10,a.y+15,a.w-20,a.h-28,6,'#c2a77d');
+      ctx.strokeStyle='#eee0c6';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(a.x+18,a.y+20);ctx.lineTo(a.x+48,a.y+8);ctx.stroke();
+      label('砧板',cx,a.y+a.h-6);
+      if(q.it)drawFood(q.it,cx,cy+2,.75);
+      if(q.p){ctx.fillStyle='#a6c58a';ctx.fillRect(a.x+5,a.y+a.h-5,(a.w-10)*q.p,3)}
+    }else if(a.t==='h'){
+      rounded(a.x+10,a.y+14,a.w-20,a.h-26,6,'#9eacaa');
+      ctx.fillStyle='#d5dfda';ctx.fillRect(a.x+16,a.y+21,a.w-32,3);label('傳遞台',cx,a.y+a.h-7);
+      if(q.it)drawFood(q.it,cx,cy,.7);
+    }else if(a.t==='a'){
+      rounded(a.x+9,a.y+12,a.w-18,a.h-23,5,'#c1a77c');
+      ctx.strokeStyle='#e9d7b4';ctx.lineWidth=2;ctx.strokeRect(a.x+15,a.y+18,a.w-30,a.h-35);
+      label('組裝台',cx,a.y+a.h-6);
+      q.a.forEach((it,j)=>drawFood(it,a.x+20+j*16,cy,0.45));
+      const m=kmat(q.a);if(m>=0){ctx.strokeStyle='#e9c06d';ctx.lineWidth=3;ctx.strokeRect(a.x+2,a.y+2,a.w-4,a.h-4);label(KR[m][0],cx,a.y-5)}
+    }else if(a.t==='s'){
+      rounded(a.x+8,a.y+12,a.w-16,a.h-22,6,'#252d32');
+      ctx.fillStyle='#c16b49';ctx.beginPath();ctx.arc(cx,cy,17,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#f2bd70';ctx.lineWidth=3;ctx.stroke();
+      label('爐台',cx,a.y+a.h-5);if(q.it)drawFood(q.it,cx,cy,.7);
+      if(q.p){ctx.fillStyle=q.p<6?'#d9a44e':q.p<10?'#c76b42':'#c94b3d';ctx.fillRect(a.x+5,a.y+a.h-5,(a.w-10)*Math.min(1,q.p/12),3)}
+    }else if(a.t==='w'){
+      rounded(a.x+9,a.y+13,a.w-18,a.h-25,6,'#c2a46d');
+      ctx.fillStyle='#e5d8bd';ctx.fillRect(a.x+16,a.y+20,a.w-32,4);label('出餐口',cx,a.y+a.h-6);
+    }else if(a.t==='r'){
+      rounded(a.x+16,a.y+12,a.w-32,a.h-22,5,'#252c31');ctx.strokeStyle='#89979a';ctx.lineWidth=3;ctx.strokeRect(a.x+22,a.y+18,a.w-44,a.h-34);label('回收',cx,a.y+a.h-6)
+    }
+  };
+  KS.forEach(prop);
+  // counters and order tickets
+  for(const side of [0,400]){rounded(side+8,518,384,70,9,'#303e43');}
+  G.o.forEach((r,j)=>{const side=j%2?400:0,x=side+18+Math.floor(j/2)*180;
+    rounded(x,526,160,54,7,'#e3d6bb');ctx.fillStyle='#3b4544';ctx.font='bold 12px sans-serif';ctx.textAlign='left';ctx.fillText('訂單 '+(j+1),x+9,541);
+    ctx.fillStyle='#8b6a4a';ctx.font='bold 18px sans-serif';ctx.textAlign='center';ctx.fillText(KR[r[0]][0],x+80,565);
+    ctx.fillStyle='#6e8d72';ctx.fillRect(x+7,576,146*Math.max(0,r[1])/60,3)
+  });
+  // illustrated cooks, no facial stickers
+  for(const side of ['L','R']){
+    const c=G.c[side],blue=side==='L',coat=blue?'#6f9db8':'#c78361',dark=blue?'#38586c':'#70483d';
+    ctx.save();ctx.translate(c.x,c.y);
+    ctx.fillStyle='rgba(0,0,0,.25)';ctx.beginPath();ctx.ellipse(0,20,20,7,0,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle=dark;ctx.beginPath();ctx.roundRect(-13,-4,26,25,7);ctx.fill();
+    ctx.fillStyle=coat;ctx.beginPath();ctx.roundRect(-15,-12,30,28,7);ctx.fill();
+    ctx.fillStyle='#e5d6bd';ctx.beginPath();ctx.arc(0,-19,11,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#e9e5d8';ctx.beginPath();ctx.roundRect(-12,-31,24,9,5);ctx.fill();
+    ctx.fillStyle=blue?'#4b7891':'#9b5d49';ctx.fillRect(-13,-23,26,3);
+    ctx.fillStyle='#d5b88b';ctx.fillRect(-5,-8,10,9);
+    ctx.restore();
+    if(G.h[side]){rounded(c.x-31,c.y-53,62,19,7,'#eee5d2');ctx.fillStyle='#344047';ctx.font='bold 10px sans-serif';ctx.textAlign='center';ctx.fillText(KI[G.h[side]]||'餐點',c.x,c.y-40)}
+  }
+  // HUD
+  rounded(332,8,136,34,9,'rgba(12,20,25,.78)');
+  ctx.fillStyle='#f0d49e';ctx.font='bold 14px sans-serif';ctx.textAlign='center';ctx.fillText('剩餘 '+Math.max(0,Math.ceil(G.t))+' 秒',400,30);
+  rounded(474,8,112,34,9,'rgba(12,20,25,.78)');ctx.fillStyle='#b8d6b2';ctx.fillText('得分 '+G.sc,530,30);
+  if(G.msg)G.msg.split('|').forEach((l,j)=>{rounded(95,190+j*35,610,28,8,'rgba(8,14,18,.82)');ctx.fillStyle='#f2d49a';ctx.font='bold 15px sans-serif';ctx.textAlign='center';ctx.fillText(l,400,209+j*35)});
+ }};;
 
 /* ---------- 主迴圈 ---------- */
 function loop(now){
@@ -424,6 +762,14 @@ function loop(now){
   if(cur)cur.step(dt);PT=PT.filter(p=>(p[4]-=dt)>0);PT.forEach(p=>{p[0]+=p[2]*dt;p[1]+=p[3]*dt});shake=Math.max(0,shake-30*dt);
   ctx.fillStyle='#0b1020';ctx.fillRect(0,0,W,H);ctx.lineWidth=2;ctx.setLineDash([]);
   if(cur){ctx.save();ctx.translate(-off+(shake?(Math.random()-.5)*shake:0),shake?(Math.random()-.5)*shake:0);cur.draw();
+   // subtle arcade finish: edge vignette, center seam and player-side accents
+   const vg=ctx.createLinearGradient(0,0,0,H);vg.addColorStop(0,'rgba(4,9,14,.22)');vg.addColorStop(.18,'rgba(4,9,14,0)');vg.addColorStop(.82,'rgba(4,9,14,0)');vg.addColorStop(1,'rgba(4,9,14,.25)');ctx.fillStyle=vg;ctx.fillRect(0,0,FW,H);
+   ctx.fillStyle='rgba(230,238,232,.10)';ctx.fillRect(398,0,4,H);
+   ctx.fillStyle='rgba(111,169,212,.5)';ctx.fillRect(0,0,5,H);ctx.fillStyle='rgba(216,139,103,.5)';ctx.fillRect(FW-5,0,5,H);
+   ctx.save();ctx.globalAlpha=.035;ctx.strokeStyle='#dce7e4';ctx.lineWidth=1;
+   for(let x=40;x<FW;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke()}
+   for(let y=40;y<H;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(FW,y);ctx.stroke()}
+   ctx.restore();
    PT.forEach(p=>{ctx.globalAlpha=Math.min(1,p[4]*2);ctx.fillStyle=p[5];ctx.fillRect(p[0]-2,p[1]-2,5,5)});ctx.globalAlpha=1;
    const rem=Math.ceil((cdEnd-now)/800);if(rem>0&&rem<=3){txt(rem,200,330,140,'rgba(255,255,255,.85)');txt(rem,600,330,140,'rgba(255,255,255,.85)')}
    ctx.restore();
