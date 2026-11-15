@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>雙屏乒乓</title>
+<style>
+:root{--bg:#f6f6f4;--fg:#1a1a1a;--ac:#e8590c;--card:#fff;--bd:#d8d8d4;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1118;--fg:#f0f0ee;--card:#181c26;--bd:#2c3140}}
+:root[data-theme="dark"]{--bg:#0e1118;--fg:#f0f0ee;--card:#181c26;--bd:#2c3140}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--fg);font-family:-apple-system,"PingFang TC","Noto Sans TC",sans-serif;overflow:hidden;touch-action:none}
+#menu{display:flex;flex-direction:column;gap:12px;max-width:360px;margin:0 auto;padding:24px 20px}
+h1{font-size:24px;margin:0}
+p{margin:0;line-height:1.5;font-size:14px;opacity:.8}
+textarea{width:100%;box-sizing:border-box;height:70px;font-size:12px;padding:8px;border:1px solid var(--bd);border-radius:10px;background:var(--card);color:var(--fg)}
+input{font-size:20px;padding:12px;border:1px solid var(--bd);border-radius:10px;background:var(--card);color:var(--fg);text-align:center;letter-spacing:4px}
+.row{display:flex;gap:10px}
+button{flex:1;font-size:17px;padding:14px;border:0;border-radius:10px;background:var(--ac);color:#fff}
+#game{display:none;position:fixed;inset:0}
+#c{width:100%;height:100%;object-fit:contain;background:#0b1020}
+#go{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);flex:none;padding:12px 28px}
+#st{position:fixed;top:calc(8px + env(safe-area-inset-top,0px));left:0;right:0;text-align:center;font-size:12px;color:#9aa3b8;pointer-events:none}
+</style></head><body>
+<div id="menu">
+  <h1>雙屏乒乓</h1>
+  <p>兩支手機直放、並排貼緊,畫面接成一個大球場。建議連同一個 Wi‑Fi。</p>
+  <div class="row" id="pick"><button id="bh">我建立(左邊)</button><button id="bg">我加入(右邊)</button></div>
+  <div id="ph" style="display:none;flex-direction:column;gap:10px">
+    <p>① 複製這段代碼,用 LINE 傳給朋友</p>
+    <textarea id="o" readonly placeholder="產生中…"></textarea><button class="cp" data-t="o">複製代碼</button>
+    <p>② 貼上朋友回傳的代碼</p>
+    <textarea id="a" placeholder="貼上回覆碼"></textarea><button id="cn">連線</button>
+  </div>
+  <div id="pg" style="display:none;flex-direction:column;gap:10px">
+    <p>① 貼上朋友傳來的代碼</p>
+    <textarea id="o2" placeholder="貼上代碼"></textarea><button id="mk">產生回覆碼</button>
+    <p>② 複製回覆碼傳給朋友</p>
+    <textarea id="a2" readonly></textarea><button class="cp" data-t="a2">複製回覆碼</button>
+  </div>
+  <p id="msg"></p>
+</div>
+<div id="game"><canvas id="c" width="400" height="600"></canvas><div id="st"></div><button id="go">發球</button></div>
+<script>
+const W=400,H=600,PH=90;
+const $=id=>document.getElementById(id);
+const cv=$('c'),ctx=cv.getContext('2d');
+let side,room,peers=0,padY=H/2;
+let S={bx:W,by:H/2,vx:0,vy:0,lp:H/2,rp:H/2,ls:0,rs:0,run:false,t:0};
+const isL=()=>side==='L';
+
+const cfg={iceServers:[{urls:'stun:stun.l.google.com:19302'}]};
+const enc=o=>btoa(unescape(encodeURIComponent(JSON.stringify(o))));
+const dec=t=>JSON.parse(decodeURIComponent(escape(atob(t.trim()))));
+let pc,dc;
+const send=o=>{if(dc&&dc.readyState==='open')dc.send(JSON.stringify(o))};
+function waitIce(){return new Promise(r=>{if(pc.iceGatheringState==='complete')return r();const f=()=>{if(pc.iceGatheringState==='complete'){pc.removeEventListener('icegatheringstatechange',f);r()}};pc.addEventListener('icegatheringstatechange',f);setTimeout(r,4000)})}
+function setup(ch){dc=ch;dc.onopen=begin;dc.onmessage=e=>onMsg(JSON.parse(e.data));dc.onclose=()=>{$('st').textContent='連線中斷'}}
+function onMsg(m){
+  if(m.t==='pad'&&isL())S.rp=m.y;
+  else if(m.t==='st'&&!isL()){const rp=S.rp;Object.assign(S,m);S.rp=rp}
+  else if(m.t==='go'&&isL())serve();
+}
+function begin(){
+  $('menu').style.display='none';$('game').style.display='block';
+  $('st').textContent=isL()?'左屏(主機)· 已連線':'右屏 · 已連線';
+  if(isL())setInterval(()=>send({t:'st',bx:S.bx,by:S.by,vx:S.vx,vy:S.vy,lp:S.lp,ls:S.ls,rs:S.rs,run:S.run}),40);
+  else setInterval(()=>send({t:'pad',y:padY}),40);
+  last=performance.now();requestAnimationFrame(loop);
+}
+const say=t=>$('msg').textContent=t;
+$('bh').onclick=async()=>{
+  side='L';$('pick').style.display='none';$('ph').style.display='flex';
+  pc=new RTCPeerConnection(cfg);setup(pc.createDataChannel('g',{ordered:false,maxRetransmits:0}));
+  await pc.setLocalDescription(await pc.createOffer());await waitIce();
+  $('o').value=enc(pc.localDescription);
+};
+$('cn').onclick=async()=>{
+  try{await pc.setRemoteDescription(dec($('a').value));say('連線中…')}catch(e){say('回覆碼格式不對,請重新複製')}
+};
+$('bg').onclick=()=>{side='R';$('pick').style.display='none';$('pg').style.display='flex'};
+$('mk').onclick=async()=>{
+  try{
+    pc=new RTCPeerConnection(cfg);pc.ondatachannel=e=>setup(e.channel);
+    await pc.setRemoteDescription(dec($('o2').value));
+    await pc.setLocalDescription(await pc.createAnswer());await waitIce();
+    $('a2').value=enc(pc.localDescription);say('請把回覆碼傳給朋友,等他按「連線」');
+  }catch(e){say('代碼格式不對,請重新複製')}
+};
+document.querySelectorAll('.cp').forEach(b=>b.onclick=async()=>{
+  const t=$(b.dataset.t);t.select();
+  try{await navigator.clipboard.writeText(t.value);say('已複製')}catch(e){document.execCommand('copy');say('已複製')}
+});
+
+function serve(){
+  if(!isL()){send({t:'go'});return}
+  const d=Math.random()<.5?-1:1;
+  S.bx=W;S.by=H/2;S.vx=300*d;S.vy=(Math.random()*2-1)*180;S.run=true;
+}
+$('go').onclick=serve;
+
+function move(e){
+  const t=e.touches?e.touches[0]:e;const r=cv.getBoundingClientRect();
+  const sc=Math.min(r.width/W,r.height/H);
+  const y=(t.clientY-r.top-(r.height-H*sc)/2)/sc;
+  padY=Math.max(PH/2,Math.min(H-PH/2,y));
+  if(isL())S.lp=padY;else S.rp=padY;
+}
+addEventListener('touchmove',move,{passive:true});addEventListener('touchstart',move,{passive:true});
+addEventListener('mousemove',e=>{if(e.buttons)move(e)});
+
+let last=0;
+function step(dt){
+  S.bx+=S.vx*dt;S.by+=S.vy*dt;
+  if(S.by<8){S.by=8;S.vy=Math.abs(S.vy)}
+  if(S.by>H-8){S.by=H-8;S.vy=-Math.abs(S.vy)}
+}
+function loop(now){
+  const dt=Math.min(.05,(now-last)/1000);last=now;
+  if(S.run){
+    if(!isL()){const e=(now-S.t)/1000;if(e<.3){}}
+    step(dt);
+    if(isL()){
+      if(S.vx<0&&S.bx<=28&&S.bx>10&&Math.abs(S.by-S.lp)<PH/2+8){S.vx=-S.vx*1.06;S.vy+=(S.by-S.lp)*4;S.bx=28}
+      if(S.vx>0&&S.bx>=2*W-28&&S.bx<2*W-10&&Math.abs(S.by-S.rp)<PH/2+8){S.vx=-S.vx*1.06;S.vy+=(S.by-S.rp)*4;S.bx=2*W-28}
+      if(S.bx<0){S.rs++;S.run=false}
+      if(S.bx>2*W){S.ls++;S.run=false}
+    }
+  }
+  draw();requestAnimationFrame(loop);
+}
+function draw(){
+  const off=isL()?0:W;
+  ctx.fillStyle='#0b1020';ctx.fillRect(0,0,W,H);
+  // seam glow
+  const sx=isL()?W:0;
+  const g=ctx.createLinearGradient(isL()?W-30:0,0,isL()?W:30,0);
+  g.addColorStop(isL()?0:1,'rgba(232,89,12,0)');g.addColorStop(isL()?1:0,'rgba(232,89,12,.35)');
+  ctx.fillStyle=g;ctx.fillRect(isL()?W-30:0,0,30,H);
+  ctx.fillStyle='rgba(255,255,255,.08)';ctx.font='bold 120px sans-serif';ctx.textAlign='center';
+  ctx.fillText(isL()?S.ls:S.rs,W/2,H/2+40);
+  // paddles
+  ctx.fillStyle='#f0f0ee';
+  if(isL())ctx.fillRect(16,S.lp-PH/2,10,PH);else ctx.fillRect(W-26,S.rp-PH/2,10,PH);
+  // ball
+  const bx=S.bx-off;
+  if(bx>-20&&bx<W+20){ctx.fillStyle='#e8590c';ctx.beginPath();ctx.arc(bx,S.by,10,0,7);ctx.fill()}
+  $('go').style.display=S.run?'none':'block';
+}
+</script></body></html>
