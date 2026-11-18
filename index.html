@@ -60,7 +60,8 @@
   [J45] (約第 1351 行) 開始畫面：輸入名字、依名字繼續存檔
   [J46] (約第 1380 行) 多人連線載入 (Trystero P2P，失敗則單人模式)
   [J47] (約第 1396 行) 動物多人同步：客戶端動物 cliA、套用封包 applyAn、房主廣播 pk
--->
+  [J51] 多人動作同步：蹲下、跳躍、揮動/使用工具、手持物品、開槍、拉弓（取代 rpU、presence 加 o/j/h/r、事件 a）
+  -->
 <!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"><title>荒野求生</title>
 <style>
 /* ===== [C1] 基礎樣式、狀態列(生命/飢餓/口渴)、資源欄、快捷欄、虛擬按鈕、提示、背包面板 ===== */
@@ -1680,4 +1681,121 @@ if(cur=='plan'&&itg.plan){itg.plan.rotation.z=sin(time*1.6)*.04;itg.plan.rotatio
 };
 })();
 
-</script></body></html>
+</script><script>
+// ==================================================================
+// [J51] 多人動作同步：蹲下、跳躍、揮動/使用工具、手持物品、開槍、拉弓
+// 本機動作 → 狀態(蹲/跳/手持/拉弓)走 presence 即時同步；揮動/使用/開槍走事件 'a'。
+// 其他玩家的模型(rpU 建立的 RP)會依此做出蹲、跳、揮工具、舉槍、拉弓等動作。
+// ==================================================================
+(()=>{
+const SWK=[[[0,.32,.52,.64,1],[-.9,-2.5,-.7,-.7,-.9]],[[0,.35,.5,.62,1],[-1.15,-1.0,-1.75,-1.75,-1.15]]];
+const ks=(t,v,u)=>{let i=0;while(i<t.length-2&&u>t[i+1])i++;return v[i]+(v[i+1]-v[i])*sm(0,1,(u-t[i])/(t[i+1]-t[i]))};
+const MZ={pist:-.2,rifle:-.62,smg:-.3,shot:-.6};
+const flM=new T3.MeshBasicMaterial({color:0xffc040,transparent:true,opacity:.95,blending:T3.AdditiveBlending,depthWrite:false,fog:false}),flG=new T3.SphereGeometry(.07,6,5);
+const flameM=new T3.MeshBasicMaterial({color:0xff7a1a,transparent:true,opacity:.9,depthWrite:false}),flameG=new T3.ConeGeometry(.06,.22,6);
+const bowGeo=(()=>{const g=new T3.TorusGeometry(.42,.014,5,16,PI*.8);g.rotateZ(-PI*.4);g.rotateY(PI/2);g.translate(0,0,.42);return g})();
+const bowMat=new T3.MeshLambertMaterial({color:0x6a4a2a}),strMat=new T3.LineBasicMaterial({color:0xe8e0c8});
+
+// 幫遠端玩家模型補上：手臂、手持物掛點、動作狀態
+function init(a,q){
+  const arms=a.bd.children.filter(c=>c.isGroup&&Math.abs(c.position.y-1.45)<.01);
+  a.arms=[arms[0]||null,arms[1]||null]; // arms[0] = 人物右手(拿工具)
+  a.hold=new T3.Group;a.hold.position.set(0,-.6,0);if(a.arms[0])a.arms[0].add(a.hold);
+  a.cr=0;a.air=0;a.sy=q.y;a.sw=null;a.us=null;a.gk=0;a.fl=0;a.dr=0;a.hk=undefined;a.hm=null;a.fm=null;a.bs=null;a.gun=false;
+}
+// 換手持物品
+function setHold(a,k){
+  while(a.hold.children.length)a.hold.remove(a.hold.children[0]);
+  a.hk=k;a.hm=null;a.fm=null;a.bs=null;a.gun=false;a.fl=0;
+  if(!k)return;
+  if(k=='bow'){
+    a.hold.add(new T3.Mesh(bowGeo,bowMat));
+    const sa=new Float32Array(9),sg=new T3.BufferGeometry();sg.setAttribute('position',new T3.BufferAttribute(sa,3));
+    const ln=new T3.Line(sg,strMat);ln.frustumCulled=false;a.hold.add(ln);a.bs={sa,sg};
+    a.hold.rotation.order='ZYX';a.hold.rotation.set(PI/2,0,PI);return;
+  }
+  const s=itg[k];if(!s)return;
+  const m=new T3.Mesh(s.geometry,s.material);m.scale.setScalar(1.15);a.hold.add(m);a.hm=m;
+  const it=IT[k];
+  if(it&&it.k=='g'){
+    a.gun=true;a.hold.rotation.order='ZYX';a.hold.rotation.set(PI/2,0,PI);
+    if(MZ[k]!=null){const f=new T3.Mesh(flG,flM);f.position.set(0,.05,MZ[k]*1.15-.03);f.visible=false;a.hold.add(f);a.fm=f}
+  }else{
+    a.hold.rotation.order='XYZ';a.hold.rotation.set(-.4,0,PI);
+    if(k=='torch'){const f=new T3.Mesh(flameG,flameM);f.position.y=.42;m.add(f)}
+  }
+}
+// 每幀：蹲、跳、手臂、手持物動作
+function pose(a,q,dt,f){
+  const k=Math.min(1,dt*12);
+  a.cr+=((q.o?1:0)-a.cr)*k;a.air+=((q.j?1:0)-a.air)*k;
+  a.bd.position.y=-.4*a.cr;
+  a.lg.forEach((l,i)=>{l.u.scale.y=1-.5*a.cr;l.u.rotation.x=sin(a.ph+l.ph)*.45*f*(1-a.air)+(i?.5:-.6)*a.air});
+  const hk=q.h||null;if(hk!==a.hk)setHold(a,hk);
+  a.dr+=((a.hk=='bow'?(+q.r||0):0)-a.dr)*Math.min(1,dt*14);
+  a.gk=Math.max(0,a.gk-dt*6);
+  if(a.fl>0){a.fl-=dt;if(a.fm&&a.fl<=0)a.fm.visible=false}
+  const wk=sin(a.ph)*.5*f;
+  let rA=a.hk?-.9+wk*.15:.15-wk,lA=.15+wk;
+  if(a.gun){rA=-1.45-a.gk*.3;lA=-1.2-a.gk*.2}
+  else if(a.hk=='bow'){rA=-1.5;lA=-1.5+a.dr*.85}
+  if(a.us){a.us.t+=dt;const u=a.us.t/a.us.d;if(u>=1)a.us=null;else rA=-.9-1.3*sin(u*PI)}
+  if(a.sw){a.sw.t+=dt;const u=a.sw.t/a.sw.d;if(u>=1)a.sw=null;else rA=ks(SWK[a.sw.k][0],SWK[a.sw.k][1],u)}
+  if(a.arms[0])a.arms[0].rotation.x=rA;
+  if(a.arms[1])a.arms[1].rotation.x=lA;
+  if(a.bs){const s=a.bs.sa;s[0]=0;s[1]=.4;s[2]=.29;s[3]=0;s[4]=0;s[5]=.29+a.dr*.45;s[6]=0;s[7]=-.4;s[8]=.29;a.bs.sg.attributes.position.needsUpdate=true}
+}
+
+// 取代原本的 rpU：多送 蹲(o)/跳(j)/手持(h)/拉弓(r)，狀態一變就立刻送出
+let lastSig='',pT=0,pSw=null,pUs=null;
+window.rpU=function(dt){
+  if(!NET)return;
+  netT-=dt;pT-=dt;
+  const sig=(P.cro?1:0)+'|'+(P.gr?0:1)+'|'+(cur||'')+'|'+(dead?1:0)+'|'+Math.round(dr*8);
+  if(netT<=0||(sig!==lastSig&&pT<=0)){
+    netT=P.gr?.15:.07;pT=.05;lastSig=sig;
+    NET.presence({x:+P.x.toFixed(2),y:+P.y.toFixed(2),z:+P.z.toFixed(2),w:+P.yaw.toFixed(2),c:myC,id:MYID,b:BIRTH,d:dead?1:0,o:P.cro?1:0,j:P.gr?0:1,h:cur||'',r:+dr.toFixed(2)}).catch(()=>{});
+  }
+  const seen=new Set();
+  for(const p of NET.peers()){
+    const q=p.presence;if(p.isMe||!q||q.x==null)continue;
+    seen.add(p.peer);let a=RP.get(p.peer);
+    if(!a){a=mkH(CL[q.c%6]||0xd9534f,0xe8c8a0,.15);a.x=q.x;a.z=q.z;a.ph=0;a.mc=CL[q.c%6]||0xd9534f;init(a,q);RP.set(p.peer,a)}
+    a.pid=q.id;a.dd=q.d;a.y=q.y;
+    const dx=q.x-a.x,dz=q.z-a.z,k=Math.min(1,dt*8),v=Math.hypot(dx,dz)*8;
+    a.x+=dx*k;a.z+=dz*k;a.sy+=(q.y-a.sy)*Math.min(1,dt*16);
+    a.g.position.set(a.x,a.sy,a.z);a.g.rotation.y=q.w+PI;a.ph+=Math.min(v,6)*dt*2.4;
+    pose(a,q,dt,Math.min(1,v/1.2));
+  }
+  for(const[id,a]of RP)if(!seen.has(id)){sc.remove(a.g);RP.delete(id)}
+  const n=seen.size;if(nUI)nUI.dataset.n=n;
+};
+
+// 本機：偵測揮動 sw / 使用 us 開始 → 廣播事件
+const u2=window.update;
+window.update=function(dt){
+  u2(dt);
+  if(sw&&sw!==pSw)nt('a',{id:MYID,t:'sw',d:sw.d,k:sw.k===TH?1:0});
+  pSw=sw;
+  if(us&&us!==pUs)nt('a',{id:MYID,t:'us',d:us.d});
+  pUs=us;
+};
+// 本機：開槍 → 廣播事件
+if(typeof window.gun=='function'){const g1=window.gun;window.gun=function(t){const a0=inv.ammo;g1(t);if(inv.ammo<a0)nt('a',{id:MYID,t:'gn'})}}
+
+// 遠端：接收事件
+const iv=setInterval(()=>{
+  if(!NET)return;clearInterval(iv);
+  NET.on('a',m=>{
+    const d=m&&m.data;if(!d||m.isMe)return;
+    let a=m.peer!=null?RP.get(m.peer):null;
+    if(!a||a.pid!==d.id){a=null;for(const x of RP.values())if(x.pid===d.id){a=x;break}}
+    if(!a||!a.arms)return;
+    if(d.t=='sw')a.sw={t:0,d:+d.d||.4,k:d.k?1:0};
+    else if(d.t=='us')a.us={t:0,d:+d.d||.6};
+    else if(d.t=='gn'){a.gk=1;a.fl=.06;if(a.fm)a.fm.visible=true}
+  });
+},400);
+})();
+</script>
+</body></html>
