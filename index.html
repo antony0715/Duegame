@@ -43,6 +43,8 @@
   用法：在編輯器搜尋 [代號]（例如 [J24]）即可跳到該區塊；每個區塊開頭都有 ====== 分隔線與標題。
   代號規則：C = CSS 樣式區、H = HTML 結構、J = JavaScript 區塊。
   ★ 動物（鹿/狼）相關：[J24] 鹿狼 AI、[J12] 傷害 dmgA、[J28] 剝取屍體、[J47] 多人同步；殭屍：[J22]。
+  ★ 最新：有洞天花板 ceil（搜尋 ceil，配合梯子 ladT 放在洞口）、門與牆同高（piece() 的 door）、寵物指令改成可展開的小按鈕 #pc；
+    柵欄門 gt、新玩家補送 pls/sps、樹苗 sp/spg/sps、牽繩 lp/lv 第 14 欄 皆已多人同步（J56）。
   ★ 新增：命名牌 nametag（搜尋 [NAMETAG]）；動物逃跑／吸引／卡住修正（搜尋 [ANIMAL-FIX]）。
   ★ 已修正：鹿/狼被誤判為殭屍而夜晚死亡、遠離即消失（搜尋 [BUGFIX]，旗標改為 a.zb）。
   ---------------------------------------------------------------
@@ -404,7 +406,7 @@ body:has(#pn:not(.hid)) :is(#mw,#zn,#tm,#td,#fs,#lc,#bA,#bJ,#bE,#bO,#bF,#js,#cr)
 // ==================================================================
 window.__roomP=new Promise(r=>window.__roomRes=r);
 try{window.GMODE=localStorage.getItem('wild_mode_v1')=='single'?'single':'multi'}catch(e){window.GMODE='multi'}
-const FLR=[],TRI=[],triIn=(t,x,z)=>{const dx=x-t.x,dz=z-t.z,c=Math.cos(t.rot),s=Math.sin(t.rot),a=dx*c-dz*s,b=dx*s+dz*c;return b>-.866&&Math.abs(a)<(1.732-b)*.5774},NEWK=['ptorch','wtorch','chest','lchest','floor','stair','wind','solar','gen','pbox','lamp','fan','heater','tv','radio','purif','tfound','tfloor','troof','nwall'],TKS=['ptorch','wtorch'],CHK=['chest','lchest'],NOCH=['rock','torch'];let RMD=0;
+const FLR=[],TRI=[],triIn=(t,x,z)=>{const dx=x-t.x,dz=z-t.z,c=Math.cos(t.rot),s=Math.sin(t.rot),a=dx*c-dz*s,b=dx*s+dz*c;return b>-.866&&Math.abs(a)<(1.732-b)*.5774},NEWK=['ptorch','wtorch','chest','lchest','floor','stair','wind','solar','gen','pbox','lamp','fan','heater','tv','radio','purif','tfound','tfloor','troof','nwall','ceil'],TKS=['ptorch','wtorch'],CHK=['chest','lchest'],NOCH=['rock','torch'];let RMD=0;
 const SAME=(p,d)=>p.k==d.k&&Math.abs(p.x-d.x)<.02&&Math.abs(p.z-d.z)<.02&&(p.y===undefined||d.y===undefined||Math.abs(p.y-d.y)<.5);
 const stairY=(t,x,z)=>{const l=(x-t.x)*Math.sin(t.rot)+(z-t.z)*Math.cos(t.rot);return t.y+.55*(Math.max(0,Math.min(5,Math.floor((l+1.5)/.5)))+1)};
 const NP={
@@ -414,6 +416,7 @@ const NP={
  chest(g,add,B,WM,WD,WS,L){const w=L?1.6:.9,h=L?.75:.5,d=L?.8:.6;add(B(w,h,d),WM,0,h/2,0);add(B(w+.06,.14,d+.06),WD,0,h+.07,0);for(const s of[-1,1])add(B(.07,h+.14,d+.08),WS,s*w*.34,(h+.14)/2,0);add(B(.14,.16,.05),WS,0,h*.8,d/2+.03)},
  lchest(g,a,B,m,d,s){NP.chest(g,a,B,m,d,s,1)},
  floor(g,add,B,WM,WD){add(B(3,.2,3),WM,0,-.1,0);for(const z of[-1,0,1])add(B(3,.1,.12),WD,0,-.22,z*1.2)},
+ ceil(g,add,B,WM,WD){for(const s of[-1,1]){add(B(3,.2,.7),WM,0,-.1,s*1.15);add(B(.7,.2,1.6),WM,s*1.15,-.1,0);add(B(1.76,.07,.08),WD,0,.02,s*.84);add(B(.08,.07,1.76),WD,s*.84,.02,0);add(B(3,.1,.12),WD,0,-.22,s*1.2)}},
  stair(g,add,B,WM,WD){for(let i=0;i<6;i++)add(B(2.8,.55*(i+1),.5),WM,0,.275*(i+1),-1.25+i*.5);for(const s of[-1,1])add(B(.1,.3,3),WD,s*1.45,1.6,0).rotation.x=-.78}
 };
 </script>
@@ -433,7 +436,7 @@ const vn=(x,z)=>{const i=Math.floor(x),j=Math.floor(z),u=x-i,v=z-j,a=u*u*(3-2*u)
 // ==================================================================
 const WL=0,S=3,RAD=190,H=(x,z)=>vn(x*.02+5,z*.02+9)*14+vn(x*.07,z*.07)*4+vn(x*.3,z*.3)*.5-7-Math.max(0,Math.hypot(x,z)-150)*.25,H0=(x,z)=>vn(x*.02+5,z*.02+9)*14+vn(x*.07,z*.07)*4+vn(x*.3,z*.3)*.5-7-Math.max(0,Math.hypot(x,z)-68)*.2;
 const F=new Map(),EG=new Set(),RF=new Set(),ROOFS=[],walls=(()=>{const a=[];a.push=function(...v){for(const w of v)if(w&&w.y0===undefined&&window.__WY!=null){w.y0=window.__WY-.3;w.y1=window.__WY+3.1}return Array.prototype.push.apply(this,v)};return a})(),doors=[],fires=[],nodes=[],ans=[];
-const gh=(x,z)=>{const f=F.get(Math.round(x/S)+','+Math.round(z/S));let y=f?Math.max(H(x,z),f.y):H(x,z);if(FLR.length){const cx=Math.round(x/S),cz=Math.round(z/S);for(const t of FLR){if(Math.round(t.x/S)!=cx||Math.round(t.z/S)!=cz)continue;let h,lim=.75;if(t.k=='stair'){h=stairY(t,x,z);if(h>P.y+.75&&P.y>=t.y-.7&&P.y<h)lim=99}else{h=t.y;if(t.k=='floor'&&FLR.some(q=>q.k=='stair'&&Math.round(q.x/S)==cx&&Math.round(q.z/S)==cz&&Math.abs(q.y+3.3-t.y)<.3))lim=.05}if(h<=P.y+lim&&h>y)y=h}}for(const t of TRI)if(t.y<=P.y+.75&&t.y>y&&triIn(t,x,z))y=t.y;if(ROOFS.length){const c2=Math.round(x/S),d2=Math.round(z/S);for(const r of ROOFS){if(Math.round(r.x/S)!=c2||Math.round(r.z/S)!=d2)continue;if(r.y<=P.y+.75&&r.y>y&&!FLR.some(q=>q.k!='stair'&&Math.round(q.x/S)==c2&&Math.round(q.z/S)==d2&&Math.abs(q.y-r.by-3.3)<.5))y=r.y}}return y};
+const gh=(x,z)=>{const f=F.get(Math.round(x/S)+','+Math.round(z/S));let y=f?Math.max(H(x,z),f.y):H(x,z);if(FLR.length){const cx=Math.round(x/S),cz=Math.round(z/S);for(const t of FLR){if(Math.round(t.x/S)!=cx||Math.round(t.z/S)!=cz)continue;if(t.k=='ceil'&&Math.abs(x-t.x)<.8&&Math.abs(z-t.z)<.8)continue;let h,lim=.75;if(t.k=='stair'){h=stairY(t,x,z);if(h>P.y+.75&&P.y>=t.y-.7&&P.y<h)lim=99}else{h=t.y;if(t.k=='floor'&&FLR.some(q=>q.k=='stair'&&Math.round(q.x/S)==cx&&Math.round(q.z/S)==cz&&Math.abs(q.y+3.3-t.y)<.3))lim=.05}if(h<=P.y+lim&&h>y)y=h}}for(const t of TRI)if(t.y<=P.y+.75&&t.y>y&&triIn(t,x,z))y=t.y;if(ROOFS.length){const c2=Math.round(x/S),d2=Math.round(z/S);for(const r of ROOFS){if(Math.round(r.x/S)!=c2||Math.round(r.z/S)!=d2)continue;if(r.y<=P.y+.75&&r.y>y&&!FLR.some(q=>q.k!='stair'&&Math.round(q.x/S)==c2&&Math.round(q.z/S)==d2&&Math.abs(q.y-r.by-3.3)<.5))y=r.y}}return y};
 const rd=new T3.WebGLRenderer({canvas:$('c'),antialias:false});rd.setPixelRatio(Math.min(devicePixelRatio||1,1.75));rd.autoClear=false;
 const sc=new T3.Scene,cam=new T3.PerspectiveCamera(72,1,.1,175),vs=new T3.Scene,vc=new T3.PerspectiveCamera(65,1,.01,10);cam.rotation.order='YXZ';sc.add(cam);sc.fog=new T3.Fog(0x9fc6e0,22,150);
 const hemi=new T3.HemisphereLight(0xcfe6ff,0x4a4030,.7),sun=new T3.DirectionalLight(0xfff2d6,1),moon=new T3.DirectionalLight(0x8aa6ff,0),tl=new T3.PointLight(0xffa550,0,10,2),fl=[0,1].map(()=>new T3.PointLight(0xff8a30,0,15,2));sc.add(hemi,sun,moon,tl,...fl);const ll=[0,1,2].map(()=>new T3.PointLight(0xfff0c0,0,18,2)),_lv=new T3.Vector3;sc.add(...ll);
@@ -516,7 +519,7 @@ const P={x:spx,y:H(spx,spz),z:spz,vx:0,vz:0,vy:0,yaw:0,pit:0,hp:100,fd:100,th:10
 const CT={};const CAP=window.__CAP={wood:1000,stone:1000,metal:800,cuore:800,sulfore:800,hqore:800,coal:800,frag:600,sulfur:600,char:600,cu:600,hqm:600,grass:500,cloth:300,leather:300,fat:300,arrow:200,iarrow:200,ammo:200,gp:200,wire:200,shell:100,raw:30,cooked:30,band:20,syr:10,rope:50,lgf:50,blade:50,pipe:50,spring:50,sheet:50},inv=((o)=>{let ft=0;return new Proxy(o,{set(t,k,v){const c=CAP[k];if(c!==undefined&&typeof v=='number'&&v>c){if(v>(t[k]||0)){const n=Date.now();if(n-ft>1200){ft=n;try{toast((NAME(k)||k)+' 已達上限 '+c)}catch(e){}}}v=c}t[k]=v;return true}})})({wood:0,stone:0,metal:0,raw:0,cooked:0,arrow:0,iarrow:0,frag:0,sulfore:0,sulfur:0,char:0,cloth:0,leather:0,fat:0,gp:0,ammo:0,band:0,hqore:0,hqm:0,rope:0,lgf:0,blade:0,pipe:0,spring:0,sheet:0,shell:0,syr:0,fire:0,bench1:0,bench2:0,bench3:0,furnace:0,furn2:0,bag:0,bed:0,rain:0,stove:0,barr:0,sbar:0,mbar:0,tc:0,grass:0}),own={};
 const KEYS=['rock','torch','hatchet','pickaxe','spear','bow','plan'],IT={rock:{n:'石塊',a:[5,4,0,.12,.1],d:10,rng:2.3,du:.5,k:'c'},torch:{n:'火把',a:[2,1,0,.05,.04],d:12,rng:2.3,du:.5,k:'c'},hatchet:{n:'石斧',a:[16,3,0,.2,.08],d:22,rng:2.5,du:.62,k:'c'},pickaxe:{n:'石鎬',a:[4,12,5,.06,.2],d:18,rng:2.5,du:.65,k:'c'},spear:{n:'長矛',a:[3,1,0,.05,.05],d:38,rng:3.4,du:.62,k:'t'},bow:{n:'弓'},plan:{n:'建築圖紙',a:[0,0,0,0,0],d:6,rng:2.3,du:.5,k:'c'}};
 const RC=[['torch','火把',{wood:15}],['plan','建築圖紙',{wood:20}],['hammer','建築鎚',{wood:30,stone:10}],['hatchet','石斧',{wood:40,stone:20}],['pickaxe','石鎬',{wood:40,stone:30}],['spear','長矛',{wood:50,stone:10}],['bow','弓',{wood:60}],['arrow','石箭 x5',{wood:15,stone:5}],['iarrow','鐵箭 x5',{wood:10,metal:5}],['band','繃帶',{cloth:3,fat:2},0,1],['gp','火藥 x10',{char:30,sulfur:20},0,10],['mhatch','金屬斧',{wood:30,frag:25},1],['mpick','金屬鎬',{wood:30,frag:25},1],['mach','彎刀',{wood:20,frag:40},1],['larm','皮甲',{leather:6,cloth:8},1],['warm','木甲',{wood:100,cloth:6},1],['ammo','子彈 x6',{frag:3,gp:4},1,6],['sword','長劍',{wood:20,frag:70},2],['marm','金屬護甲',{frag:120,leather:6,cloth:10},2],['pist','手槍',{frag:90,wood:30},2],['rifle','突擊步槍',{frag:200,wood:50,leather:4},3]];
-const SK=['foundation','wall','window','door','roof'],DK=['fire','bench1','bench2','bench3','furnace','furn2','bag','bed','rain','stove','barr','sbar','mbar','tc',...NEWK],PK=SK.concat(DK),TR=['wood','stone','frag'],TQ=[1,1.5,.7],PN={foundation:'地基',wall:'牆',window:'窗牆',door:'門框',roof:'屋頂',fire:'營火',bench1:'工作臺 1 級',bench2:'工作臺 2 級',bench3:'工作臺 3 級',furnace:'熔爐',bag:'睡袋',bed:'床',rain:'雨水收集器',stove:'灶台',barr:'木製路障',tc:'領地櫃'},PC={foundation:{wood:30},wall:{wood:20},window:{wood:20},door:{wood:25},roof:{wood:20},fire:{wood:10,stone:5},bench1:{wood:80},bench2:{wood:120,frag:40},bench3:{wood:150,frag:100,stone:50},furnace:{stone:60,wood:20},bag:{cloth:10},bed:{wood:60,cloth:30},rain:{wood:60,frag:20},stove:{stone:60,wood:20,frag:10},barr:{wood:40}},NM={wood:'木',stone:'石',metal:'礦'};let cat=0,tier=0;const BPK=['floor','stair','tfound','tfloor','troof','nwall'],BPW={floor:40,stair:60,tfound:30,tfloor:25,troof:25,nwall:25},BPL=SK.concat(BPK),BL=()=>BPL,bcR=k=>{if(DK.includes(k))return{[k]:1};return{grass:Math.ceil(PC[k].wood/3)}},bc=k=>window.__FREE?{}:bcR(k);
+const SK=['foundation','wall','window','door','roof'],DK=['fire','bench1','bench2','bench3','furnace','furn2','bag','bed','rain','stove','barr','sbar','mbar','tc',...NEWK],PK=SK.concat(DK),TR=['wood','stone','frag'],TQ=[1,1.5,.7],PN={foundation:'地基',wall:'牆',window:'窗牆',door:'門框',roof:'屋頂',fire:'營火',bench1:'工作臺 1 級',bench2:'工作臺 2 級',bench3:'工作臺 3 級',furnace:'熔爐',bag:'睡袋',bed:'床',rain:'雨水收集器',stove:'灶台',barr:'木製路障',tc:'領地櫃'},PC={foundation:{wood:30},wall:{wood:20},window:{wood:20},door:{wood:25},roof:{wood:20},fire:{wood:10,stone:5},bench1:{wood:80},bench2:{wood:120,frag:40},bench3:{wood:150,frag:100,stone:50},furnace:{stone:60,wood:20},bag:{cloth:10},bed:{wood:60,cloth:30},rain:{wood:60,frag:20},stove:{stone:60,wood:20,frag:10},barr:{wood:40}},NM={wood:'木',stone:'石',metal:'礦'};let cat=0,tier=0;const BPK=['floor','stair','tfound','tfloor','troof','nwall','ceil'],BPW={floor:40,stair:60,tfound:30,tfloor:25,troof:25,nwall:25,ceil:40},BPL=SK.concat(BPK),BL=()=>BPL,bcR=k=>{if(DK.includes(k))return{[k]:1};return{grass:Math.ceil(PC[k].wood/3)}},bc=k=>window.__FREE?{}:bcR(k);
 const cost=c=>Object.keys(c).map(k=>NM[k]+c[k]).join(' ');
 Object.assign(IT,{mhatch:{n:'金屬斧',a:[28,3,0,.34,.09],d:30,rng:2.5,du:.5,k:'c',v:'a',c:0x7fa0bf},mpick:{n:'金屬鎬',a:[4,18,9,.07,.32],d:26,rng:2.5,du:.55,k:'c',v:'p',c:0x7fa0bf},mach:{n:'彎刀',a:[5,1,0,.07,.05],d:52,rng:2.6,du:.42,k:'c',v:'s',c:0xc4c4be},sword:{n:'長劍',a:[3,1,0,.05,.04],d:70,rng:2.9,du:.46,k:'c',v:'s',c:0xdfe6ea},pist:{n:'手槍',k:'g',am:'ammo',dmg:38,cd:.32,v:'g',c:0x3c3c40},rifle:{n:'突擊步槍',k:'g',am:'ammo',dmg:30,cd:.11,auto:1,v:'g',c:0x2f2f33},larm:{n:'皮甲',k:'a',ar:.15,v:'x',c:0x8a5a34},warm:{n:'木甲',k:'a',ar:.28,v:'x',c:0xa06a3c},marm:{n:'金屬護甲',k:'a',ar:.5,v:'x',c:0x6a7684}});KEYS.push('mhatch','mpick','mach','sword','pist','rifle','larm','warm','marm');
 const NX={frag:'金屬碎片',sulfore:'硫磺礦',sulfur:'硫磺',char:'木炭',cloth:'布料',leather:'皮革',fat:'動物脂肪',gp:'火藥',ammo:'子彈',band:'繃帶'},DX={frag:'熔爐熔煉金屬礦取得，進階裝備與工作臺的材料',sulfore:'敲擊硫磺礦脈取得，需用熔爐熔煉',sulfur:'熔煉硫磺礦取得，火藥原料',char:'在熔爐燃燒木材取得，火藥原料',cloth:'採集大麻植物，或用草合成取得',leather:'獵殺動物取得',fat:'獵殺動物取得',gp:'木炭與硫磺製成，彈藥原料',ammo:'手槍與步槍的彈藥',band:'手持點擊使用，恢復生命',mhatch:'砍樹效率更高',mpick:'採礦效率更高，可採硫磺礦',mach:'快速揮砍的近戰武器',sword:'重型近戰武器',pist:'半自動，單發射擊',rifle:'全自動，按住連射',larm:'輕度減傷，拖曳到人物旁的裝備格才會生效',warm:'中度減傷，拖曳到人物旁的裝備格才會生效',marm:'高度減傷，拖曳到人物旁的裝備格才會生效'},RK={木材:'wood',石頭:'stone',金屬礦:'metal',生肉:'raw'};for(const k in NX)RK[NX[k]]=k;
@@ -546,7 +549,7 @@ let q=null;for(const r of[1.6,2.8,3.8]){let bd=1.8;const x=P.x-sin(P.yaw)*r,z=P.
 function whc(q,n){return window.__FREE?{}:whcR(q,n)}
 function whcR(q,n){const b=+(PC[q.k]&&PC[q.k].wood)||0;return[0,{wood:b},{stone:Math.ceil(b*1.5)},{frag:Math.ceil(b*.7)},{hqm:Math.ceil(b*.4)}][n]}
 const ic2=(k,x,y,z)=>`<svg x='${x}' y='${y}' width='${z}' height='${z}' viewBox='0 0 48 48'>${IC[k]}</svg>`,TI=['grass','wood','stone','frag','hqm'],WC='#e8e6df';
-const WDS={foundation:'每座房子都需要地基',wall:'隔出房間的牆壁',window:'讓光線進來的窗牆',door:'可安裝門的牆框',roof:'遮風擋雨的屋頂',floor:'可蓋二樓的地板，抬頭放置可疊上一層',stair:'連接上下樓層',tfound:'三角形地基，貼著地基邊緣',tfloor:'三角形地板',troof:'三角形天花板',nwall:'一半寬度的窄牆，貼在地基或地板邊緣'},TD2=['最脆弱的臨時材質','基本堅固的木質結構','不受火焰和近戰武器影響的堅固材質。','抗爆能力更強的金屬材質','最高等級的裝甲材質'];
+const WDS={foundation:'每座房子都需要地基',wall:'隔出房間的牆壁',window:'讓光線進來的窗牆',door:'可安裝門的牆框',roof:'遮風擋雨的屋頂',floor:'可蓋二樓的地板，抬頭放置可疊上一層',stair:'連接上下樓層',tfound:'三角形地基，貼著地基邊緣',tfloor:'三角形地板',troof:'三角形天花板',nwall:'一半寬度的窄牆，貼在地基或地板邊緣',ceil:'中間有洞的天花板，抬頭放在上一層；對準洞口放梯子就能爬上去'},TD2=['最脆弱的臨時材質','基本堅固的木質結構','不受火焰和近戰武器影響的堅固材質。','抗爆能力更強的金屬材質','最高等級的裝甲材質'];
 const whW=(s,n)=>{const a=[];for(let i=0;i<s.length;i+=n)a.push(s.slice(i,i+n));return a.slice(0,2)},whF=(id,c,k0,k1)=>`<filter id='${id}' color-interpolation-filters='sRGB'><feColorMatrix type='matrix' values='${[0,1,2].map(r=>{const v=c[r],l=[.3,.59,.11].map(x=>+(v*k1*x).toFixed(3)).join(' ');return l+' 0 '+(+(v*k0).toFixed(3))}).join(' ')} 0 0 0 1 0'/></filter>`;
 function drawWh(){if(wh.dv)return drawWhDv();const q=wh.q,pl=wh.p,pt=(r,a)=>[+(sin(a)*r).toFixed(1),+(-cos(a)*r).toFixed(1)],R=120,r0=72,NN=pl?BPL.length:6,sc=PI*2/NN;
 let s=`<svg viewBox='-134 -134 268 268'><defs>${whF('fR',[.8,.2,.12],.75,.5)}${whF('fW',[1,1,1],.9,.1)}${whF('fC',[.95,.28,.18],.8,.5)}</defs>`;
@@ -952,9 +955,9 @@ g.userData.f=f}
 function piece(k,t){const WM=TW[t|0],WD=TD[t|0],g=new T3.Group,B=(w,h,l)=>new T3.BoxGeometry(w,h,l),add=(geo,mat,x,y,z,p=g)=>{const m=new T3.Mesh(geo,mat);m.position.set(x,y,z);p.add(m);return m};let door=null;if(NP[k]){NP[k](g,add,B,WM,WD,WS);return{g,door:null}}
 if(k=='foundation'){add(B(S,3,S),WM,0,-1.5,0);for(const[sx,sz]of[[0,1],[0,-1],[1,0],[-1,0]])add(B(sx?.2:S+.04,.14,sx?S+.04:.2),WD,sx*(S/2-.08),-.04,sz*(S/2-.08))
 for(const a of[-1,1])for(const b of[-1,1])add(B(.3,.22,.3),WD,a*(S/2-.1),0,b*(S/2-.1))}
-else if(k=='wall'||k=='door'||k=='window'){const gap=k=='door'?1.1:0,w=(S-gap)/2;if(k=='window'){add(B(S,.9,.14),WM,0,.45,0);add(B(S,1.3,.14),WM,0,2.55,0);for(const s of[-1,1])add(B(.9,1,.14),WM,s*1.05,1.4,0);add(B(1.3,.05,.22),WD,0,.92,0);add(B(1.2,1,.03),GL,0,1.4,0);add(B(1.2,.05,.07),WD,0,1.4,0);add(B(.05,1,.07),WD,0,1.4,0)}else if(!gap)add(B(S,3.2,.14),WM,0,1.6,0);else{for(const s of[-1,1])add(B(w,3.2,.14),WM,s*(gap/2+w/2),1.6,0);add(B(gap,1.1,.14),WM,0,2.65,0)}
+else if(k=='wall'||k=='door'||k=='window'){const gap=k=='door'?1.1:0,w=(S-gap)/2;if(k=='window'){add(B(S,.9,.14),WM,0,.45,0);add(B(S,1.3,.14),WM,0,2.55,0);for(const s of[-1,1])add(B(.9,1,.14),WM,s*1.05,1.4,0);add(B(1.3,.05,.22),WD,0,.92,0);add(B(1.2,1,.03),GL,0,1.4,0);add(B(1.2,.05,.07),WD,0,1.4,0);add(B(.05,1,.07),WD,0,1.4,0)}else if(!gap)add(B(S,3.2,.14),WM,0,1.6,0);else{for(const s of[-1,1])add(B(w,3.2,.14),WM,s*(gap/2+w/2),1.6,0)}
 for(const s of[-1,1])add(B(.18,3.32,.26),WD,s*(S/2-.07),1.66,0);add(B(S+.04,.16,.26),WD,0,3.26,0);add(B(S+.04,.16,.26),WD,0,.08,0);
-if(gap){const p=new T3.Group;p.position.set(-gap/2,0,0);g.add(p);add(B(gap-.04,2.05,.07),WM,(gap-.04)/2+.01,1.03,0,p);for(const y of[.45,1.6])add(B(gap-.04,.09,.1),WD,(gap-.04)/2+.01,y,0,p);add(B(.05,.08,.1),WS,gap-.12,1.05,.06,p);door=p}}
+if(gap){const p=new T3.Group;p.position.set(-gap/2,0,0);g.add(p);add(B(gap-.04,3.2,.07),WM,(gap-.04)/2+.01,1.6,0,p);for(const y of[.45,1.6,2.75])add(B(gap-.04,.09,.1),WD,(gap-.04)/2+.01,y,0,p);add(B(.05,.08,.1),WS,gap-.12,1.05,.06,p);door=p}}
 else if(k=='roof'){add(B(S+.3,.16,S+.3),WM,0,3.38,0);for(const x of[-1,0,1])add(B(.14,.16,S+.3),WD,x*1.1,3.22,0);for(const e of[-1,1]){add(B(S+.34,.24,.1),WD,0,3.36,e*(S/2+.15));add(B(.1,.24,S+.34),WD,e*(S/2+.15),3.36,0)}add(B(.6,.2,.6),WD,0,3.54,0)}
 else if(k.startsWith('bench')){buildBench(+k[5],g,add,B,WM,WD)}
 else if(k=='furnace'||k=='furn2'){if(k=='furn2')g.scale.setScalar(1.5);buildFurnace(k,g,add)}
@@ -968,7 +971,7 @@ return{g,door}}
 const ghosts={};for(const k of PK){const{g}=piece(k);g.traverse(o=>{if(o.isMesh)o.material=gm});g.visible=false;sc.add(g);ghosts[k]=g}
 function target(){if(MV&&cur=='hammer'&&MV.e&&MV.e.isPL&&window.PLH)return PLH.target();const k=MV&&cur=='hammer'?MV.k:DK.includes(cur)?cur:BL()[bsel]||BL()[0],tx=aimPt()[0],tz=aimPt()[1],gx=Math.round(tx/S),gz=Math.round(tz/S),o={k,ok:false,x:0,y:0,z:0,rot:0,t:cat?0:tier,key:gx+','+gz};
 if(NEWK.includes(k)&&!['chest','lchest','ptorch'].includes(k))return tgN(o,k,tx,tz,gx,gz);if(DK.includes(k)){o.x=tx;o.z=tz;o.y=gh(tx,tz);o.rot=Math.round(P.yaw/(PI/2))*PI/2;o.ok=o.y>WL+.15&&![...fires,...deps].some(f=>!(MV&&MV.e.rf&&(MV.e.rf[0].includes(f)||MV.e.rf[2].includes(f)))&&Math.hypot(f.x-tx,f.z-tz)<1.6);return o}
-const fd=F.get(o.key);if(k=='foundation'||k=='roof'){o.x=gx*S;o.z=gz*S;if(k=='roof'){const fs=FLR.filter(t=>t.k=='floor'&&Math.abs(t.x-o.x)<.6&&Math.abs(t.z-o.z)<.6).map(t=>t.y),cs=(fd?[fd.y]:[]).concat(fs).sort((a,b)=>a-b);let b=null;for(const y of cs)if(y<=P.y+.8)b=y;if(b===null&&cs.length)b=cs[0];if(b!==null){o.y=b;if(!fd||Math.abs(b-fd.y)>.3)o.key=o.key+'@'+Math.round(b*10);o.ok=!RF.has(o.key)}return o}
+const fd=F.get(o.key);if(k=='foundation'||k=='roof'){o.x=gx*S;o.z=gz*S;if(k=='roof'){const fs=FLR.filter(t=>(t.k=='floor'||t.k=='ceil')&&Math.abs(t.x-o.x)<.6&&Math.abs(t.z-o.z)<.6).map(t=>t.y),cs=(fd?[fd.y]:[]).concat(fs).sort((a,b)=>a-b);let b=null;for(const y of cs)if(y<=P.y+.8)b=y;if(b===null&&cs.length)b=cs[0];if(b!==null){o.y=b;if(!fd||Math.abs(b-fd.y)>.3)o.key=o.key+'@'+Math.round(b*10);o.ok=!RF.has(o.key)}return o}
 const nb=[[1,0],[-1,0],[0,1],[0,-1]].map(d=>F.get((gx+d[0])+','+(gz+d[1]))).find(Boolean);let mx=-9,mn=9;for(const[a,b]of[[0,0],[1,1],[1,-1],[-1,1],[-1,-1]]){const h=H(o.x+a*S/2,o.z+b*S/2);mx=Math.max(mx,h);mn=Math.min(mn,h)}
 o.y=nb?nb.y:mx+.2;o.ok=!fd&&mn>WL-.2&&mx<=o.y&&o.y-mn<2.6;return o}
 const fx=tx/S-gx,fz=tz/S-gz;let ex,ez,bx,bz;if(Math.abs(fx)>Math.abs(fz)){const s=Math.sign(fx)||1;ex=(gx+s*.5)*S;ez=gz*S;bx=gx+s;bz=gz;o.rot=PI/2}else{const s=Math.sign(fz)||1;ex=gx*S;ez=(gz+s*.5)*S;bx=gx;bz=gz+s}
@@ -1236,7 +1239,7 @@ function aimS(){let b=null,bt=99;for(const d of dps){if(!STK.includes(d.k))conti
 function ctxf(){const fx=-sin(P.yaw),fz=-cos(P.yaw),fr=(x,z,m)=>{const dx=x-P.x,dz=z-P.z,h=Math.hypot(dx,dz);return h<1||(dx*fx+dz*fz)/h>m};
 {let d0=null,dd0=2.6;for(const d of drops){if(d.air)continue;const h=Math.hypot(d.x-P.x,d.z-P.z);if(h<dd0&&Math.abs(d.y-P.y)<2.5&&fr(d.x,d.z,.3)){dd0=h;d0=d}}if(d0)return{t:'item',g:d0,l:'撿起'}}
 let g0=null,gd=2.4;for(const g of gs){if(!g.on)continue;const h=Math.hypot(g.x-P.x,g.z-P.z);if(h<gd&&fr(g.x,g.z,.3)){gd=h;g0=g}}if(g0)return{t:'pick',g:g0,l:'撿起'};
-let b=null,bd=99;for(const d of doors){const t=aimD(d,3.2,1.1,1);if(t>=0&&t<bd){bd=t;b=d}}if(b)return{t:'door',d:b,l:b.open?'關門':'開門'};
+let b=null,bd=99;for(const d of doors){const t=aimD(d,3.2,1.1,1.6);if(t>=0&&t<bd){bd=t;b=d}}if(b)return{t:'door',d:b,l:b.open?'關門':'開門'};
 const ax=P.x-sin(P.yaw)*1.8,az=P.z-cos(P.yaw)*1.8;if(P.pit<-.2&&H(ax,az)<WL-.05)return{t:'drink',l:'飲水'};return null}
 function useE(){const c=ctxf();if(!c||us||dead)return;if(c.t=='door'){c.d.open=!c.d.open;nt('dr',{x:c.d.x,z:c.d.z,o:c.d.open})}else if(c.t=='pick')pickStone(c.g);else if(c.t=='item')pickDrop(c.g);else{us={t:0,d:.9};P.th=Math.min(100,P.th+14);hbar()}}
 function eat(){if(us||dead)return;if(inv.cooked>0){inv.cooked--;P.fd=Math.min(100,P.fd+35)}else if(inv.raw>0){inv.raw--;P.fd=Math.min(100,P.fd+12);hurt(4,1);toast('生肉讓你不舒服')}else return;us={t:0,d:.9};hbar()}
@@ -1388,8 +1391,8 @@ hbar();requestAnimationFrame(tick);
 // [J35] 擴充包 A（第 2 個 IIFE）：箱子、火把、地板、樓梯 的資料/圖示/放置瞄準
 // ==================================================================
 (()=>{
-const NMS={ptorch:'地插火把',wtorch:'壁掛火把',chest:'箱子',lchest:'大型箱子',floor:'地板',stair:'樓梯'},
-DES={ptorch:'插在地上的火把。放入木頭或燃料即可點燃',wtorch:'裝在牆上的火把。對準牆面放置，放入木頭或燃料即可點燃',chest:'12 格儲物箱，點擊開啟',lchest:'30 格大型儲物箱，需工作臺 1 級',floor:'可蓋二樓的地板。抬頭放置可疊在上一層',stair:'連接上下樓層，沿視線方向往上走'};
+const NMS={ptorch:'地插火把',wtorch:'壁掛火把',chest:'箱子',lchest:'大型箱子',floor:'地板',stair:'樓梯',ceil:'有洞天花板'},
+DES={ptorch:'插在地上的火把。放入木頭或燃料即可點燃',wtorch:'裝在牆上的火把。對準牆面放置，放入木頭或燃料即可點燃',chest:'12 格儲物箱，點擊開啟',lchest:'30 格大型儲物箱，需工作臺 1 級',floor:'可蓋二樓的地板。抬頭放置可疊在上一層',stair:'連接上下樓層，沿視線方向往上走',ceil:'中間有一個洞的天花板（也可當上層地板）。抬頭放在上一層；對準洞口放梯子，就能從洞口爬上去。走到洞口上方會掉下去'};
 Object.assign(PN,NMS);Object.assign(NX,NMS);Object.assign(DX,DES);Object.assign(DS,DES);for(const k in NMS)RK[NMS[k]]=k;
 const q=(b,f)=>`<svg viewBox='0 0 48 48'>${b}</svg>`;
 Object.assign(IC,{ptorch:"<rect x='22' y='16' width='4' height='26' fill='#8b5a30'/><path d='M24 3C31 12 29 17 24 19 19 17 17 12 24 3Z' fill='#ff9a24'/><rect x='15' y='40' width='18' height='4' fill='#85857f'/>",
@@ -1397,12 +1400,13 @@ wtorch:"<rect x='7' y='12' width='6' height='26' fill='#6a431f'/><rect x='12' y=
 chest:"<rect x='6' y='22' width='36' height='18' fill='#a06a3c'/><rect x='6' y='15' width='36' height='8' fill='#8b5a30'/><rect x='21' y='23' width='6' height='7' fill='#c4c4be'/>",
 lchest:"<rect x='3' y='17' width='42' height='25' fill='#a06a3c'/><rect x='3' y='9' width='42' height='9' fill='#8b5a30'/><rect x='10' y='9' width='4' height='33' fill='#6a7684'/><rect x='34' y='9' width='4' height='33' fill='#6a7684'/><rect x='21' y='20' width='6' height='8' fill='#c4c4be'/>",
 floor:"<polygon points='4,26 24,16 44,26 24,36' fill='#b57a44'/><polygon points='4,26 24,36 24,42 4,32' fill='#8b5a30'/><polygon points='44,26 24,36 24,42 44,32' fill='#6a431f'/>",
+ceil:"<polygon points='4,26 24,16 44,26 24,36' fill='#b57a44'/><polygon points='14,26 24,21 34,26 24,31' fill='#2a1c10'/><polygon points='4,26 24,36 24,42 4,32' fill='#8b5a30'/><polygon points='44,26 24,36 24,42 44,32' fill='#6a431f'/>",
 stair:"<rect x='6' y='34' width='36' height='8' fill='#8b5a30'/><rect x='14' y='26' width='28' height='8' fill='#a06a3c'/><rect x='22' y='18' width='20' height='8' fill='#b57a44'/><rect x='30' y='10' width='12' height='8' fill='#d9a468'/>"});
 for(const k of NEWK){inv[k]=0;RES.push(k);CT[k]=3}
-Object.assign(DHP,{ptorch:40,wtorch:40,chest:150,lchest:300,floor:250,stair:250});
-Object.assign(DD,{ptorch:600,wtorch:600,chest:1800,lchest:3600,floor:1800,stair:1800});
-Object.assign(DM,{ptorch:'wood',wtorch:'wood',chest:'wood',lchest:'wood',floor:'wood',stair:'wood'});
-RC.push(['ptorch','地插火把',{wood:25},0,1],['wtorch','壁掛火把',{wood:30},0,1],['chest','箱子',{wood:60},0,1],['lchest','大型箱子',{wood:150,frag:20},1,1],['floor','地板',{wood:40},0,1],['stair','樓梯',{wood:60},0,1]);
+Object.assign(DHP,{ptorch:40,wtorch:40,chest:150,lchest:300,floor:250,stair:250,ceil:250});
+Object.assign(DD,{ptorch:600,wtorch:600,chest:1800,lchest:3600,floor:1800,stair:1800,ceil:1800});
+Object.assign(DM,{ptorch:'wood',wtorch:'wood',chest:'wood',lchest:'wood',floor:'wood',stair:'wood',ceil:'wood'});
+RC.push(['ptorch','地插火把',{wood:25},0,1],['wtorch','壁掛火把',{wood:30},0,1],['chest','箱子',{wood:60},0,1],['lchest','大型箱子',{wood:150,frag:20},1,1],['floor','地板',{wood:40},0,1],['stair','樓梯',{wood:60},0,1],['ceil','有洞天花板',{wood:40},0,1]);
 const chH0=window.chH;window.chH=s=>{if(!s)return chH0();const ks=Object.keys(s.cs).filter(k=>s.cs[k]>0),cap=s.k=='lchest'?30:12;let c=ks.map(k=>`<div class="sl" data-z=ch data-k2=${k} data-src=ch>${ico(k,40)}<b>x${s.cs[k]}</b></div>`).join('');for(let i=ks.length;i<cap;i++)c+='<div class=sl data-z=ch></div>';return `<div class=gr data-z=ch>${c}</div><div class=hint>${ks.length}/${cap} 種物品。點背包物品放入，點箱內物品取出</div>`};
 window.initN=(e,t)=>{if(CHK.includes(t.k))e.cs={};if(t.fl)e.fl=t.fl};
 window.depN=(t,g)=>{const k=t.k;if(TKS.includes(k)){deps.push({x:t.x,z:t.z});fires.push({x:t.x,z:t.z,y:t.y+(k=='ptorch'?.4:.7),f:g.userData.f,s:R(0,6)})}
@@ -1477,12 +1481,12 @@ for(const k in DHP)if(!DM[k])DM[k]='wood';
 for(const k of['cuore','cu','wire','coal','sw','fw','bw']){inv[k]=0;RES.push(k);CT[k]=4}
 IT.flask={n:'水壺',k:'f',v:'x',c:0x4a7a9a};KEYS.push('flask');
 RC.push(['wire','銅線 x5',{cu:2},0,5],['pbox','配電箱',{frag:10,cu:5,wire:6},0,1],['lamp','電燈',{frag:5,wire:3,wood:5},0,1],['fan','電風扇',{frag:12,wire:4,wood:5},0,1],['heater','電暖器',{frag:20,cu:4,wire:5},1,1],['tv','電視機',{frag:30,cu:6,wire:6},1,1],['radio','收音機',{frag:15,cu:3,wire:4},1,1],['wind','風力發電機',{wood:60,frag:20,cu:10,wire:10},1,1],['solar','太陽能板',{frag:30,cu:10,wire:10},1,1],['gen','火力發電機',{frag:60,cu:15,wire:10},1,1],['purif','淨水器',{frag:40,cu:8,wire:8},1,1],['flask','水壺',{leather:2,frag:3},0],['tfound','三角地基',{wood:30},0,1],['tfloor','三角地板',{wood:25},0,1],['troof','三角天花板',{wood:25},0,1],['nwall','三角窄牆',{wood:25},0,1]);
-for(const k of BPK){const i=RC.findIndex(r=>r[0]==k);if(i>=0)RC.splice(i,1);const j=DK.indexOf(k);if(j>=0)DK.splice(j,1);PC[k]={wood:BPW[k]}}Object.assign(PHF,{floor:1,stair:1,tfound:1.5,tfloor:.8,troof:.8,nwall:.7});for(const k of['pbox','lamp','fan','heater','tv','radio','wind','solar','gen','wire'])CT[k]=6;for(const k of['purif','flask'])CT[k]=7;
+for(const k of BPK){const i=RC.findIndex(r=>r[0]==k);if(i>=0)RC.splice(i,1);const j=DK.indexOf(k);if(j>=0)DK.splice(j,1);PC[k]={wood:BPW[k]}}Object.assign(PHF,{floor:1,stair:1,ceil:1,tfound:1.5,tfloor:.8,troof:.8,nwall:.7});for(const k of['pbox','lamp','fan','heater','tv','radio','wind','solar','gen','wire'])CT[k]=6;for(const k of['purif','flask'])CT[k]=7;
 for(const k of['pist','rifle','smg','shot','mach','sword'])CT[k]=1;
 CI.push('solar','purif');
 const PWK=['wind','solar','gen','pbox','lamp','purif','fan','heater','tv','radio'],DW0={fan:1,heater:3,tv:2,radio:1};
 const SQ=[[1,0],[-1,0],[0,1],[0,-1]],TE=[[0,-.866,0,-1],[.75,.433,.866,.5],[-.75,.433,-.866,.5]];
-function trEdges(w){const E=[],A=(x,z,nx,nz,y)=>E.push({x,z,nx,nz,y});if(w!='r')for(const f of F.values())for(const[a,b]of SQ)A(f.x+a*1.5,f.z+b*1.5,a,b,f.y);if(w=='l')for(const t of FLR)if(t.k=='floor')for(const[a,b]of SQ)A(t.x+a*1.5,t.z+b*1.5,a,b,t.y);for(const t of TRI){if(w=='f'?t.k!='tfound':w=='r'?t.k!='troof':t.k=='troof')continue;const c=Math.cos(t.rot),s=Math.sin(t.rot);for(const[x,z,nx,nz]of TE)A(t.x+x*c+z*s,t.z-x*s+z*c,nx*c+nz*s,nz*c-nx*s,t.y)}return E}
+function trEdges(w){const E=[],A=(x,z,nx,nz,y)=>E.push({x,z,nx,nz,y});if(w!='r')for(const f of F.values())for(const[a,b]of SQ)A(f.x+a*1.5,f.z+b*1.5,a,b,f.y);if(w=='l')for(const t of FLR)if(t.k=='floor'||t.k=='ceil')for(const[a,b]of SQ)A(t.x+a*1.5,t.z+b*1.5,a,b,t.y);for(const t of TRI){if(w=='f'?t.k!='tfound':w=='r'?t.k!='troof':t.k=='troof')continue;const c=Math.cos(t.rot),s=Math.sin(t.rot);for(const[x,z,nx,nz]of TE)A(t.x+x*c+z*s,t.z-x*s+z*c,nx*c+nz*s,nz*c-nx*s,t.y)}return E}
 function terr(x,z,r){const c=Math.cos(r),s=Math.sin(r);let mn=9,mx=-9;for(const[a,b]of[[0,0],[-1.5,-.866],[1.5,-.866],[0,1.732]]){const h=H(x+a*c+b*s,z-a*s+b*c);mn=Math.min(mn,h);mx=Math.max(mx,h)}return[mn,mx]}
 function pboxT(o,tc0,tx,tz,gx,gz){const ap=aimPt(1);let n=null,nd=2.6;for(const d of pcs)if(d.k=='nwall'){const q=Math.hypot(d.x-ap[0],d.z-ap[1]);if(q<nd){nd=q;n=d}}
 if(n){const tX=Math.cos(n.rot),tZ=-Math.sin(n.rot),sx=Math.sin(n.rot),sz=Math.cos(n.rot),sg=((P.x-n.x)*sx+(P.z-n.z)*sz)>=0?1:-1,pr=Math.max(-.55,Math.min(.55,(ap[0]-n.x)*tX+(ap[1]-n.z)*tZ));o.x=n.x+tX*pr+sx*sg*.2;o.z=n.z+tZ*pr+sz*sg*.2;o.y=n.y+1.1;o.rot=Math.atan2(sx*sg,sz*sg);o.ok=true}else tc0(o,'wtorch',tx,tz,gx,gz);
@@ -2739,7 +2743,7 @@ nm('seed','樹木種子','砍樹有機會掉落；手持點擊地面種下，約
 nm('egg','雞蛋','雞產出，可當食物',pg_('24,6 38,26 24,42 10,26','#f4ecd8'));nm('milk','牛乳','牛產出',pg_('12,10 36,10 38,42 10,42','#f2f2f2')+pg_('12,10 36,10 36,18 12,18','#6aa0e0'));nm('wool','羊毛','綿羊產出，可當布料用（手持點擊轉為 2 布料）',pg_('6,20 18,8 34,8 44,20 40,38 10,38','#f0f0ea'));
 nm('sign','告示牌','立在地上，互動可寫字／畫圖',pg_('8,6 40,6 40,26 8,26','#c89a58')+pg_('22,26 26,26 26,44 22,44','#7a4a22'),{wood:20});
 nm('board','繪圖板','立在地上或對準牆壁掛上；互動可自由繪畫',pg_('4,6 44,6 44,36 4,36','#e8e0cc')+pg_('4,6 44,6 44,10 4,10','#8a5a28')+pg_('10,16 30,28 22,22','#d4572e'),{wood:30,cloth:2});
-nm('ladder','梯子','放在牆上，或地板／地基的邊緣（上下都可以），靠近後往前走即可攀爬，空白鍵跳離。建築錘可移動或拆除',pg_('13,4 18,4 18,44 13,44','#7a4a22')+pg_('30,4 35,4 35,44 30,44','#7a4a22')+pg_('18,10 30,10 30,13 18,13','#b88a50')+pg_('18,20 30,20 30,23 18,23','#b88a50')+pg_('18,30 30,30 30,33 18,33','#b88a50')+pg_('18,39 30,39 30,42 18,42','#b88a50'),{wood:25});
+nm('ladder','梯子','放在牆上，或地板／地基的邊緣（上下都可以），也可以接在「有洞天花板」的洞口（抬頭對準洞放，往上爬就能從洞口上去），靠近後往前走即可攀爬，空白鍵跳離。建築錘可移動或拆除',pg_('13,4 18,4 18,44 13,44','#7a4a22')+pg_('30,4 35,4 35,44 30,44','#7a4a22')+pg_('18,10 30,10 30,13 18,13','#b88a50')+pg_('18,20 30,20 30,23 18,23','#b88a50')+pg_('18,30 30,30 30,33 18,33','#b88a50')+pg_('18,39 30,39 30,42 18,42','#b88a50'),{wood:25});
 const B_=(g,w,h,l,c,x,y,z)=>{const m=new T3.Mesh(new T3.BoxGeometry(w,h,l),LB(c));m.position.set(x,y,z);g.add(m);return m};
 const WK=(x,z,q,o)=>({x0:x-(q?.2:1.4),x1:x+(q?.2:1.4),z0:z-(q?1.4:.2),z1:z+(q?1.4:.2),on:1});
 // ---- 載具座位 ----
@@ -2752,7 +2756,7 @@ let FS=null;const bob=new T3.Mesh(new T3.SphereGeometry(.12,8,6),new T3.MeshBasi
 function fishing(){if(FS){if(FS.s=='bite'){const r=Math.random();let a=0,f=FISH[0];for(const q of FISH){a+=q[3];if(r<a){f=q;break}}inv[f[0]]++;toast('釣到了 '+f[1]+'！');hbar()}else toast('收竿');FS=null;bob.visible=false;return}
 const x=P.x-sin(P.yaw)*5,z=P.z-cos(P.yaw)*5;if(H(x,z)>WL-.2){toast('對準前方水面拋竿');return}FS={s:'wait',t:R(3,8),x,z};bob.position.set(x,WL,z);bob.visible=true;toast('已拋竿，等浮標下沉')}
 // ---- 擺放物 ----
-const PL=[];function plGeo(o){const g=new T3.Group,k=o.k;if(k=='fence'||k=='gate'){const w=k=='gate'?0x7a4a22:0x9a6a3a;for(const s of[-1.3,1.3])B_(g,.14,1.2,.14,0x6a3f1a,s,.6,0);B_(g,2.6,.12,.08,w,0,.45,0);B_(g,2.6,.12,.08,w,0,.9,0);if(k=='gate')B_(g,2.5,.1,.08,w,0,.68,0).rotation.z=.25}else if(k=='sign'){B_(g,.1,1.2,.1,0x6a3f1a,0,.6,0);o.pl=B_(g,1.1,.7,.08,0xc89a58,0,1.3,0)}else if(k=='ladder'){const L=o.len||3.6;for(const s of[-.3,.3])B_(g,.07,L,.07,0x7a4a22,s,L/2,0);for(let y=.25;y<L-.1;y+=.3)B_(g,.6,.05,.06,0x9a6a3a,0,y,0)}else{if(!o.wall)for(const s of[-.7,.7])B_(g,.08,1.2,.06,0x6a3f1a,s,.6,0);B_(g,2.1,1.5,.08,0x8a5a28,0,o.wall?0:1.4,0);o.pl=B_(g,1.94,1.34,.12,0xf4f0e2,0,o.wall?0:1.4,0)}
+const PL=[],PLDEL=new Set();function plGeo(o){const g=new T3.Group,k=o.k;if(k=='fence'||k=='gate'){const w=k=='gate'?0x7a4a22:0x9a6a3a;for(const s of[-1.3,1.3])B_(g,.14,1.2,.14,0x6a3f1a,s,.6,0);B_(g,2.6,.12,.08,w,0,.45,0);B_(g,2.6,.12,.08,w,0,.9,0);if(k=='gate')B_(g,2.5,.1,.08,w,0,.68,0).rotation.z=.25}else if(k=='sign'){B_(g,.1,1.2,.1,0x6a3f1a,0,.6,0);o.pl=B_(g,1.1,.7,.08,0xc89a58,0,1.3,0)}else if(k=='ladder'){const L=o.len||3.6;for(const s of[-.3,.3])B_(g,.07,L,.07,0x7a4a22,s,L/2,0);for(let y=.25;y<L-.1;y+=.3)B_(g,.6,.05,.06,0x9a6a3a,0,y,0)}else{if(!o.wall)for(const s of[-.7,.7])B_(g,.08,1.2,.06,0x6a3f1a,s,.6,0);B_(g,2.1,1.5,.08,0x8a5a28,0,o.wall?0:1.4,0);o.pl=B_(g,1.94,1.34,.12,0xf4f0e2,0,o.wall?0:1.4,0)}
 return g}
 function mkPl(o){o.isPL=1;o.hp=o.mh=100;if(o.k=='ladder'&&!(o.len>0))o.len=3.6;const g=plGeo(o),k=o.k;g.position.set(o.x,o.y,o.z);g.rotation.y=o.r;sc.add(g);o.g=g;if(k=='fence'||k=='gate'){const q=Math.abs(sin(o.r))>.7;o.w=WK(o.x,o.z,q);walls.push(o.w)}PL.push(o);if(o.img)paint(o);return o}
 function paint(o){if(!o.pl)return;const im=new Image();im.onload=()=>{const c=document.createElement('canvas');c.width=im.width;c.height=im.height;c.getContext('2d').drawImage(im,0,0);const t=new T3.CanvasTexture(c),f=new T3.MeshBasicMaterial({map:t}),e=new T3.MeshBasicMaterial({color:o.k=='sign'?0xc89a58:0xcfc6ac}),old=o.pl.material;o.pl.material=[e,e,e,e,f,f];try{const a=Array.isArray(old)?[old[0],old[4]]:[old];for(const m of a){if(m.map)m.map.dispose();m.dispose()}}catch(_){}};im.src=o.img}
@@ -2762,7 +2766,12 @@ return{x,z,y,r,wall,ok:!(H(x,z)<WL+.1)}}
 function putPl(k){const t=plT(k);if(!t.ok){toast(t.msg||'這裡不能放置');return}const{x,z,y,r,wall}=t;inv[k]--;const o=mkPl({id:nid(),k,x,z,y,r,wall,len:t.len});nt('pl',[o.id,k,x,z,y,r,wall?1:0,'',t.len||0]);toast('已放置'+PN[k]);hbar()}
 on_('pl',m=>{if(m.isMe)return;const a=m.data;if(PL.some(q=>q.id==a[0]))return;mkPl({id:a[0],k:a[1],x:a[2],z:a[3],y:a[4],r:a[5],wall:a[6],img:a[7],len:+a[8]||0})});
 on_('pd',m=>{if(m.isMe)return;const o=PL.find(q=>q.id==m.data[0]);if(o){o.img=m.data[1];o.tx=m.data[2]||'';paint(o)}});
-function gateT(o){o.open=!o.open;o.w.on=o.open?0:1;o.g.rotation.y=o.r+(o.open?1.45:0);o.g.position.x=o.x+(o.open?-cos(o.r)*1.3*0:0)}
+function gateS(o,v){if(!o||!o.w)return;o.open=v?1:0;o.w.on=o.open?0:1;o.g.rotation.y=o.r+(o.open?1.45:0)}
+function gateT(o){gateS(o,!o.open);nt('gt',[o.id,o.open?1:0])}
+on_('gt',m=>{if(m.isMe||!Array.isArray(m.data))return;const o=PL.find(q=>q.id==m.data[0]);if(o&&o.k=='gate')gateS(o,+m.data[1])});
+// 新玩家加入：補送全部擺放物（柵欄／柵欄門／告示牌／繪圖板／梯子）與樹苗；圖畫另外一張一張補（避免一次封包太大）
+on_('pls',m=>{if(m.isMe||!Array.isArray(m.data))return;for(const r of m.data){if(!Array.isArray(r)||!r[0]||!r[1]||PLDEL.has(r[0]))continue;let o=PL.find(q=>q.id==r[0]);if(!o)o=mkPl({id:r[0],k:r[1],x:+r[2],z:+r[3],y:+r[4],r:+r[5],wall:r[6],img:'',tx:r[9]||'',len:+r[10]||0});else if(r[9]!=null&&r[9]!==o.tx)o.tx=r[9];if(o.k=='gate')gateS(o,+r[8])}});
+function plJoinSend(){nt('pls',PLS.raw().map(r=>{const q=r.slice();q[7]='';return q}));PL.forEach((o,i)=>{if(o.img)setTimeout(()=>{if(PL.includes(o))nt('pd',[o.id,o.img,o.tx||''])},700+i*250)});nt('sps',{s:SP.map(q=>[q.id,q.x,q.z,Math.round(q.t)]),g:GT})}
 // 畫板／告示牌介面（DE 帶 class u：遊戲的全域 touchstart 會對 .u 以外的區域 preventDefault，按鈕才點得到）
 const PAPER='#f4f0e2',SIGNBG='#ead3a0';
 const PCOL=['#1d1d1f','#ffffff','#d93a2b','#f28c28','#f2c824','#4aa832','#25a59a','#2e7bd4','#7a4bc4','#e86aa8','#8a5a28','#8c8c8c'];
@@ -2877,6 +2886,7 @@ function lpose(o,dt){const sf=o.sf=(o.sf||0)+((o.sit?1:0)-(o.sf||0))*Math.min(1,
  const D=LK[o.t],h=.25+D.s*.55,nk={x:o.x+sin(o.yaw)*.3*D.s,y:o.y+h,z:o.z+cos(o.yaw)*.3*D.s};
  if(o.tie){const d=Math.hypot(o.x-o.tie.x,o.z-o.tie.z);ropeSet(o,{x:o.tie.x,y:gh(o.tie.x,o.tie.z)+1,z:o.tie.z},nk,Math.max(0,1-d/TL)*.9)}
  else if(o.lead)ropeSet(o,{x:P.x-sin(P.yaw)*.4,y:P.y+.9,z:P.z-cos(P.yaw)*.4},nk,.25);
+ else if(o.ldr&&o.ldr!=MYID&&(CLI()||(o.ext&&time-o.ext<1.5))){let ap=null;for(const a of RP.values())if(a.pid==o.ldr&&!a.dd){ap=a;break}if(ap)ropeSet(o,{x:ap.x,y:(ap.y||gh(ap.x,ap.z))+.9,z:ap.z},nk,.25);else ropeOff(o)}
  else ropeOff(o)}
 // 寵物現在要跟隨／被叫去的玩家：最後下指令的玩家（找不到就是房主自己）
 function petPl(o){const w=o.ow;if(w&&w!=MYID)for(const a of RP.values())if(a.pid==w&&!a.dd)return a;return P}
@@ -2900,9 +2910,9 @@ o.y+=(gh(o.x,o.z)-o.y)*Math.min(1,dt*8);lpose(o,dt);
 if(D.pet||o.age<1200)continue;o.br-=dt;if(o.hu>40)o.pr+=dt;
 if(o.br<=0&&o.hu>60&&!CLI()){const m=LV.find(q=>q!==o&&q.t==o.t&&q.age>=1200&&q.hu>60&&q.br<=0&&Math.hypot(q.x-o.x,q.z-o.z)<4);if(m&&LV.length<40){o.br=m.br=480;if(Math.random()<.4){mkL(o.t,o.x+1,o.z+1,1);toast(D.n+'生下了小寶寶')}}else o.br=10}}}
 function nearL(){let b=null,bd=2.8;for(const o of LV){const d=Math.hypot(o.x-P.x,o.z-P.z);if(d<bd&&o.age>=1200&&LK[o.t].p&&o.pr>=LK[o.t].pt){bd=d;b=o}}return b}
-let lT=0;function lsync(dt){if(!NET)return;lT-=dt;if(lT>0)return;lT=.25;if(HOST)nt('lv',LV.map(o=>[o.id,o.t,r2(o.x),r2(o.z),r2(o.yaw),Math.round(o.age),Math.round(o.hu),Math.round(o.pr),o.anm||'',o.sit?1:0,o.cm==null?2:o.cm,o.tie?r2(o.tie.x):'',o.tie?r2(o.tie.z):'']));else for(const o of LV)if(o.lead)nt('lp',[o.id,r2(o.x),r2(o.z),r2(o.yaw)])}
-on_('lv',m=>{if(m.isMe||HOST||!Array.isArray(m.data))return;const ids=new Set;for(const r of m.data){if(!LK[r[1]])continue;ids.add(r[0]);let o=LV.find(q=>q.id==r[0]);if(!o)o=mkL(r[1],r[2],r[3],r[5]<1200,r[0]);o.rx=r[2];o.rz=r[3];if(!o.lead)o.yaw=r[4];o.age=r[5];o.hu=r[6];o.pr=r[7];if(!(o.nmP&&time-o.nmP<2))o.anm=r[8]||'';o.sit=r[9]?1:0;o.cm=r[10]==null?2:+r[10];o.tie=(r[11]===''||r[11]==null||!isFinite(+r[11])||!isFinite(+r[12]))?null:{x:+r[11],z:+r[12]}}for(let i=LV.length-1;i>=0;i--)if(!ids.has(LV[i].id)){sc.remove(LV[i].g);LV.splice(i,1)}});
-on_('lp',m=>{if(m.isMe||!HOST)return;const o=LV.find(q=>q.id==m.data[0]);if(o){o.rx=m.data[1];o.rz=m.data[2];o.yaw=m.data[3];o.ext=time}});
+let lT=0;function lsync(dt){if(!NET)return;lT-=dt;if(lT>0)return;lT=.25;if(HOST)nt('lv',LV.map(o=>[o.id,o.t,r2(o.x),r2(o.z),r2(o.yaw),Math.round(o.age),Math.round(o.hu),Math.round(o.pr),o.anm||'',o.sit?1:0,o.cm==null?2:o.cm,o.tie?r2(o.tie.x):'',o.tie?r2(o.tie.z):'',o.lead?MYID:(o.ext&&time-o.ext<1.5&&o.ldr?o.ldr:'')]));else for(const o of LV)if(o.lead)nt('lp',[o.id,r2(o.x),r2(o.z),r2(o.yaw),MYID])}
+on_('lv',m=>{if(m.isMe||HOST||!Array.isArray(m.data))return;const ids=new Set;for(const r of m.data){if(!LK[r[1]])continue;ids.add(r[0]);let o=LV.find(q=>q.id==r[0]);if(!o)o=mkL(r[1],r[2],r[3],r[5]<1200,r[0]);o.rx=r[2];o.rz=r[3];if(!o.lead)o.yaw=r[4];o.age=r[5];o.hu=r[6];o.pr=r[7];if(!(o.nmP&&time-o.nmP<2))o.anm=r[8]||'';o.sit=r[9]?1:0;o.cm=r[10]==null?2:+r[10];o.tie=(r[11]===''||r[11]==null||!isFinite(+r[11])||!isFinite(+r[12]))?null:{x:+r[11],z:+r[12]};o.ldr=r[13]||''}for(let i=LV.length-1;i>=0;i--)if(!ids.has(LV[i].id)){sc.remove(LV[i].g);LV.splice(i,1)}});
+on_('lp',m=>{if(m.isMe||!HOST)return;const o=LV.find(q=>q.id==m.data[0]);if(o){o.rx=m.data[1];o.rz=m.data[2];o.yaw=m.data[3];o.ext=time;o.ldr=m.data[4]||''}});
 on_('lf',m=>{if(m.isMe||!HOST)return;const o=LV.find(q=>q.id==m.data[0]);if(o)o.hu=100});
 on_('lc',m=>{if(m.isMe||!HOST)return;const o=LV.find(q=>q.id==m.data[0]);if(o)o.pr=0});
 on_('lt',m=>{if(m.isMe||!HOST)return;const a=ans.find(q=>q.id==m.data[0]);if(!a||a.gone)return;const k=a.kd||a.k||a.t;if(!LK[k])return;a.gone=1;[a.g,a.m,a.mesh].forEach(o=>o&&(o.visible=false));const lo=mkL(k,a.x,a.z);lo.ow=m.data[1]||0;if(a.anm)lo.anm=a.anm});
@@ -2928,12 +2938,13 @@ function tetherUse(){const fx=-sin(P.yaw),fz=-cos(P.yaw);
  if(!b){toast('附近沒有可以綁的動物（8 格內）');return}
  inv.tether--;b.lead=0;b.cl=0;b.tie={x:r2(ax.x),z:r2(ax.z)};b.ext=0;if(CLI())nt('ltie',[b.id,b.tie.x,b.tie.z]);toast('已把'+(b.anm||LK[b.t].n)+'綁在牆邊（繩長約 '+TL+' 格）');hbar()}
 // 寵物指令面板（左下角，附近 60 格內有寵物才顯示）＋ 鍵盤 Z 待命／X 跟隨／V 自由／B 叫過來
-const PCcss=document.createElement('style');PCcss.textContent='#pc{position:fixed;left:6px;bottom:calc(env(safe-area-inset-bottom,0px) + 48px);z-index:12;display:none;flex-direction:column-reverse;gap:6px}#pc .pb{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(205,209,213,.4);border:1px solid rgba(255,255,255,.5);font-size:17px;line-height:1;cursor:pointer;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}#pc .pb.on{border-color:#ffcc00;background:rgba(232,235,238,.62)}#pc .pb:active{background:rgba(225,228,231,.58)}body:has(.ov:not(.hid)) #pc,body:has(#pn:not(.hid)) #pc,body:has(#sx:not(.hid)) #pc,body:has(#svm:not(.hid)) #pc,body:has(#rb:not(.hid)) #pc,body:has(#bm:not(.hid)) #pc,body.ed #pc{display:none!important}';document.head.appendChild(PCcss);
+const PCcss=document.createElement('style');PCcss.textContent='#pc{position:fixed;left:6px;bottom:calc(env(safe-area-inset-bottom,0px) + 46px);z-index:12;display:none;flex-direction:column-reverse;align-items:center;gap:6px}#pc .pt,#pc .pb{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(205,209,213,.4);border:1px solid rgba(255,255,255,.5);font-size:17px;line-height:1;cursor:pointer;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}#pc .pm{display:none;flex-direction:column-reverse;gap:6px}#pc.open .pm{display:flex}#pc.open .pt,#pc .pb.on{border-color:#ffcc00;background:rgba(232,235,238,.62)}#pc .pt:active,#pc .pb:active{background:rgba(225,228,231,.58)}body:has(.ov:not(.hid)) #pc,body:has(#pn:not(.hid)) #pc,body:has(#sx:not(.hid)) #pc,body:has(#svm:not(.hid)) #pc,body:has(#rb:not(.hid)) #pc,body:has(#bm:not(.hid)) #pc,body.ed #pc{display:none!important}';document.head.appendChild(PCcss);
 const PCE=document.createElement('div');PCE.id='pc';PCE.className='u';
-PCE.innerHTML=[[1,'✋','原地待命（Z）'],[2,'🐾','跟隨玩家（X）'],[0,'🌿','自由活動（V）'],[3,'📣','叫過來（B）']].map(a=>`<div class="pb" data-m="${a[0]}" title="${a[2]}" aria-label="${a[2]}">${a[1]}</div>`).join('');document.body.appendChild(PCE);
-PCE.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('.pb');if(b)petCmd(+b.dataset.m)});
+PCE.innerHTML='<div class="pt" title="寵物指令（點一下展開／收合）" aria-label="寵物指令">🐾</div><div class="pm">'+[[1,'✋','原地待命（Z）'],[2,'🐾','跟隨玩家（X）'],[0,'🌿','自由活動（V）'],[3,'📣','叫過來（B）']].map(a=>`<div class="pb" data-m="${a[0]}" title="${a[2]}" aria-label="${a[2]}">${a[1]}</div>`).join('')+'</div>';document.body.appendChild(PCE);
+let pcOT=0;const pcOpen=v=>{PCE.classList.toggle('open',!!v);clearTimeout(pcOT);if(v)pcOT=setTimeout(()=>PCE.classList.remove('open'),8000)};
+PCE.addEventListener('click',e=>{const q=e.target.closest?e.target:null;if(!q)return;if(q.closest('.pt')){pcOpen(!PCE.classList.contains('open'));return}const b=q.closest('.pb');if(b){petCmd(+b.dataset.m);pcOpen(0)}});
 addEventListener('keydown',e=>{if(e.repeat||!started||dead||paused||GOV||EO||ANO)return;const t=e.target;if(t&&(t.tagName=='INPUT'||t.tagName=='TEXTAREA'))return;if(e.ctrlKey||e.metaKey||e.altKey)return;const m={z:1,x:2,v:0,b:3}[e.key.toLowerCase()];if(m!=null)petCmd(m)});
-let pcT=0;function pcUpd(dt){pcT-=dt;if(pcT>0)return;pcT=.4;let n=null,nd=60;for(const o of LV)if(LK[o.t].pet){const d=Math.hypot(o.x-P.x,o.z-P.z);if(d<nd){nd=d;n=o}}const sh=!!n&&started&&!dead;PCE.style.display=sh?'flex':'none';if(!sh)return;const cm=n.cm==null?2:n.cm;for(const b of PCE.children)b.classList.toggle('on',+b.dataset.m==cm)}
+let pcT=0;function pcUpd(dt){pcT-=dt;if(pcT>0)return;pcT=.4;let n=null,nd=60;for(const o of LV)if(LK[o.t].pet){const d=Math.hypot(o.x-P.x,o.z-P.z);if(d<nd){nd=d;n=o}}const sh=!!n&&started&&!dead;PCE.style.display=sh?'flex':'none';if(!sh){PCE.classList.remove('open');return}const cm=n.cm==null?2:n.cm;for(const b of PCE.querySelectorAll('.pb'))b.classList.toggle('on',+b.dataset.m==cm)}
 const pcu=window.update;window.update=function(dt){pcu(dt);pcUpd(dt)};
 // ---- [NAMETAG] 命名牌：幫動物取名；靠近並瞄準時，頭上顯示名字（樣式同 J54 隊友名字）----
 const ANcss=document.createElement('style');ANcss.textContent='.edx input.ani{width:100%;box-sizing:border-box;padding:10px 12px;border-radius:10px;border:2px solid #3a4047;background:#1b1f23;color:#fff;font:16px system-ui,"Noto Sans TC",sans-serif;-webkit-user-select:text;user-select:text;outline:0}.edx input.ani:focus{border-color:#ffcc00}';document.head.appendChild(ANcss);
@@ -2975,7 +2986,14 @@ function ANloop(){requestAnimationFrame(ANloop);
 requestAnimationFrame(ANloop);
 // ---- 種樹 ----
 
-const SP=[];function plant(){const x=P.x-sin(P.yaw)*1.8,z=P.z-cos(P.yaw)*1.8,y=H(x,z);if(y<1.2||nodes.some(q=>q.on&&Math.hypot(q.x-x,q.z-z)<2.5)){toast('這裡不能種');return}inv.seed--;const m=new T3.Mesh(new T3.ConeGeometry(.2,.9,5),LB(0x5a9a3a));m.position.set(x,y+.4,z);sc.add(m);SP.push({x,z,m,t:0});toast('已種下樹苗');hbar()}
+const SP=[],GT=[];
+function spMk(id,x,z,t){const m=new T3.Mesh(new T3.ConeGeometry(.2,.9,5),LB(0x5a9a3a));m.position.set(x,H(x,z)+.4,z);sc.add(m);const s={id,x,z,m,t:t||0};SP.push(s);return s}
+function growT(x,z){if(nodes.some(q=>q.k=='tree'&&Math.hypot(q.x-x,q.z-z)<.3))return;addNode('tree',x,z);GT.push([x,z])}
+function spGrow(s){const i=SP.indexOf(s);if(i>=0)SP.splice(i,1);sc.remove(s.m);growT(s.x,s.z)}
+function plant(){const x=r2(P.x-sin(P.yaw)*1.8),z=r2(P.z-cos(P.yaw)*1.8),y=H(x,z);if(y<1.2||nodes.some(q=>q.on&&Math.hypot(q.x-x,q.z-z)<2.5)){toast('這裡不能種');return}inv.seed--;const s=spMk(nid(),x,z,0);nt('sp',[s.id,x,z,0]);toast('已種下樹苗');hbar()}
+on_('sp',m=>{if(m.isMe||!Array.isArray(m.data))return;const a=m.data;if(SP.some(q=>q.id==a[0]))return;spMk(a[0],+a[1],+a[2],+a[3]||0)});
+on_('spg',m=>{if(m.isMe||!Array.isArray(m.data))return;const a=m.data,s=SP.find(q=>q.id==a[0])||SP.find(q=>Math.hypot(q.x-+a[1],q.z-+a[2])<.3);if(s)spGrow(s);else growT(+a[1],+a[2])});
+on_('sps',m=>{if(m.isMe||!m.data)return;for(const a of m.data.s||[]){if(!Array.isArray(a)||SP.some(q=>q.id==a[0])||nodes.some(q=>q.k=='tree'&&Math.hypot(q.x-+a[1],q.z-+a[2])<.3))continue;spMk(a[0],+a[1],+a[2],+a[3]||0)}for(const g of m.data.g||[])if(Array.isArray(g))growT(+g[0],+g[1])});
 // ---- 輸入與每幀掛接 ----
 const nearX=()=>{if(PAS)return['下車',exitS,PAS.k];if(DRV)return null;const v=nearV();if(v&&v.dr&&v.dr!=MYID&&(v.pa||[]).length<(SEATS[v.k]||[]).length&&!(v.pa||[]).includes(MYID))return['搭乘',()=>{pSet(v,MYID,1);PAS=v;nt('vp',[v.id,MYID,1]);toast('已上車（互動鍵下車）')},v.k];
 let b=null,bd=3.2;for(const o of PL){const d=Math.hypot(o.x-P.x,o.z-P.z);if(d<bd&&['gate','sign','board'].includes(o.k)){bd=d;b=o}}if(b)return[b.k=='gate'?'開關':'編輯',()=>b.k=='gate'?gateT(b):edit(b),b.k];const l=nearL();if(l)return['收集',()=>{const D=LK[l.t];inv[D.p]=(inv[D.p]||0)+1;l.pr=0;if(CLI())nt('lc',[l.id]);toast('獲得 '+(NAME(D.p)||D.p));hbar()},LK[l.t].p];{let tb=null,td=3.2;for(const o of LV)if(o.tie){const d=Math.hypot(o.x-P.x,o.z-P.z);if(d<td){td=d;tb=o}}if(tb)return['解開綁繩',()=>untie(tb),'tether']}return null};
@@ -2990,9 +3008,9 @@ if(c=='egg'&&inv.egg>0||c=='milk'&&inv.milk>0){atk=false;inv[c]--;P.fd=Math.min(
 const u3=window.update;window.update=function(dt){if(EO&&(dead||GOV))edClose(0);if(PAS&&(dead||!VEH.includes(PAS)))exitS();u3(dt);if(PAS)seatP(PAS);liv(dt);lsync(dt);
 if(FS){FS.t-=dt;if(FS.s=='wait'&&FS.t<=0){FS.s='bite';FS.t=1.6;toast('魚上鉤了！快點一下');}else if(FS.s=='bite'){bob.position.y=WL-.15+sin(time*30)*.05;if(FS.t<=0){FS=null;bob.visible=false;toast('魚跑了')}}if(Math.hypot(FS&&FS.x-P.x,FS&&FS.z-P.z)>12){FS=null;bob.visible=false}}
 for(const n of nodes)if(n.k=='tree'){if(n.on)n.sdg=0;else if(!n.sdg){n.sdg=1;if(Math.random()<.6){inv.seed++;toast('掉落了樹木種子');hbar()}}}
-for(let i=SP.length-1;i>=0;i--){const s=SP[i];s.t+=dt;s.m.scale.setScalar(1+Math.min(1.5,s.t/400));if(s.t>600){sc.remove(s.m);SP.splice(i,1);addNode('tree',s.x,s.z)}}};
+for(let i=SP.length-1;i>=0;i--){const s=SP[i];s.t+=dt;s.m.scale.setScalar(1+Math.min(1.5,s.t/400));if(s.t>600&&(!NET||HOST)){spGrow(s);nt('spg',[s.id,s.x,s.z])}}};
 window.PLS={raw:()=>PL.map(o=>[o.id,o.k,r2(o.x),r2(o.z),r2(o.y),r2(o.r),o.wall?1:0,o.img||'',o.open?1:0,o.tx||'',o.len?r2(o.len):0]),set:a=>{for(const o of[...PL]){sc.remove(o.g);const i=walls.indexOf(o.w);if(i>=0)walls.splice(i,1)}PL.length=0;if(Array.isArray(a))for(const r of a)if(Array.isArray(r)&&r[1]){const o=mkPl({id:r[0],k:r[1],x:r[2],z:r[3],y:r[4],r:r[5],wall:r[6],img:r[7],tx:r[9]||'',len:+r[10]||0});if(r[8]&&o.w){o.open=1;o.w.on=0;o.g.rotation.y=o.r+1.45}}}};
-window.LIVS={raw:()=>({v:2,a:LV.map(o=>[o.t,r2(o.x),r2(o.z),Math.round(o.age),Math.round(o.hu),Math.round(o.pr),Math.round(o.br),o.anm||'',o.cm==null?2:o.cm,o.tie?r2(o.tie.x):'',o.tie?r2(o.tie.z):'']),s:SP.map(s=>[r2(s.x),r2(s.z),Math.round(s.t)])}),set:d=>{for(const o of LV)sc.remove(o.g);LV.length=0;for(const s of SP)sc.remove(s.m);SP.length=0;if(!d||!Array.isArray(d.a))return;for(const r of d.a)if(LK[r[0]]){const o=mkL(r[0],r[1],r[2]);o.age=(!d.v&&r[3]>=240)?1200:r[3];o.hu=r[4];o.pr=r[5];o.br=r[6];if(r[7])o.anm=String(r[7]).slice(0,24);if(r[8]!=null&&r[8]!=='')o.cm=+r[8];if(r[9]!==''&&r[9]!=null&&isFinite(+r[9])&&isFinite(+r[10]))o.tie={x:+r[9],z:+r[10]}}for(const r of d.s||[]){const m2=new T3.Mesh(new T3.ConeGeometry(.2,.9,5),LB(0x5a9a3a));m2.position.set(r[0],H(r[0],r[1])+.4,r[1]);sc.add(m2);SP.push({x:r[0],z:r[1],m:m2,t:r[2]})}}};
+window.LIVS={raw:()=>({v:2,a:LV.map(o=>[o.t,r2(o.x),r2(o.z),Math.round(o.age),Math.round(o.hu),Math.round(o.pr),Math.round(o.br),o.anm||'',o.cm==null?2:o.cm,o.tie?r2(o.tie.x):'',o.tie?r2(o.tie.z):'']),s:SP.map(s=>[r2(s.x),r2(s.z),Math.round(s.t)]),g:GT.slice()}),set:d=>{for(const o of LV)sc.remove(o.g);LV.length=0;for(const s of SP)sc.remove(s.m);SP.length=0;if(!d||!Array.isArray(d.a))return;for(const g of d.g||[])if(Array.isArray(g))growT(+g[0],+g[1]);for(const r of d.a)if(LK[r[0]]){const o=mkL(r[0],r[1],r[2]);o.age=(!d.v&&r[3]>=240)?1200:r[3];o.hu=r[4];o.pr=r[5];o.br=r[6];if(r[7])o.anm=String(r[7]).slice(0,24);if(r[8]!=null&&r[8]!=='')o.cm=+r[8];if(r[9]!==''&&r[9]!=null&&isFinite(+r[9])&&isFinite(+r[10]))o.tie={x:+r[9],z:+r[10]}}for(const r of d.s||[])spMk(nid(),r[0],r[1],r[2]);}};
 
 // ---- 放置預覽（柵欄／柵欄門／告示牌／繪圖板／載具／種子）：綠＝可放，紅＝不可放 ----
 const pvm=new T3.MeshBasicMaterial({color:0x46d36b,transparent:true,opacity:.45,depthWrite:false}),PV={};
@@ -3010,8 +3028,21 @@ function pcHit(){try{const o=new T3.Vector3,d=new T3.Vector3;cam.getWorldPositio
 function ladFree(x,z,y,len,self){for(const o of PL){if(o===self||o.k!='ladder')continue;if(Math.hypot(o.x-x,o.z-z)<.55&&y<o.y+o.len&&y+len>o.y)return false}return true}
 function ladT(self){
   const fb={ok:false,x:P.x-sin(P.yaw)*2,z:P.z-cos(P.yaw)*2,y:0,r:P.yaw+PI,wall:false,len:3.6,msg:'對準牆壁，或地板／地基的邊緣'};fb.y=gh(fb.x,fb.z);
-  const h=pcHit();if(!h)return fb;const q=h.p,k=q.k,cl_=(v,a,b)=>Math.max(a,Math.min(b,v));
+  const cl_=(v,a,b)=>Math.max(a,Math.min(b,v)),h=pcHit();
+  // 有洞天花板：看著洞（抬頭看上方的洞，或站在天花板上低頭看洞）就放在洞口邊緣；不一定要打到天花板本身
+  let cq=null;{const ey=P.y+1.6,cp=Math.cos(P.pit),ddx=-sin(P.yaw)*cp,ddy=Math.sin(P.pit),ddz=-cos(P.yaw)*cp,hd=h?Math.hypot(h.pt.x-P.x,h.pt.y-ey,h.pt.z-P.z):1e9;let bt=1e9;
+    if(Math.abs(ddy)>.05)for(const p of pcs){if(p.k!='ceil'||!p.g)continue;const t_=(p.g.position.y-ey)/ddy;if(t_<.3||t_>7||t_>hd+.3||t_>=bt)continue;if(Math.abs(P.x+ddx*t_-p.x)<1.5&&Math.abs(P.z+ddz*t_-p.z)<1.5){bt=t_;cq=p}}}
+  if(!cq&&!h)return fb;const q=cq||h.p,k=q.k;
   const ground=(x,z)=>{const tr=H(x,z),f=F.get(Math.round(x/S)+','+Math.round(z/S));return f?Math.max(tr,f.y):tr};
+  if(k=='ceil'){
+    const cx=q.x,cz=q.z,top=q.g.position.y+.3;let ux=cx-P.x,uz=cz-P.z,ox,oz;
+    if(Math.hypot(ux,uz)<.6){ux=-sin(P.yaw);uz=-cos(P.yaw)}
+    if(Math.abs(ux)>Math.abs(uz)){ox=Math.sign(ux)||1;oz=0}else{ox=0;oz=Math.sign(uz)||1}
+    const r=Math.atan2(-ox,-oz),lx=cos(r),lz=-sin(r),pt=h&&h.p===q?h.pt:null,t=pt?cl_((pt.x-cx)*lx+(pt.z-cz)*lz,-.4,.4):0,x=cx+ox*.7+lx*t,z=cz+oz*.7+lz*t;
+    let base=ground(x,z);for(const f of FLR){if(f===q.fl||Math.round(f.x/S)!=Math.round(x/S)||Math.round(f.z/S)!=Math.round(z/S))continue;if(f.k=='ceil'&&Math.abs(x-f.x)<.8&&Math.abs(z-f.z)<.8)continue;const hh=f.k=='stair'?stairY(f,x,z):f.y;if(hh<=top-1.5&&hh>base)base=hh}
+    const len=top-base;if(len<1.2)return{...fb,msg:'這裡太矮，放不下梯子'};
+    return{ok:H(x,z)>=WL-.5&&ladFree(x,z,base,len,self),x,z,y:base,r,wall:false,len,msg:'這裡已經有梯子了'};
+  }
   if(k=='wall'||k=='window'){
     let r=q.g.rotation.y;const d=(P.x-q.x)*sin(r)+(P.z-q.z)*cos(r);if(d<0)r+=PI;
     const lx=cos(r),lz=-sin(r),t=cl_((h.pt.x-q.x)*lx+(h.pt.z-q.z)*lz,-.9,.9),x=q.x+sin(r)*.2+lx*t,z=q.z+cos(r)*.2+lz*t,wb=q.g.position.y,top=wb+3.6,gy=ground(x,z),base=(wb-gy>.05&&wb-gy<2.5)?gy:wb,len=top-base;
@@ -3055,7 +3086,7 @@ function ladPost(){
 const uLd=window.update;window.update=function(dt){ladPre(dt);uLd(dt);ladPost()};
 // ---- 建築錘：移動／拆除 告示牌、繪圖板、柵欄、柵欄門、梯子 ----
 function rePl(o){if(o.g)sc.remove(o.g);const i=walls.indexOf(o.w);if(i>=0)walls.splice(i,1);o.w=null;o.pl=null;o.open=0;const g=plGeo(o),k=o.k;g.position.set(o.x,o.y,o.z);g.rotation.y=o.r;sc.add(g);o.g=g;if(k=='fence'||k=='gate'){const q=Math.abs(sin(o.r))>.7;o.w=WK(o.x,o.z,q);walls.push(o.w)}if(o.img)paint(o)}
-function plDel(o){const i=PL.indexOf(o);if(i>=0)PL.splice(i,1);if(o.g)sc.remove(o.g);const j=walls.indexOf(o.w);if(j>=0)walls.splice(j,1);if(EO===o)edClose(0);if(LD===o)LD=null}
+function plDel(o){if(o.id)PLDEL.add(o.id);const i=PL.indexOf(o);if(i>=0)PL.splice(i,1);if(o.g)sc.remove(o.g);const j=walls.indexOf(o.w);if(j>=0)walls.splice(j,1);if(EO===o)edClose(0);if(LD===o)LD=null}
 window.PLH={
   start(o){if(!PL.includes(o))return;MV={e:o,k:o.k};atk=false;toast('移動「'+(PN[o.k]||o.k)+'」：對準新位置點擊放置，切換物品可取消')},
   target(){const o=MV.e,t=plT(o.k,o);return{k:o.k,ok:!!t.ok,x:t.x,y:t.y,z:t.z,rot:t.r,key:'',pl:1,wall:t.wall,len:t.len,msg:t.msg}},
@@ -3113,7 +3144,7 @@ const u4=window.update;window.update=function(dt){u4(dt);if(!TM)return;if(!solo(
 // ---- 時間同步：以 time 為唯一來源，tod 由它推算；校時採平滑修正 ----
 window.__tcr=0;window.__tmS=s=>{if(!isFinite(s))return;const df=s-time;if(Math.abs(df)>4)time=s,window.__tcr=0;else window.__tcr=df};
 const u5=window.update;window.update=function(dt){u5(dt);if(window.__tcr){const st=window.__tcr*Math.min(1,dt*2);time+=st;window.__tcr-=st;if(Math.abs(window.__tcr)<.005)window.__tcr=0}tod=((time/DL)%1+1)%1};
-const hv2=setInterval(()=>{if(!NET)return;clearInterval(hv2);for(const[ev,f]of NH)NET.on(ev,f)},500);
+const hv2=setInterval(()=>{if(!NET)return;clearInterval(hv2);for(const[ev,f]of NH)NET.on(ev,f);NET.onPeers(c=>{if(started&&c.joined.some(p=>!p.isMe))plJoinSend()})},500);
 })();
 </script>
 <script>
@@ -3189,7 +3220,7 @@ const sec=(h,items)=>`<div class=sec><h3>${h}</h3>${items}</div>`;
 function tabPlay(){return[
 sec('操作',`<ul><li>左半螢幕：按住拖曳＝移動搖桿，推到底可奔跑</li><li>右半螢幕：拖曳＝轉動視角</li><li>大圓鈕＝攻擊／採集／使用手上的物品（弓：按住拉弓，放開射擊）</li><li>右側小鈕：跳躍、蹲下；出現互動鈕時可撿起物品、開門、喝水等；對準工作臺／熔爐／箱子時出現「開啟」鈕</li><li>左側鈕：背包、製作。快捷欄 7 格，點選切換手持；背包 18 格，點物品再點目標格即可移動，長按可拆分堆疊</li><li>左上小地圖：點一下開大地圖，再點地圖可放標記；右上時間：點擊看天數；暫停鈕可存檔</li><li>電腦鍵盤：WASD 移動、空白跳、E 互動、C 蹲、1~7 切換物品、Tab 背包、M 地圖、Z／X／V／B 寵物指令（待命／跟隨／自由／叫過來）、P／Esc 暫停</li><li>左下角：📖 規則書、⚙ 自訂按鍵位置</li></ul>`),
 sec('生存',`<ul><li>三條狀態：生命、飢餓（飽食）、口渴（水分）。飢餓或口渴見底會持續扣血</li><li>獵殺動物取得生肉，放在營火或熔爐旁烹飪成熟肉；也可種田吃作物</li><li>水：水壺可裝海水，需用淨水器淨化；水在營火或熔爐旁煮沸可安全飲用</li><li>夜晚狼與殭屍會出沒；殭屍會隨天數變強。繃帶與醫療針筒可恢復生命</li><li>天氣會影響冷熱：營火、電暖器可取暖，電風扇可降溫</li><li>動物只有在有人手持武器時才會逃跑；手持飼料會吸引牠們靠近。命名牌可以幫動物取名字，靠近並瞄準就會顯示</li></ul>`),
-sec('寵物與綁繩',`<ul><li>用飼料馴服狗、貓（也可馴服豬、羊、牛、雞）。馴服的寵物預設會跟著你；附近 60 格內有寵物時，左下角會出現指令鈕，電腦可按 Z／X／V／B</li><li>✋ 原地待命（Z）：寵物原地坐下不動，直到你換指令</li><li>🐾 跟隨（X）：寵物跟在你身邊，太遠會自動跑回來</li><li>🌿 自由活動（V）：寵物在附近隨意走動，不會跟著你</li><li>📣 叫過來（B）：不論目前是哪個指令，寵物都會立刻跑到你身邊，到了之後回到原本的指令（待命的會在你旁邊坐下）</li><li>牽繩：手持點擊動物牽著走，再點一次放開；繩子會斷在 16 格外</li><li>綁繩：手持面對牆壁或柵欄（6 格內）點擊，把最近的動物（寵物優先）綁在牆邊，繩長約 5 格，只能在繩長內活動；走近被綁的動物按互動鍵（或手持綁繩面對牠點擊）即可解開並收回綁繩。被綁住的寵物聽不到「叫過來」；牆被拆掉時繩子會自動鬆開</li><li>寵物指令、綁繩、坐姿都會多人同步，也會存進存檔</li></ul>`),
+sec('寵物與綁繩',`<ul><li>用飼料馴服狗、貓（也可馴服豬、羊、牛、雞）。馴服的寵物預設會跟著你；附近 60 格內有寵物時，規則書按鈕正上方會出現一顆小小的 🐾 按鈕，點一下展開四個指令（選完自動收起），電腦可按 Z／X／V／B</li><li>✋ 原地待命（Z）：寵物原地坐下不動，直到你換指令</li><li>🐾 跟隨（X）：寵物跟在你身邊，太遠會自動跑回來</li><li>🌿 自由活動（V）：寵物在附近隨意走動，不會跟著你</li><li>📣 叫過來（B）：不論目前是哪個指令，寵物都會立刻跑到你身邊，到了之後回到原本的指令（待命的會在你旁邊坐下）</li><li>牽繩：手持點擊動物牽著走，再點一次放開；繩子會斷在 16 格外</li><li>綁繩：手持面對牆壁或柵欄（6 格內）點擊，把最近的動物（寵物優先）綁在牆邊，繩長約 5 格，只能在繩長內活動；走近被綁的動物按互動鍵（或手持綁繩面對牠點擊）即可解開並收回綁繩。被綁住的寵物聽不到「叫過來」；牆被拆掉時繩子會自動鬆開</li><li>寵物指令、綁繩、牽繩、坐姿、柵欄與柵欄門、樹苗都會多人同步（新加入的玩家也會看到），並存進存檔</li></ul>`),
 sec('採集',`<ul><li>一開始雙手空空：走近地上的石塊按互動撿起，才能砍樹、採石</li><li>樹給木材，岩石給石頭；金屬礦、硫磺礦、銅礦、煤礦、高品質礦各有礦脈，需對應等級的鎬</li><li>被採光的樹與礦脈約 2.5 分鐘後重生（你在附近、或在領地櫃範圍內不會重生）</li><li>新生態域的景物也能敲：沙漠仙人掌（水分、草、布料）、雪堆（水分）、沼澤蘆葦（草、布料）、秋林落葉堆（草、木材）、火山岩刺（石頭、木炭，需要工具）</li><li>各生態域：草原、沙漠、雪地、沼澤、秋林、火山荒原，名稱會顯示在小地圖下方</li></ul>`),
 sec('製作與設施',`<ul><li>製作鈕開啟製作介面，分類：工具、武器、防具、設施、材料、醫療、電力、水源、農作</li><li>工作臺 1／2／3 級：解鎖更高階的配方；配方上註明需要的工作臺等級</li><li>營火：烹飪生肉。熔爐：放入燃料（木材、木炭、低級燃料、煤炭）與礦石熔煉成金屬；大型熔爐一次處理更多</li><li>箱子、大型箱子：儲物。睡袋：設定重生點</li></ul>`),
 sec('建築',`<ul><li>建築圖紙：點一下放置，按住拖曳選結構（地基、牆、窗牆、門框、屋頂、地板、樓梯、三角形結構等）。結構最初是草房，用草建造</li><li>建築鎚：對準結構點擊，依序升級材質：草房 → 木頭 → 石頭 → 金屬 → 裝甲；也能移動或拆除設施</li><li>建築會隨時間腐朽。把材料放進領地櫃，範圍約 40 格內的建築就會持續用其中的材料維護</li><li>殭屍和狼會破壞牆壁，被攻擊時畫面會提示方位與耐久</li></ul>`),
