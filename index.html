@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>極速飄移 3D 多人版</title>
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="theme-color" content="#07070f"><title>極速飄移 3D 多人版</title>
 <style>
 :root{color-scheme:dark;--bg:#07070f;--fg:#fff;--ac:#00e5ff;--hot:#ff2d95;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);font-family:system-ui,"PingFang TC","Noto Sans TC",sans-serif;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none}
@@ -19,20 +19,35 @@ canvas{position:fixed;inset:0;width:100%;height:100%}
 .ov h1{margin:0;font-size:44px;font-style:italic;color:var(--ac);text-shadow:0 0 18px var(--hot)}
 .ov p{margin:0;line-height:1.6;opacity:.85;max-width:420px}
 button.go{font:800 20px inherit;font-family:inherit;padding:14px 40px;border:0;border-radius:30px;background:var(--hot);color:#fff}
-#tc{position:fixed;left:0;right:0;bottom:0;padding:0 10px calc(env(safe-area-inset-bottom,0px) + 18px);display:none;justify-content:space-between;align-items:flex-end}
-@media (pointer:coarse){#tc{display:flex}}
-#tc div{display:flex;gap:8px}
-#tc b{width:62px;height:62px;border-radius:50%;background:#ffffff26;border:2px solid #ffffff55;display:flex;align-items:center;justify-content:center;font-size:26px}
+*{-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
+button,input{touch-action:manipulation}
+#tc{position:fixed;inset:0;display:none;pointer-events:none}
+@media (pointer:coarse){#tc{display:block}}
+#tc b{position:absolute;left:0;top:0;box-sizing:border-box;width:62px;height:62px;border-radius:50%;background:#ffffff26;border:2px solid #ffffff55;display:flex;align-items:center;justify-content:center;font-size:26px;pointer-events:auto;touch-action:none}
 #tc b.big{width:84px;height:84px;font-size:20px;background:#ff2d9555}
 #tc b.on{background:#00e5ff66}
-#snd{position:fixed;right:12px;bottom:12px;background:none;border:0;font-size:20px;color:#fff;opacity:.6;display:none}
+body.editing #tc{display:block;z-index:25}
+body.editing #ov{visibility:hidden}
+body.editing #tc b.sel{outline:3px dashed #ffd62d;outline-offset:4px}
+#tools{position:fixed;right:8px;top:calc(env(safe-area-inset-top,0px) + 70px);display:flex;flex-direction:column;gap:8px;z-index:40}
+#tools button{width:38px;height:38px;padding:0;border-radius:10px;border:1px solid #ffffff44;background:#0006;color:#fff;font-size:18px;opacity:.85}
+#ed{display:none}@media (pointer:coarse){#ed{display:block}}
+#snd{display:none}
+#ep{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 60px);transform:translateX(-50%);z-index:30;display:none;flex-direction:column;gap:10px;width:min(80vw,320px);padding:12px 14px;border-radius:14px;background:#000000b3;border:1px solid #ffffff40;text-align:center;font-size:13px;line-height:1.5}
+body.editing #ep{display:flex}
+#ep input[type=range]{width:100%}#ep div{display:flex;gap:8px;justify-content:center}
+#ep button{padding:8px 16px;border-radius:18px;border:0;background:#ffffff30;color:#fff;font:inherit}
+#ep #edone{background:var(--hot)}
+#toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 110px);transform:translateX(-50%);z-index:50;display:none;max-width:80vw;padding:10px 14px;border-radius:12px;background:#000c;border:1px solid #ffffff40;font-size:13px;line-height:1.5;text-align:center}
 </style></head><body>
 <div id="fx"></div><canvas id="sl"></canvas><div id="fl"></div>
 <div id="hud"><div><span id="lap">圈數 1/3</span><small id="tm">0:00.00</small><small id="rk"></small></div><div><div id="spd">0<small>KM/H</small></div><div id="bar"><div id="bb"></div></div><small>氮氣</small></div><div style="text-align:right"><span id="sc">0</span><small id="bs">最佳 --</small></div></div>
 <div id="dr"></div><div id="msg"></div>
 <div id="tc"><div><b data-k="l">◀</b><b data-k="r">▶</b></div><div><b data-k="b">煞車</b><b data-k="n" style="background:#00e5ff44">氮氣</b><b class="big" data-k="d">飄移</b></div></div>
-<button id="snd">🔊</button>
-<div class="ov" id="ov"><h1>極速飄移</h1><p>三圈競速！按住「飄移」過彎就會集氮氣，集越多越好，想衝的時候自己按氮氣鍵噴射加速！</p><p>電腦：方向鍵／WASD 駕駛，空白鍵飄移，S 或 ↓ 煞車，N 氮氣<br>手機：自動油門，左側轉向，右側飄移</p><p id="nt"></p><button class="go" id="go">單人開始</button><button class="go" id="mk" style="background:#2d6bff;font-size:16px;padding:10px 26px">建立多人房間</button><div id="jr" style="display:flex;gap:8px"><input id="rc" maxlength="4" placeholder="房間代碼" style="width:110px;font-size:18px;text-align:center;border-radius:20px;border:2px solid #ffffff55;background:#ffffff18;color:#fff;text-transform:uppercase"><button class="go" id="jn" style="background:#2dbf6a;font-size:16px;padding:10px 26px">加入</button></div></div>
+<div id="tools"><button id="fs" title="全螢幕">⛶</button><button id="ed" title="調整按鈕位置與大小">✥</button><button id="snd">🔊</button></div>
+<div id="ep"><span>拖曳按鈕移動位置，點選按鈕後用滑桿調整大小<br>（橫向、直向各自記憶）</span><input type="range" id="esz" min="50" max="200" value="100"><span id="esv">100%</span><div><button id="erst">還原預設</button><button id="edone">完成</button></div></div>
+<div id="toast"></div>
+<div class="ov" id="ov"><h1>極速飄移</h1><p>三圈競速！按住「飄移」過彎就會集氮氣，集越多越好，想衝的時候自己按氮氣鍵噴射加速！</p><p>電腦：方向鍵／WASD 駕駛，空白鍵飄移，S 或 ↓ 煞車，N 氮氣<br>手機：自動油門，左側轉向，右側飄移<br>右側 ✥ 可自訂按鈕位置與大小</p><p id="nt"></p><button class="go" id="go">單人開始</button><button class="go" id="mk" style="background:#2d6bff;font-size:16px;padding:10px 26px">建立多人房間</button><div id="jr" style="display:flex;gap:8px"><input id="rc" maxlength="4" placeholder="房間代碼" style="width:110px;font-size:18px;text-align:center;border-radius:20px;border:2px solid #ffffff55;background:#ffffff18;color:#fff;text-transform:uppercase"><button class="go" id="jn" style="background:#2dbf6a;font-size:16px;padding:10px 26px">加入</button></div></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script>
@@ -92,7 +107,39 @@ $('snd').onclick=()=>{mute=!mute;$('snd').textContent=mute?'🔇':'🔊'};
 const kmap={ArrowLeft:'l',a:'l',ArrowRight:'r',d:'r',ArrowUp:'g',w:'g',ArrowDown:'b',s:'b',' ':'d',Shift:'d',n:'n',x:'n'};
 addEventListener('keydown',e=>{const k=kmap[e.key.length>1?e.key:e.key.toLowerCase()];if(k){K[k]=1;e.preventDefault()}});
 addEventListener('keyup',e=>{const k=kmap[e.key.length>1?e.key:e.key.toLowerCase()];if(k)K[k]=0});
-document.querySelectorAll('#tc b').forEach(b=>{const k=b.dataset.k,on=e=>{e.preventDefault();K[k]=1;b.classList.add('on')},off=e=>{K[k]=0;b.classList.remove('on')};b.addEventListener('pointerdown',on);['pointerup','pointercancel','pointerleave'].forEach(n=>b.addEventListener(n,off))});
+// ===== touch buttons: custom layout / fullscreen / anti-zoom =====
+let editing=false,selK=null,drag=null;
+const BEL={},BASE={l:62,r:62,b:62,n:62,d:84},BK=Object.keys(BASE),LS='drift_ui_v1',user={P:null,L:null};
+document.querySelectorAll('#tc b').forEach(b=>{const k=b.dataset.k;BEL[k]=b;const on=e=>{e.preventDefault();if(editing)return;K[k]=1;b.classList.add('on')},off=e=>{if(editing)return;K[k]=0;b.classList.remove('on')};b.addEventListener('pointerdown',on);['pointerup','pointercancel','pointerleave'].forEach(n=>b.addEventListener(n,off))});
+const ori=()=>innerWidth>innerHeight?'L':'P',clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+function defLay(){const w=innerWidth,h=innerHeight,sb=parseFloat(getComputedStyle(document.documentElement).paddingBottom)||0,X={l:41,r:111,b:w-203,n:w-133,d:w-52},o={};for(const k of BK)o[k]={x:X[k]/w,y:(h-sb-18-BASE[k]/2)/h,s:1};return o}
+try{const j=JSON.parse(localStorage.getItem(LS)||'null');for(const o of['P','L'])if(j&&j[o]&&BK.every(k=>j[o][k]&&isFinite(j[o][k].x)&&isFinite(j[o][k].y)&&isFinite(j[o][k].s)))user[o]=j[o]}catch(e){}
+const curL=()=>user[ori()]||defLay(),save=()=>{try{localStorage.setItem(LS,JSON.stringify(user))}catch(e){}};
+function fit(k,l){const hw=BASE[k]*l.s/2,w=innerWidth,h=innerHeight;l.x=clamp(l.x,Math.min(.5,hw/w),Math.max(.5,1-hw/w));l.y=clamp(l.y,Math.min(.5,hw/h),Math.max(.5,1-hw/h))}
+function apply(){const L=curL();for(const k of BK){const l=L[k],b=BEL[k];fit(k,l);b.style.left=l.x*100+'%';b.style.top=l.y*100+'%';b.style.transform='translate(-50%,-50%) scale('+l.s+')'}}
+function select(k){selK=k;for(const q of BK)BEL[q].classList.toggle('sel',q===k);const v=Math.round(curL()[k].s*100);$('esz').value=v;$('esv').textContent=v+'%'}
+function setEdit(v){editing=v;document.body.classList.toggle('editing',v);drag=null;if(v){for(const k in K)K[k]=0;for(const k of BK)BEL[k].classList.remove('on');if(!user[ori()])user[ori()]=defLay();select(selK||'d')}else save();apply();if(AC)v?AC.suspend():AC.resume()}
+for(const k of BK){const b=BEL[k];
+ b.addEventListener('pointerdown',e=>{if(!editing)return;select(k);const r=b.getBoundingClientRect();drag={id:e.pointerId,dx:e.clientX-(r.left+r.width/2),dy:e.clientY-(r.top+r.height/2)};try{b.setPointerCapture(e.pointerId)}catch(_){}});
+ b.addEventListener('pointermove',e=>{if(!editing||!drag||drag.id!==e.pointerId)return;const l=curL()[k];l.x=(e.clientX-drag.dx)/innerWidth;l.y=(e.clientY-drag.dy)/innerHeight;apply()});
+ const end=e=>{if(drag&&drag.id===e.pointerId){drag=null;save()}};b.addEventListener('pointerup',end);b.addEventListener('pointercancel',end)}
+$('esz').oninput=e=>{if(!selK)return;curL()[selK].s=e.target.value/100;$('esv').textContent=e.target.value+'%';apply();save()};
+$('erst').onclick=()=>{user[ori()]=defLay();apply();select(selK||'d');save()};
+$('edone').onclick=()=>setEdit(false);$('ed').onclick=()=>setEdit(!editing);
+addEventListener('resize',()=>{if(editing&&!user[ori()])user[ori()]=defLay();apply()});apply();
+// fullscreen (iPhone Safari has no web fullscreen API -> hint to add to home screen)
+const DE=document.documentElement,reqFS=DE.requestFullscreen||DE.webkitRequestFullscreen,fsEl=()=>document.fullscreenElement||document.webkitFullscreenElement;
+let tt;function toast(t){const e=$('toast');e.textContent=t;e.style.display='block';clearTimeout(tt);tt=setTimeout(()=>e.style.display='none',5000)}
+if(navigator.standalone||matchMedia('(display-mode: standalone)').matches)$('fs').style.display='none';
+$('fs').onclick=()=>{if(fsEl()){(document.exitFullscreen||document.webkitExitFullscreen).call(document);return}
+ if(!reqFS){toast('iPhone 的 Safari 不支援網頁全螢幕。請點「分享」→「加入主畫面」，之後從主畫面圖示開啟就是全螢幕。');return}
+ try{const p=reqFS.call(DE);if(p&&p.catch)p.catch(()=>toast('無法進入全螢幕'))}catch(e){toast('無法進入全螢幕')}};
+['fullscreenchange','webkitfullscreenchange'].forEach(n=>document.addEventListener(n,()=>{$('fs').textContent=fsEl()?'✕':'⛶'}));
+// block iOS pinch / double-tap zoom
+['gesturestart','gesturechange','gestureend'].forEach(n=>document.addEventListener(n,e=>e.preventDefault()));
+document.addEventListener('touchmove',e=>{if(e.touches.length>1||(e.scale&&e.scale!==1))e.preventDefault()},{passive:false});
+let lt=0;document.addEventListener('touchend',e=>{const n=Date.now();if(n-lt<350&&e.target.tagName!=='INPUT')e.preventDefault();lt=n},{passive:false});
+document.addEventListener('dblclick',e=>e.preventDefault());
 // state
 let cy=0,cvy=0,wx=0,wy=0,wz=0,crashT=0,inv=0,nit=0,hbp=false,x,z,h,vx,vz,steer,boost,driftT,drifting,chain,score,idx,half,lap,tm,lapT,st='menu',cd=0,lastN=-9,camA,fov=65,off=false,flash=0;
 let best=0;try{best=+localStorage.getItem('drift_best')||0}catch(e){}
@@ -134,7 +181,7 @@ function netTick(dt){if(!net)return;const pr=lap*N+idx-(lap===0&&idx>N*.9?N:0);
   if(r.b)sp(r.x-Math.sin(r.h)*2.5,.7,r.z-Math.cos(r.h)*2.5,0,0,0,0xffa030,.3,.6,-.5,1,.9)}
  $('rk').textContent='名次 '+rk+'/'+n}
 const clock=new THREE.Clock();
-function loop(){requestAnimationFrame(loop);const dt=Math.min(clock.getDelta(),.05);
+function loop(){requestAnimationFrame(loop);if(editing){clock.getDelta();return}const dt=Math.min(clock.getDelta(),.05);
  if(st==='count'){cd-=dt;const n=Math.ceil(cd-.5);if(n!==lastN){lastN=n;show(n>0?n:'GO!')}if(cd<=.5)st='race'}
  if(crashT>0){crashT-=dt;if(crashT<=0)respawn()}if(inv>0)inv-=dt;
  const rc=st==='race',cr=crashT>0,gas=rc&&!cr&&(K.g||auto),brk=rc&&!cr&&K.b,hb=rc&&!cr&&K.d;
