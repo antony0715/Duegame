@@ -345,7 +345,7 @@ function skid(px,pz,r){ob.position.set(px,.06+gyS,pz);ob.rotation.y=r;ob.updateM
 // ===== audio: files in ./audio/ (missing files are skipped silently) =====
 const AUD_DIR='audio/',AUD_DIRS=['audio/',''],BD={};
 // loudness balance (measured): per-file trims so everything sits at a similar level
-const SFX_TRIM={boost:.75,miniturbo:.75,land:.8};const BGM_TRIM={1:.5,2:.28};const ATR={engine:.42,warmup:.15,drift:1};
+const SFX_TRIM={boost:.75,miniturbo:.75,land:.8};const SFX_DUR={boost:3,miniturbo:3},SFX_LAST={};const BGM_TRIM={1:.5,2:.28};const ATR={engine:.42,warmup:.15,drift:1.7};
 const SFX_FILES={engine:'sfx_engine',drift:'sfx_drift',boost:'sfx_boost',miniturbo:'sfx_miniturbo',ring:'sfx_ring',launch_perfect:'sfx_launch_perfect',launch_ok:'sfx_launch_ok',launch_fail:'sfx_launch_fail',jump:'sfx_jump',land:'sfx_land',wall:'sfx_wall',crash:'sfx_crash',item_get:'sfx_item_get',item_use:'sfx_item_use',shield:'sfx_shield',item_hit:'sfx_item_hit',shield_block:'sfx_shield_block',count:'sfx_count',go:'sfx_go',lap:'sfx_lap',finish:'sfx_finish',click:'sfx_click',flick:'sfx_flick',warmup:'sfx_warmup'};
 const SFX_CAT={boost:'boost',miniturbo:'drift',ring:'boost',launch_perfect:'boost',launch_ok:'boost',launch_fail:'crash',jump:'air',land:'air',wall:'crash',crash:'crash',item_get:'item',item_use:'item',shield:'item',item_hit:'item',shield_block:'item',count:'cue',go:'cue',lap:'cue',finish:'cue',click:'ui',flick:'drift'};
 // every event has its own file: audio/sfx_<event>.mp3
@@ -359,7 +359,9 @@ let AC,mg,mb,sb,sOsc,sOg,sNg,eL,dL,wL,pl=[],pos=-1,cur=0;const cb={},B={},mus=[]
 const mute=()=>!!AS.mute;
 function applyVol(init){if(!AC)return;const t=AC.currentTime,s=(g,v)=>init?(g.gain.value=v):g.gain.setTargetAtTime(v,t,.03);s(mg,AS.mute?0:AS.master/100);s(mb,AS.music/100);s(sb,AS.sfx/100);for(const c of CATS)s(cb[c],AS[c]/100)}
 function loadSfx(k){let p=Promise.reject();for(const d of AUD_DIRS)p=p.catch(()=>fetch(d+SFX_FILES[k]+'.mp3').then(r=>r.ok?r.arrayBuffer():Promise.reject()).then(a=>new Promise((ok,no)=>AC.decodeAudioData(a,ok,no))));p.then(b=>{B[k]=b}).catch(()=>{})}
-function sfx(k,v=1,r=1){const m=SFX_MAP[k];if(!AC||!m||!B[m[0]])return;try{const s=AC.createBufferSource();s.buffer=B[m[0]];s.playbackRate.value=r*m[2];const g=AC.createGain();g.gain.value=v*m[3];s.connect(g);g.connect(cb[m[1]]);s.start()}catch(e){}}
+function sfx(k,v=1,r=1){const m=SFX_MAP[k];if(!AC||!m||!B[m[0]])return;try{const s=AC.createBufferSource();s.buffer=B[m[0]];s.playbackRate.value=r*m[2];const g=AC.createGain(),vv=v*m[3];g.gain.value=vv;s.connect(g);g.connect(cb[m[1]]);s.start();
+ const d=SFX_DUR[k];if(d){const t=AC.currentTime,o=SFX_LAST[k];if(o){try{o.g.gain.cancelScheduledValues(t);o.g.gain.setValueAtTime(o.g.gain.value,t);o.g.gain.linearRampToValueAtTime(0,t+.12);o.s.stop(t+.15)}catch(e){}}
+ g.gain.setValueAtTime(vv,t);g.gain.setValueAtTime(vv,t+d-1.2);g.gain.linearRampToValueAtTime(0,t+d);s.stop(t+d+.05);SFX_LAST[k]={s,g}}}catch(e){}}
 function loopSrc(k,c){const s=AC.createBufferSource();s.buffer=B[k];s.loop=true;const g=AC.createGain();g.gain.value=0;s.connect(g);g.connect(cb[c]);s.start();return{s,g}}
 const FADE_IN=2,FADE_OUT=1.5;
 function fadeTo(g,v,d){const t=AC.currentTime,p=g.gain;p.cancelScheduledValues(t);p.setValueAtTime(p.value,t);p.linearRampToValueAtTime(v,t+d)}
@@ -493,6 +495,7 @@ function cTog(e,k){const w=e.closest('.cw');w.classList.toggle('open');CO[k]=w.c
 function refC(k){const f={md:mdHTML,lp:lpHTML,sp:spHTML}[k];document.querySelectorAll('.cw[data-c="'+k+'"]').forEach(e=>e.outerHTML=f())}
 function setMode(i){if(net&&!host)return;MODE=i;try{localStorage.setItem('drift_md',i)}catch(e){}CO.md=0;refC('md');lbSync();initRace()}
 $('gear').onclick=()=>$('tools').classList.toggle('open');$('ed').addEventListener('click',()=>$('tools').classList.remove('open'));$('it').onclick=()=>useHeld();
+const FLIP_KMH=300,fastEnough=()=>Math.hypot(vx,vz)*2.8>=FLIP_KMH;
 const flipV=()=>34*SPD*VC.sb,flipC=om=>27*SPD*VC.sb*clamp(VC.ms/om,.6,1.6),bump=(p,s)=>{for(const k of KK){const q=(p-k.a)/k.L;if(q>=0&&q<=1&&Math.abs(s-k.c)<k.w)return k.h*q}return 0};
 function at(s,l){s=(s%N+N)%N;const i=s|0,j=(i+1)%N,f=s-i,n=Nm[i];return[pts[i].x+(pts[j].x-pts[i].x)*f+n.x*l,pts[i].y+(pts[j].y-pts[i].y)*f+bump(s,l),pts[i].z+(pts[j].z-pts[i].z)*f+n.z*l,Math.atan2(T[i].x,T[i].z)]}
 const pp=o=>o===ME?[x,z]:[o.x,o.z],tmOf=o=>o===ME?myTm:o&&o.tm,fr=(a,b)=>MODE===3&&a&&b&&tmOf(a)!==undefined&&tmOf(a)===tmOf(b);
@@ -593,7 +596,7 @@ function botTick(dt){if(net||!BOTS.length)return;const run=st==='race'||st==='fi
   if(b.lap>=LAPS&&!b.fin)b.fin=++finN;b.p=b.fin?LAPS*N+N*.5-b.fin:b.lap*N+b.s;
   let lt=(b.l0+Math.sin(t*.6+b.ph)*.25)*HW*.8;if(ZS.some(q=>b.s>=q[0]-8&&b.s<q[0]+q[1]))lt=(b.l0>=0?1:-1)*(IW+(HW-IW)*.5);
   b.lat+=(lt-b.lat)*Math.min(1,dt*2.5);const a=at(b.s,b.lat);b.x=a[0];b.z=a[2];b.h=a[3];b.g.position.set(a[0],a[1],a[2]);b.g.rotation.y=a[3]+(b.hit>0?b.hit*9:0);
-  {const dx=x-b.x,dz=z-b.z,d=Math.hypot(dx,dz);if(d<4&&d>.01&&crashT<=0&&Math.abs(gyS-a[1])<1.6){const nx=dx/d,nz=dz/d,bm=(VH[b.vi]||VH[0]).ms,pk=1.4*bm/(VC.ms+bm),rv=(vx-Math.sin(b.h)*b.v)*nx+(vz-Math.cos(b.h)*b.v)*nz;x+=nx*(4-d)*.7*pk;z+=nz*(4-d)*.7*pk;vx*=.985;vz*=.985;b.v*=.985;if(-rv>flipC(bm)*1.25&&inv<=0){crash(nx,nz,-rv*.8);b.hit=Math.max(b.hit,2)}}}
+  {const dx=x-b.x,dz=z-b.z,d=Math.hypot(dx,dz);if(d<4&&d>.01&&crashT<=0&&Math.abs(gyS-a[1])<1.6){const nx=dx/d,nz=dz/d,bm=(VH[b.vi]||VH[0]).ms,pk=1.4*bm/(VC.ms+bm),rv=(vx-Math.sin(b.h)*b.v)*nx+(vz-Math.cos(b.h)*b.v)*nz,fsp=fastEnough();x+=nx*(4-d)*.7*pk;z+=nz*(4-d)*.7*pk;vx*=.985;vz*=.985;b.v*=.985;if(-rv>flipC(bm)*1.25&&inv<=0&&fsp){crash(nx,nz,-rv*.8);b.hit=Math.max(b.hit,2)}}}
   if(MODE>=2&&run&&!b.fin&&(b.bt-=dt)<=0){b.bt=6+Math.random()*7;useItem(b,roll(2))}}
  const L=[{n:myName(),p:pm,c:MODE===3?'#ff4040':'#ff2d2d',me:1,t:0},...BOTS.map(b=>({n:b.n,p:b.p,c:b.col,t:b.tm}))].sort((a,b)=>b.p-a.p);if(st==='race')rkN=L.findIndex(q=>q.me)+1;if(MODE===3){tsc=[0,0];L.forEach((q,i)=>tsc[q.t]+=[10,8,6,5,4,3][i])}
  setLb(L)}
@@ -665,7 +668,7 @@ let lbS='';function netTick(dt){if(!net)return;const pr=lap*N+idx-(lap===0&&!hal
  let rk=1,n=1;const now=performance.now(),L=[{n:myName(),p:pr,c:MODE===3?(myTm?'#3a7bff':'#ff4040'):'#ff2d2d',me:1,t:myTm}];
  for(const k in RM){const r=RM[k],live=now-r.t<3000;r.g.visible=live;if(!live)continue;n++;if(r.p>pr)rk++;L.push({n:r.n||'車手',p:r.p,c:r.g.children[0].material.color.getStyle(),t:TMM[k]});const a=Math.min(1,dt*12);r.x+=(r.tx-r.x)*a;r.z+=(r.tz-r.z)*a;r.h+=ad(r.h,r.th)*a;r.y+=(r.ty-r.y)*a;r.rx+=ad(r.rx,r.trx)*a;r.rz+=ad(r.rz,r.trz)*a;r.g.position.set(r.x,r.y,r.z);r.g.rotation.set(r.rx,r.h,r.rz);
   {const dx=x-r.x,dz=z-r.z,d=Math.hypot(dx,dz),md=4.2;if(st==='race'&&d<md&&d>.01&&crashT<=0&&inv<=0&&r.y<1.5){const nx=dx/d,nz=dz/d,ov=md-d,om=(VH[r.v]||VH[0]).ms,pk=1.2*om/(VC.ms+om);x+=nx*ov*pk;z+=nz*ov*pk;const rv=(vx-r.vx)*nx+(vz-r.vz)*nz;
-   if(rv<0){vx-=nx*rv*.75;vz-=nz*rv*.75;vx*=.97;vz*=.97;h+=Math.sign(Math.sin(h)*nz-Math.cos(h)*nx)*Math.min(.3,-rv*.012);flash=.2;if(-rv>flipC((VH[r.v]||VH[0]).ms))crash(nx,nz,-rv*.8);
+   if(rv<0){const fsp=fastEnough();vx-=nx*rv*.75;vz-=nz*rv*.75;vx*=.97;vz*=.97;h+=Math.sign(Math.sin(h)*nz-Math.cos(h)*nx)*Math.min(.3,-rv*.012);flash=.2;if(-rv>flipC((VH[r.v]||VH[0]).ms)&&fsp)crash(nx,nz,-rv*.8);
     if(rv<-3)for(let q=0;q<10;q++)sp(x-nx*2,.8,z-nz*2,(Math.random()-.5)*16+nx*8,Math.random()*6,(Math.random()-.5)*16+nz*8,Math.random()<.5?0xffd060:0xffffff,.35,.3,-.7,1,1)}}}
   if(r.b)sp(r.x-Math.sin(r.h)*2.5,.7,r.z-Math.cos(r.h)*2.5,0,0,0,0xffa030,.3,.6,-.5,1,.9)}
  const lb=L.length>1?L.sort((a,b)=>b.p-a.p).slice(0,8).map((q,i)=>'<div'+(q.me?' class="me"':'')+'><u>'+(i+1)+'</u><i style="background:'+q.c+'"></i><span>'+esc(q.n)+'</span></div>').join(''):'';if(MODE===3){const sc=[0,0];L.forEach((q,i)=>{if(q.t!==undefined)sc[q.t]+=[10,8,6,5,4,3,2,1][i]||0});tsc=sc}setLb(L)}
@@ -726,7 +729,7 @@ function loop(){requestAnimationFrame(loop);if(editing){clock.getDelta();return}
  {const al=(x-pts[idx].x)*T[idx].x+(z-pts[idx].z)*T[idx].z,j=al>=0?(idx+1)%N:(idx+N-1)%N,g0=pts[idx].y+(pts[j].y-pts[idx].y)*Math.min(1,Math.abs(al)/3);vert(g0+bump(idx+al/3,sd),dt,Math.hypot(vx,vz));pitch=air?pitch:bumpS(idx+al/3,sd)+Math.atan((pts[(idx+1)%N].y-pts[(idx+N-1)%N].y)/6*(f2[0]*T[idx].x+f2[1]*T[idx].z))}
  if(wallT>0)wallT-=dt;if(lockT>0)lockT-=dt;if(spinT>0){spinT-=dt;for(const s of[1,-1])if(Math.random()<.35)sp(x-Math.sin(h)*1.5-Math.cos(h)*VC.tw*s,.5,z-Math.cos(h)*1.5+Math.sin(h)*VC.tw*s,(Math.random()-.5)*3,1+Math.random()*1.5,(Math.random()-.5)*3,0xffffff,.5,.5,2,0,.16)}
  if(Math.abs(sd)>WALL-.8&&!cr){const sg=Math.sign(sd),nx=Nm[idx].x*sg,nz=Nm[idx].z*sg,CW=WALL-.8;x=pts[idx].x+Nm[idx].x*sg*CW;z=pts[idx].z+Nm[idx].z*sg*CW;const vn=vx*nx+vz*nz;
-  if(vn>0){if(vn>flipV()&&wallT<=0&&inv<=0){vx-=nx*vn;vz-=nz*vn;wallT=.3;crash(-nx,-nz,vn*.8)}else if(wallT<=0){wallT=.3;sfx('wall',Math.min(1,.4+vn*.04));const bn=Math.min(6,2+vn*.15)/Math.sqrt(VC.ms),tf=Math.max(.5,.95-vn*.012),hd=vn>9,tx=vx-nx*vn,tz=vz-nz*vn;vx=tx*tf-nx*bn;vz=tz*tf-nz*bn;
+  if(vn>0){if(vn>flipV()&&wallT<=0&&inv<=0&&fastEnough()){vx-=nx*vn;vz-=nz*vn;wallT=.3;crash(-nx,-nz,vn*.8)}else if(wallT<=0){wallT=.3;sfx('wall',Math.min(1,.4+vn*.04));const bn=Math.min(6,2+vn*.15)/Math.sqrt(VC.ms),tf=Math.max(.5,.95-vn*.012),hd=vn>9,tx=vx-nx*vn,tz=vz-nz*vn;vx=tx*tf-nx*bn;vz=tz*tf-nz*bn;
     const ta=Math.atan2(T[idx].x,T[idx].z),fw=Math.sin(h)*T[idx].x+Math.cos(h)*T[idx].z;wyw=ad(h,fw>=0?ta:ta+Math.PI)*Math.min(.7,.3+vn*.02)*7;
     flash=hd?.4:.25;if(hd){if(drifting){lockDir=ddir;lockT=1.2}drifting=false;driftT=0;for(let q=0;q<14;q++)sp(x,.8,z,(Math.random()-.5)*16-nx*6,Math.random()*6,(Math.random()-.5)*16-nz*6,Math.random()<.5?0xffd060:0xffffff,.35,.3,-.7,1,1)}if(chain>0){chain=0;tip('撞牆！')}}
    else{vx-=nx*vn;vz-=nz*vn}}}
