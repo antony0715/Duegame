@@ -45,7 +45,7 @@ body.editing #ep{display:flex}
 #ep input[type=range]{width:100%}#ep div{display:flex;gap:8px;justify-content:center}
 #ep button{padding:8px 16px;border-radius:18px;border:0;background:#ffffff30;color:#fff;font:inherit}
 #ep #edone{background:var(--hot)}
-#toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 110px);transform:translateX(-50%);z-index:50;display:none;max-width:80vw;padding:10px 14px;border-radius:12px;background:#000c;border:1px solid #ffffff40;font-size:13px;line-height:1.5;text-align:center}
+#toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 110px);transform:translateX(-50%);z-index:70;display:none;max-width:80vw;padding:10px 14px;border-radius:12px;background:#000c;border:1px solid #ffffff40;font-size:13px;line-height:1.5;text-align:center}
 .tkr{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;max-width:420px}.tk{font:700 14px inherit;font-family:inherit;padding:8px 14px;border-radius:18px;border:2px solid #ffffff55;background:#ffffff18;color:#fff}.tk.on{background:var(--ac);color:#07070f;border-color:var(--ac)}
 .ov{overflow-y:auto;-webkit-overflow-scrolling:touch;justify-content:flex-start;gap:10px;padding:16px 24px}.ov>:first-child{margin-top:auto}.ov>:last-child{margin-bottom:auto}.ov h1{font-size:36px}.ov .tkr{flex-shrink:0}.ov button,.ov p{flex-shrink:0}
 #bar{height:12px;border-radius:7px;border:1.5px solid #ffffff80;background:#00000055}#bar.full{box-shadow:0 0 10px #c04bff;animation:pl .45s infinite alternate}#bar.full #bb{background:linear-gradient(90deg,#c04bff,#ff2d95)}#bar.burn #bb{background:linear-gradient(90deg,#ff7a1e,#ffd62d)}@keyframes pl{to{box-shadow:0 0 20px #ff2d95}}#tc b.rdy{border-color:#ffd62d;box-shadow:0 0 16px #ffd62d,inset 0 0 14px #ffffff2e}
@@ -343,11 +343,13 @@ function upP(dt){for(const q of PL){if(q.l<=0)continue;q.l-=dt;if(q.l<=0){q.m.vi
 const SI=new THREE.InstancedMesh(new THREE.PlaneGeometry(.5,1.6).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:0,transparent:true,opacity:.55,depthWrite:false}),1500),ob=new THREE.Object3D();SI.frustumCulled=false;SI.count=0;S.add(SI);let ki=0;
 function skid(px,pz,r){ob.position.set(px,.06+gyS,pz);ob.rotation.y=r;ob.updateMatrix();SI.setMatrixAt(ki%1500,ob.matrix);ki++;SI.count=Math.min(ki,1500);SI.instanceMatrix.needsUpdate=true}
 // ===== audio: files in ./audio/ (missing files are skipped silently) =====
-const AUD_DIR='audio/';
+const AUD_DIR='audio/',AUD_DIRS=['audio/',''],BD={};
+// loudness balance (measured): per-file trims so everything sits at a similar level
+const SFX_TRIM={boost:.75,miniturbo:.75,land:.8};const BGM_TRIM={1:.5,2:.28};const ATR={engine:.42,warmup:.15,drift:1};
 const SFX_FILES={engine:'sfx_engine',drift:'sfx_drift',boost:'sfx_boost',miniturbo:'sfx_miniturbo',ring:'sfx_ring',launch_perfect:'sfx_launch_perfect',launch_ok:'sfx_launch_ok',launch_fail:'sfx_launch_fail',jump:'sfx_jump',land:'sfx_land',wall:'sfx_wall',crash:'sfx_crash',item_get:'sfx_item_get',item_use:'sfx_item_use',shield:'sfx_shield',item_hit:'sfx_item_hit',shield_block:'sfx_shield_block',count:'sfx_count',go:'sfx_go',lap:'sfx_lap',finish:'sfx_finish',click:'sfx_click',flick:'sfx_flick',warmup:'sfx_warmup'};
 const SFX_CAT={boost:'boost',miniturbo:'drift',ring:'boost',launch_perfect:'boost',launch_ok:'boost',launch_fail:'crash',jump:'air',land:'air',wall:'crash',crash:'crash',item_get:'item',item_use:'item',shield:'item',item_hit:'item',shield_block:'item',count:'cue',go:'cue',lap:'cue',finish:'cue',click:'ui',flick:'drift'};
 // every event has its own file: audio/sfx_<event>.mp3
-const SFX_MAP={};for(const k in SFX_CAT)SFX_MAP[k]=[k,SFX_CAT[k],1,1];
+const SFX_MAP={};for(const k in SFX_CAT)SFX_MAP[k]=[k,SFX_CAT[k],1,SFX_TRIM[k]||1];
 const BGM_MAX=8;const SIL='data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=';
 const CATS=['engine','drift','boost','crash','air','item','cue','ui'];
 const AL=[['master','主音量'],['music','音樂'],['sfx','音效總量'],['engine','引擎聲'],['drift','飄移／輪胎聲'],['boost','氮氣／加速'],['crash','撞牆／翻車'],['air','跳躍／著地'],['item','道具'],['cue','倒數／圈數／完賽'],['ui','按鈕聲']];
@@ -356,7 +358,7 @@ let AS={...ADEF};try{const j=JSON.parse(localStorage.getItem('drift_aud')||'{}')
 let AC,mg,mb,sb,sOsc,sOg,sNg,eL,dL,wL,pl=[],pos=-1,cur=0;const cb={},B={},mus=[];
 const mute=()=>!!AS.mute;
 function applyVol(init){if(!AC)return;const t=AC.currentTime,s=(g,v)=>init?(g.gain.value=v):g.gain.setTargetAtTime(v,t,.03);s(mg,AS.mute?0:AS.master/100);s(mb,AS.music/100);s(sb,AS.sfx/100);for(const c of CATS)s(cb[c],AS[c]/100)}
-function loadSfx(k){fetch(AUD_DIR+SFX_FILES[k]+'.mp3').then(r=>r.ok?r.arrayBuffer():Promise.reject()).then(a=>new Promise((ok,no)=>AC.decodeAudioData(a,ok,no))).then(b=>{B[k]=b}).catch(()=>{})}
+function loadSfx(k){let p=Promise.reject();for(const d of AUD_DIRS)p=p.catch(()=>fetch(d+SFX_FILES[k]+'.mp3').then(r=>r.ok?r.arrayBuffer():Promise.reject()).then(a=>new Promise((ok,no)=>AC.decodeAudioData(a,ok,no))));p.then(b=>{B[k]=b}).catch(()=>{})}
 function sfx(k,v=1,r=1){const m=SFX_MAP[k];if(!AC||!m||!B[m[0]])return;try{const s=AC.createBufferSource();s.buffer=B[m[0]];s.playbackRate.value=r*m[2];const g=AC.createGain();g.gain.value=v*m[3];s.connect(g);g.connect(cb[m[1]]);s.start()}catch(e){}}
 function loopSrc(k,c){const s=AC.createBufferSource();s.buffer=B[k];s.loop=true;const g=AC.createGain();g.gain.value=0;s.connect(g);g.connect(cb[c]);s.start();return{s,g}}
 const FADE_IN=2,FADE_OUT=1.5;
@@ -369,9 +371,9 @@ m.on=1;m.nx=0;m.g.gain.cancelScheduledValues(AC.currentTime);m.g.gain.value=0;co
 a.onerror=()=>{if(mus[cur]!==m||!m.on)return;m.on=0;pl.splice(n,1);if(!pl.length){nowTxt();return}pos=Math.min(pos,pl.length-1);nextTrack()};
 a.onended=()=>{if(mus[cur]===m&&m.on&&!m.nx){m.nx=1;nextTrack()}};
 a.ontimeupdate=()=>{if(mus[cur]===m&&!m.nx&&pl.length>1&&isFinite(a.duration)&&a.duration>FADE_IN+FADE_OUT+4&&a.duration-a.currentTime<FADE_OUT+.3){m.nx=1;nextTrack()}};
-a.src=AUD_DIR+'bgm_'+id+'.mp3';try{a.currentTime=0}catch(e){}a.play().then(()=>fadeTo(m.g,1,FADE_IN)).catch(()=>{});nowTxt()}
+a.src=(BD[id]!=null?BD[id]:AUD_DIR)+'bgm_'+id+'.mp3';try{a.currentTime=0}catch(e){}a.play().then(()=>fadeTo(m.g,BGM_TRIM[id]||.5,FADE_IN)).catch(()=>{});nowTxt()}
 // global playlist: bgm_1.mp3, bgm_2.mp3 ... (only the ones that exist), plays through every screen
-function startMusic(){const ids=[...Array(BGM_MAX)].map((_,i)=>i+1);Promise.all(ids.map(i=>fetch(AUD_DIR+'bgm_'+i+'.mp3',{method:'HEAD'}).then(r=>r.ok?i:0).catch(()=>0))).then(r=>{pl=r.filter(Boolean);nowTxt();if(pl.length)playTrack(AS.shuffle?Math.random()*pl.length|0:0)})}
+function startMusic(){const ids=[...Array(BGM_MAX)].map((_,i)=>i+1);Promise.all(ids.map(i=>{let q=Promise.reject();for(const d of AUD_DIRS)q=q.catch(()=>fetch(d+'bgm_'+i+'.mp3',{method:'HEAD'}).then(r=>r.ok&&!/html/i.test(r.headers.get('content-type')||'')?(BD[i]=d,i):Promise.reject()));return q.catch(()=>0)})).then(r=>{pl=r.filter(Boolean);nowTxt();if(pl.length)playTrack(AS.shuffle?Math.random()*pl.length|0:0)})}
 function aud(){if(AC)return;try{AC=new(window.AudioContext||window.webkitAudioContext)();
 mg=AC.createGain();mg.connect(AC.destination);mb=AC.createGain();mb.connect(mg);sb=AC.createGain();sb.connect(mg);for(const c of CATS){cb[c]=AC.createGain();cb[c].connect(sb)}applyVol(true);
 // synth fallback for engine / drift (used until/unless the files load)
@@ -382,10 +384,10 @@ for(let i=0;i<2;i++){try{const a=new Audio();a.preload='auto';const g=AC.createG
 if(mus.length===2)startMusic()}catch(e){}}
 function audTick(sp2){if(!AC)return;const t=AC.currentTime,on=st==='race'||st==='count';
 if(B.engine&&!eL)eL=loopSrc('engine','engine');if(B.drift&&!dL)dL=loopSrc('drift','drift');if(B.warmup&&!wL)wL=loopSrc('warmup','engine');
-const wu=st==='count'&&!launched;if(wL){wL.s.playbackRate.setTargetAtTime(.8+clamp((3.5-cd)/3,0,1)*.6,t,.08);wL.g.gain.setTargetAtTime(wu?1:0,t,wu?.1:.06)}
-if(eL){eL.s.playbackRate.setTargetAtTime(clamp(.7+sp2*.022+(boost>0?.12:0),.4,3),t,.06);eL.g.gain.setTargetAtTime(on?(wL&&wu?.3:1):0,t,.12)}
+const wu=st==='count'&&!launched;if(wL){wL.s.playbackRate.setTargetAtTime(.8+clamp((3.5-cd)/3,0,1)*.6,t,.08);wL.g.gain.setTargetAtTime(wu?ATR.warmup:0,t,wu?.1:.06)}
+if(eL){eL.s.playbackRate.setTargetAtTime(clamp(.7+sp2*.022+(boost>0?.12:0),.4,3),t,.06);eL.g.gain.setTargetAtTime(on?(wL&&wu?.3:1)*ATR.engine:0,t,.12)}
 sOsc.frequency.setTargetAtTime(85+sp2*5+(boost>0?60:0),t,.05);sOg.gain.setTargetAtTime(eL||!on?0:.12,t,.12);
-const dv=on&&drifting&&crashT<=0;if(dL)dL.g.gain.setTargetAtTime(dv?1:0,t,.06);sNg.gain.setTargetAtTime(dL||!dv?0:.16,t,.06)}
+const dv=on&&drifting&&crashT<=0;if(dL)dL.g.gain.setTargetAtTime(dv?ATR.drift:0,t,.06);sNg.gain.setTargetAtTime(dL||!dv?0:.012,t,.06)}
 // unlock audio on the first gesture (menu music starts here)
 for(const ev of['touchend','click','keydown'])addEventListener(ev,()=>{if(!AC)aud();else if(AC.state==='suspended')AC.resume()},{capture:true});
 document.addEventListener('visibilitychange',()=>{if(!AC)return;if(document.hidden)AC.suspend();else AC.resume()});
@@ -429,9 +431,9 @@ addEventListener('resize',()=>{if(editing&&!user[ori()])user[ori()]=defLay();app
 const DE=document.documentElement,reqFS=DE.requestFullscreen||DE.webkitRequestFullscreen,fsEl=()=>document.fullscreenElement||document.webkitFullscreenElement;
 let tt;function toast(t){const e=$('toast');e.textContent=t;e.style.display='block';clearTimeout(tt);tt=setTimeout(()=>e.style.display='none',5000)}
 if(navigator.standalone||matchMedia('(display-mode: standalone)').matches)$('fs').style.display='none';
-$('fs').onclick=()=>{if(fsEl()){(document.exitFullscreen||document.webkitExitFullscreen).call(document);return}
+function toggleFS(){if(fsEl()){(document.exitFullscreen||document.webkitExitFullscreen).call(document);return}
  if(!reqFS){toast('iPhone 的 Safari 不支援網頁全螢幕。請點「分享」→「加入主畫面」，之後從主畫面圖示開啟就是全螢幕。');return}
- try{const p=reqFS.call(DE);if(p&&p.catch)p.catch(()=>toast('無法進入全螢幕'))}catch(e){toast('無法進入全螢幕')}};
+ try{const p=reqFS.call(DE);if(p&&p.catch)p.catch(()=>toast('無法進入全螢幕'))}catch(e){toast('無法進入全螢幕')}}$('fs').onclick=toggleFS;
 ['fullscreenchange','webkitfullscreenchange'].forEach(n=>document.addEventListener(n,()=>{$('fs').innerHTML=fsEl()?IC.f1:IC.f0}));
 // ===== unified touch handling (controls, edit-drag, buttons) + zoom blocking =====
 const pressed={},btnT={};
