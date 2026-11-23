@@ -302,6 +302,20 @@ TRK.push({...B,n:'夜山登頂・上山',mode:0,P:Pu},{...B,n:'夜山登頂・�
 
 
 
+// ===== 世界巡迴 v3：羅馬／東京／雪梨／舊金山／泰姬陵 =====
+{const T2=Math.PI*2,sn=Math.sin,cs=Math.cos,sm=t=>{t=Math.max(0,Math.min(1,t));return t*t*(3-2*t)},sp=(x,q)=>Math.sign(x)*Math.pow(Math.abs(x),q),pc=(f,n)=>Array.from({length:n},(_,i)=>{const p=f(i/n);return[Math.round(p[0]),Math.round(p[1])]});
+TRK.push({...FL0,n:'羅馬競技場',t:'dusk',df:3,hw:9,k:1.25,lamp:1,nt:150,sk:'round',g:[0xa89a6a,0xb1a373],gm:0x9a8c5e,tc:[.27,.4,.22],mc:[.09,.3,.5],mh:.9,trc:0x5a4030,rd:[0x4a4640,0x524e48],cb:[0x9e2230,0xe8dcc0],wl:[0xd8c49a,0xc8b488],ga:'greek',
+ P:[[529,0],[522,26],[506,47],[486,64],[462,77],[437,88],[412,96],[388,108],[370,128],[352,148],[332,165],[311,182],[288,196],[265,210],[241,221],[216,232],[190,241],[165,248],[139,255],[112,260],[86,264],[59,267],[32,269],[6,270],[-21,270],[-48,268],[-74,274],[-101,279],[-127,275],[-149,259],[-167,240],[-185,220],[-207,206],[-234,205],[-260,210],[-287,214],[-314,210],[-336,196],[-354,176],[-376,161],[-402,153],[-428,149],[-455,145],[-481,138],[-506,129],[-529,115],[-544,94],[-551,68],[-550,41],[-543,15],[-530,-8],[-513,-29],[-493,-47],[-472,-63],[-449,-78],[-427,-93],[-406,-109],[-383,-124],[-362,-140],[-341,-157],[-321,-174],[-299,-190],[-276,-204],[-252,-216],[-227,-227],[-202,-237],[-177,-245],[-150,-247],[-124,-241],[-99,-230],[-76,-216],[-54,-202],[-31,-188],[-6,-178],[21,-177],[46,-187],[67,-204],[86,-222],[106,-241],[126,-259],[147,-275],[170,-289],[195,-299],[221,-300],[247,-293],[270,-280],[291,-262],[308,-242],[322,-219],[335,-195],[347,-171],[359,-147],[373,-125],[394,-109],[419,-100],[445,-92],[470,-82],[493,-68],[512,-50],[526,-26]],hf:u=>16*Math.pow(sn(Math.PI*u*3),2)+8*sn(T2*u*5+1),Kk:[[.2,0,1,3.8],[.7,0,1,3.8]],Pd:[[.06,0],[.38,.5],[.58,-.5],[.86,0]],lk:'rome'},
+{...FL0,n:'東京晴空塔',t:'night',df:4,hw:7.5,k:1.25,pier:1,bld:1,bc:[.85,.45,.7],ac:0xff4fd8,lamp:1,nt:60,sk:'round',g:[0x2c2a3a,0x34324a],gm:0x24223a,tc:[.35,.3,.3],mc:[.75,.3,.4],mh:1.2,rd:[0x24242c,0x2c2c34],cb:[0xff2d95,0xffffff],ga:'neon',
+ P:[[440,0],[457,19],[476,36],[493,55],[509,75],[521,97],[530,121],[533,146],[529,171],[519,194],[502,213],[480,227],[457,236],[432,242],[406,245],[381,249],[357,255],[335,268],[312,279],[287,285],[262,287],[236,285],[211,280],[187,273],[162,266],[137,261],[112,257],[86,258],[61,259],[36,260],[10,260],[-15,260],[-41,260],[-66,259],[-92,258],[-117,256],[-143,253],[-168,250],[-193,245],[-218,240],[-242,233],[-267,225],[-290,216],[-313,204],[-335,191],[-356,176],[-372,157],[-379,133],[-379,107],[-374,82],[-369,57],[-370,32],[-380,9],[-393,-13],[-407,-35],[-417,-58],[-418,-84],[-410,-108],[-398,-130],[-383,-150],[-365,-168],[-345,-184],[-325,-201],[-308,-219],[-287,-234],[-262,-239],[-237,-235],[-213,-228],[-188,-223],[-163,-227],[-142,-242],[-124,-259],[-104,-276],[-81,-286],[-56,-284],[-34,-272],[-14,-256],[7,-241],[31,-233],[55,-237],[78,-250],[99,-263],[123,-273],[148,-274],[171,-263],[188,-245],[203,-224],[217,-202],[232,-182],[247,-163],[258,-140],[271,-118],[291,-103],[316,-99],[341,-98],[366,-94],[390,-84],[410,-69],[424,-48],[430,-23]],hf:u=>38*Math.pow(sn(Math.PI*u*2),2),Kk:[[.12,0,1,3.8],[.62,0,1,3.8]],Pd:[[.05,0],[.3,.5],[.55,-.5],[.82,0]],lk:'tokyo',row:{f:'tokyo',g:[30],s:10}},
+{...FL0,n:'雪梨歌劇院',t:'day',df:2,hw:10,k:1.25,lamp:1,nt:40,sk:'palm',g:[0x78b86a,0x82c274],gm:0x1f90d0,tc:[.3,.5,.4],mc:[.5,.3,.5],mh:.5,rd:[0x4a4e56,0x52565e],cb:[0x2d9bff,0xffffff],ga:'palm',
+ P:[[374,0],[374,25],[376,51],[378,76],[376,101],[372,126],[362,149],[346,169],[325,183],[301,191],[276,194],[251,194],[225,193],[200,193],[175,199],[151,205],[126,209],[100,212],[75,212],[50,211],[25,209],[0,205],[-25,199],[-47,186],[-64,167],[-77,146],[-89,124],[-101,101],[-113,79],[-127,58],[-146,41],[-170,32],[-195,32],[-219,38],[-242,49],[-264,62],[-285,76],[-306,90],[-328,104],[-349,116],[-372,128],[-396,137],[-420,143],[-445,144],[-470,139],[-492,127],[-510,109],[-525,88],[-535,65],[-542,41],[-545,16],[-544,-10],[-539,-34],[-530,-58],[-517,-80],[-501,-99],[-481,-114],[-457,-125],[-433,-129],[-407,-129],[-382,-125],[-358,-118],[-334,-110],[-310,-103],[-285,-97],[-260,-93],[-235,-92],[-211,-102],[-192,-117],[-173,-134],[-152,-149],[-128,-155],[-102,-157],[-78,-163],[-57,-176],[-38,-194],[-20,-211],[1,-225],[26,-230],[51,-226],[74,-215],[97,-204],[120,-195],[145,-193],[171,-194],[196,-193],[220,-183],[242,-173],[265,-160],[286,-146],[306,-131],[324,-113],[340,-94],[354,-73],[365,-50],[372,-25]],hf:u=>14*Math.pow(sn(Math.PI*u),2)+8*sn(T2*u*2)+6*sn(T2*u*5),Kk:[[.3,0,1,3.8],[.78,0,1,3.8]],Pd:[[.08,0],[.45,.5],[.62,-.5],[.9,0]],lk:'syd'},
+{...FL0,n:'舊金山金門大橋',t:'dusk',df:4,hw:8.5,k:1.25,lamp:1,nt:40,sk:'pine',g:[0x8a8f98,0x959aa3],gm:0x2a6aa0,tc:[.3,.4,.28],mc:[.06,.5,.4],mh:1.4,rd:[0x3a3e46,0x42464e],cb:[0xd8451f,0xffffff],wl:[0xd8451f,0xc03a18],ga:'cable',
+ P:[[-430,-110],[-300,-110],[-150,-110],[0,-110],[150,-110],[300,-110],[430,-110],[497,-84],[536,-30],[528,25],[485,58],[430,64],[370,52],[310,68],[250,54],[190,66],[140,60],[126,63],[115,71],[107,82],[104,96],[107,110],[115,121],[126,129],[140,132],[200,126],[250,138],[300,128],[330,132],[344,135],[355,143],[363,154],[366,168],[363,182],[355,193],[344,201],[330,204],[270,210],[210,196],[150,212],[90,198],[30,214],[-30,198],[-90,214],[-150,198],[-210,214],[-270,200],[-330,208],[-390,190],[-445,152],[-490,98],[-508,34],[-490,-52]],
+ hf:u=>46*sm(u/.08)*(1-sm((u-0.256)/.1))+(u>.5?20*Math.pow(sn(Math.PI*(u-.5)/.5*2.5),2)*sm((1-u)/.06):0),Kk:[[.2,0,1,3.8],[.7,0,1,3.8],[.9,0,1,3.8]],Pd:[[.05,0],[.25,.5],[.32,-.5],[.6,0],[.8,.5],[.95,-.5]],lk:'gg'},
+{...FL0,n:'泰姬陵',t:'dawn',df:3,hw:9,k:1.25,lamp:1,nt:120,sk:'round',g:[0x8fae5a,0x99b863],gm:0x86a458,tc:[.3,.35,.3],mc:[.08,.3,.6],mh:.5,rd:[0x5a5048,0x625850],cb:[0xe8a030,0xffffff],wl:[0xe8e0d0,0xd8d0c0],ga:'stone',
+ P:[[395,0],[401,24],[403,49],[400,73],[393,97],[382,119],[366,138],[347,154],[325,166],[302,173],[277,175],[252,174],[228,169],[204,162],[180,157],[156,161],[137,177],[126,199],[117,222],[106,244],[94,265],[79,285],[70,308],[65,333],[57,356],[45,378],[30,397],[10,413],[-12,423],[-37,426],[-61,423],[-83,412],[-101,395],[-113,374],[-120,350],[-121,325],[-118,300],[-117,276],[-121,251],[-131,229],[-134,204],[-131,179],[-132,155],[-143,133],[-163,119],[-188,117],[-212,122],[-236,125],[-261,122],[-285,116],[-306,103],[-321,84],[-332,61],[-343,39],[-352,18],[-351,-7],[-345,-31],[-334,-54],[-320,-74],[-303,-91],[-282,-105],[-259,-113],[-234,-116],[-210,-122],[-187,-131],[-167,-146],[-156,-167],[-155,-192],[-156,-217],[-156,-242],[-153,-266],[-145,-289],[-132,-311],[-114,-328],[-94,-342],[-70,-351],[-46,-355],[-21,-353],[2,-347],[24,-335],[44,-320],[62,-303],[79,-285],[94,-265],[106,-244],[117,-221],[126,-198],[137,-176],[150,-155],[170,-140],[192,-129],[215,-120],[238,-109],[260,-98],[283,-89],[306,-81],[329,-71],[350,-58],[369,-42],[384,-22]],hf:u=>10*Math.pow(sn(Math.PI*u*2),2)+8*sn(T2*u*3+.5),Kk:[[.15,0,1,3.8],[.65,0,1,3.8]],Pd:[[.04,0],[.3,.5],[.52,-.5],[.78,0]],lk:'taj'})}
+
 const LMP=[];let LB=1;try{const v=localStorage.getItem('drift_lamp');LB=v===null?1.38:+v;if(!isFinite(LB))LB=1.38}catch(e){}
 let GS=1,POOL=null;try{const v=localStorage.getItem('drift_lampg');GS=v===null?.49:+v;if(!isFinite(GS))GS=.49}catch(e){}
 var RP={on:0,w:0,f:[],seg:-1};let OPN=0,OST=2,N,pts,T,Nm,HW,WALL,tk=0,CHW=1.1,CHL=2.2,CHX=0,CHZ=0;const TG=new THREE.Group();S.add(TG);
@@ -675,9 +689,13 @@ const VH=[
 {n:'蜘蛛人',d:'甩尾時從手腕噴出蛛絲，黏住彎道內側把車身拉進彎。靈活、飄移噴射強，但車身輕',c:0xe0242b,sc:[1,1,1],sp:1.1,ac:1.3,tn:1.25,gp:.85,nt:1.1,ln:1.8,tw:.3,fl:1.8,tr:'web',
  b:(m,w,c,g)=>{m(.6,.1,1.6,c,0,.05,0).visible=false;rgHuman(g,{k:'spider',fast:1.1,skin:0xd8201c,top:0xd8201c,arm:0xd8201c,sh:0x1f3f9e,thigh:0x1f3f9e,shank:0x1f3f9e,shoe:0xd8201c,cowl:1,mask:1,deco:rgSpiderDeco})}},
 {n:'超人',d:'開氮氣就單手前伸、像子彈一樣直線飛行，披風獵獵作響。極速與氮氣頂尖，但轉彎較笨重',c:0x1d4fd6,sc:[1,1,1],sp:1.28,ac:1.2,tn:.95,gp:.9,nt:1.8,ln:1.2,tw:.3,fl:1.8,nf:1,tr:'sup',
- b:(m,w,c,g)=>{m(.6,.1,1.6,c,0,.05,0).visible=false;rgHuman(g,{k:'super',skin:0xf0c9a0,hair:0x14141c,top:0x1d4fd6,arm:0x1d4fd6,sh:0xc8202c,thigh:0x1d4fd6,shank:0x1d4fd6,shoe:0xc8202c,belt:0xffd42a,deco:rgSuperDeco})}}
+ b:(m,w,c,g)=>{m(.6,.1,1.6,c,0,.05,0).visible=false;rgHuman(g,{k:'super',skin:0xf0c9a0,hair:0x14141c,top:0x1d4fd6,arm:0x1d4fd6,sh:0xc8202c,thigh:0x1d4fd6,shank:0x1d4fd6,shoe:0xc8202c,belt:0xffd42a,deco:rgSuperDeco})}},
+{n:'鋼鐵人',d:'甩尾時雙掌對準前方地板射出黃色雷射，光束左右掃過路面、濺出火花。加速與氮氣出色，但盔甲偏重',c:0xc0141c,sc:[1,1,1],sp:1.12,ac:1.3,tn:1.1,gp:.95,nt:1.6,ln:1.4,tw:.3,fl:1.8,st:1,
+ b:(m,w,c,g)=>{m(.6,.1,1.6,c,0,.05,0).visible=false;rgHuman(g,{k:'iron',skin:0xa80f18,top:0xa80f18,arm:0xa80f18,sh:0xe6b422,thigh:0xa80f18,shank:0xe6b422,shoe:0xa80f18,belt:0xe6b422,glove:0xe6b422,mask:1,deco:rgIronDeco})}},
+{n:'黑豹',d:'全身纏繞暗紫色能量，飄移與氮氣時紫光暴漲、腳下盪開紫色能量環並拖出紫色尾焰。靈活又快，但車身輕',c:0x2a1650,sc:[1,1,1],sp:1.2,ac:1.3,tn:1.3,gp:.9,nt:1.2,ln:1.7,tw:.3,fl:1.8,tr:'pan',st:1,
+ b:(m,w,c,g)=>{m(.6,.1,1.6,c,0,.05,0).visible=false;rgHuman(g,{k:'pan',skin:0x16161e,top:0x16161e,arm:0x16161e,sh:0x101016,thigh:0x16161e,shank:0x16161e,shoe:0x0c0c10,mask:1,deco:rgPantherDeco})}}
 ];
-{const X={街頭跑車:[1,1,1,1],摩托車:[.5,.7,1.15,.8],重機:[.8,.8,1,1.1],超級跑車:[1.1,1.15,1.1,1.2],越野吉普:[1.5,1.3,.9,1],卡丁車:[.6,.9,1.3,1],小巴士:[2,1.2,.9,.8],購物車:[.4,.6,1.4,.7],拖拉機:[2,1.4,.8,.9],嘟嘟車:[.7,.7,1.2,.9],冰淇淋車:[1.6,1,1,.8],割草機:[.5,.9,1.3,1],馬桶車:[.6,.8,1.1,1],沙發:[1.1,1,1,.7],嬰兒車:[.3,.5,1.2,.8],推土機:[2.5,1.6,.8,1],浴缸:[.9,.8,1,.8],南瓜馬車:[1,.9,1,1],熱狗車:[1,1,1,.9],坦克:[3,1.8,.8,1.2],警車:[1.2,1.1,1,1.2],校車:[2.2,1.3,.9,.8],滑板:[.3,.55,1.3,1],垃圾車:[2.4,1.3,.8,.8],腳踏車:[.3,.5,1.3,.7],香蕉車:[.7,.8,1.2,.8],滑板車:[.3,.55,1.3,.8],獨輪車:[.3,.4,1.4,.7],F1賽車:[1,1.1,1.1,1.2],火箭:[1,.9,.9,.9],飛碟:[.8,.8,1.2,.9],消防車:[2,1.2,.9,.9],怪獸卡車:[2.2,.7,.9,.9],甜甜圈車:[.9,1,1,.9],辦公椅:[.5,.7,1.3,.8],西瓜車:[1.2,1.1,1,1],洗衣機:[1.4,1,1,.8],烤麵包機:[1,.9,1.1,.9],大黃鴨:[.9,.9,1,.8],珍珠奶茶車:[.6,.5,1.1,.8],紙箱貓車:[.4,.6,1.2,.8],冰箱:[2,.6,.8,.9],睡床:[1.3,1,.9,.7],披薩車:[.8,.8,1.1,.9],泡麵車:[.9,.7,1,.8],炸雞腿車:[1,.9,1,.9],拉力賽車:[1.3,1.2,1.1,1.1],老爺車:[1.4,1.1,1,.9],雪地摩托:[1.3,1,1.1,1],計程車:[1.4,1.1,1,1],救護車:[2,1.3,.9,1],貨櫃車:[2.6,1.6,.8,.7],獨角獸:[1,.8,1.1,.8],幽靈:[.6,.7,1.3,.8],機器人:[1.8,1.4,.8,1.1],漢堡車:[1,.9,1,.9],壽司車:[1,.9,1,.9],鋼琴車:[1.8,1.2,.9,.8],跑步選手:[.4,.55,1.3,.7],閃電俠:[.4,.6,1.2,.8],貨車:[2.1,1.4,.85,.85],蜘蛛人:[.4,.6,1.3,.8],超人:[.9,1.1,1,.9]};
+{const X={街頭跑車:[1,1,1,1],摩托車:[.5,.7,1.15,.8],重機:[.8,.8,1,1.1],超級跑車:[1.1,1.15,1.1,1.2],越野吉普:[1.5,1.3,.9,1],卡丁車:[.6,.9,1.3,1],小巴士:[2,1.2,.9,.8],購物車:[.4,.6,1.4,.7],拖拉機:[2,1.4,.8,.9],嘟嘟車:[.7,.7,1.2,.9],冰淇淋車:[1.6,1,1,.8],割草機:[.5,.9,1.3,1],馬桶車:[.6,.8,1.1,1],沙發:[1.1,1,1,.7],嬰兒車:[.3,.5,1.2,.8],推土機:[2.5,1.6,.8,1],浴缸:[.9,.8,1,.8],南瓜馬車:[1,.9,1,1],熱狗車:[1,1,1,.9],坦克:[3,1.8,.8,1.2],警車:[1.2,1.1,1,1.2],校車:[2.2,1.3,.9,.8],滑板:[.3,.55,1.3,1],垃圾車:[2.4,1.3,.8,.8],腳踏車:[.3,.5,1.3,.7],香蕉車:[.7,.8,1.2,.8],滑板車:[.3,.55,1.3,.8],獨輪車:[.3,.4,1.4,.7],F1賽車:[1,1.1,1.1,1.2],火箭:[1,.9,.9,.9],飛碟:[.8,.8,1.2,.9],消防車:[2,1.2,.9,.9],怪獸卡車:[2.2,.7,.9,.9],甜甜圈車:[.9,1,1,.9],辦公椅:[.5,.7,1.3,.8],西瓜車:[1.2,1.1,1,1],洗衣機:[1.4,1,1,.8],烤麵包機:[1,.9,1.1,.9],大黃鴨:[.9,.9,1,.8],珍珠奶茶車:[.6,.5,1.1,.8],紙箱貓車:[.4,.6,1.2,.8],冰箱:[2,.6,.8,.9],睡床:[1.3,1,.9,.7],披薩車:[.8,.8,1.1,.9],泡麵車:[.9,.7,1,.8],炸雞腿車:[1,.9,1,.9],拉力賽車:[1.3,1.2,1.1,1.1],老爺車:[1.4,1.1,1,.9],雪地摩托:[1.3,1,1.1,1],計程車:[1.4,1.1,1,1],救護車:[2,1.3,.9,1],貨櫃車:[2.6,1.6,.8,.7],獨角獸:[1,.8,1.1,.8],幽靈:[.6,.7,1.3,.8],機器人:[1.8,1.4,.8,1.1],漢堡車:[1,.9,1,.9],壽司車:[1,.9,1,.9],鋼琴車:[1.8,1.2,.9,.8],跑步選手:[.4,.55,1.3,.7],閃電俠:[.4,.6,1.2,.8],貨車:[2.1,1.4,.85,.85],蜘蛛人:[.4,.6,1.3,.8],超人:[.9,1.1,1,.9],鋼鐵人:[.8,1,1.1,.9],黑豹:[.4,.65,1.3,.8]};
 VH.forEach(v=>{const a=X[v.n]||[1,1,1,1];v.ms=a[0];v.sb=a[1];v.dg=a[2];v.br=a[3]})}
 // ===== 動作骨架：腳踏車踩踏板、人物跑步、閃電特效、貼照片貨車 =====
 const rgC=(v,a,b)=>Math.max(a,Math.min(b,v)),rgL=(a,b,t)=>a+(b-a)*t,rgP2=Math.PI*2;let rgDT=null;
@@ -883,6 +901,95 @@ function rgSuperAnim(R0,spd,dt,cr){
  R0.fx.visible=true;R0.vc.position.set(H.x,H.y,H.z+.1);R0.vc.scale.setScalar(.6+.5*f);R0.vm.opacity=.28*f*(.7+.3*Math.random());
  for(let k=0;k<R0.sk.length;k++){const q=R0.sk[k],a=R0.sa[k];q.visible=Math.random()<.4+.6*f*(.5+s*.5);if(!q.visible)continue;const L=(2+s*6)*(.5+Math.random()*.5)*f;q.position.set(H.x+a[0],H.y+a[1],H.z+a[2]-L/2);q.scale.set(.045,.045,L)}}
 
+// ---------- 鋼鐵人（甩尾：雙掌射出黃色雷射，掃過前方地板）／黑豹（全身暗紫能量）----------
+function rgLzM(c,o,nb){return new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:o,blending:nb?THREE.NormalBlending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide})}
+function rgIronDeco(g,R0,o){
+ const T=R0.T,Hd=R0.Hd,gold=0xe6b422,gl=0x302000;R0.k='iron';R0.fn=rgIronAnim;
+ // 金色面甲＋發亮白眼
+ rgBox(Hd,.27,.25,.02,gold,0,.17,.172,gl);
+ for(const s of[-1,1]){const e=rgBox(Hd,.085,.034,.012,0xffffff,s*.07,.21,.186,0xcfe8ff);e.rotation.z=-s*.22}
+ rgBox(Hd,.1,.018,.012,0x6a4d08,0,.09,.186);rgBox(Hd,.36,.07,.36,0x8a0b12,0,.37,-.01);
+ // 胸口電弧反應爐＋金色胸甲
+ for(const s of[-1,1])rgBox(T,.09,.28,.02,gold,s*.2,.46,.158,gl);
+ rgBox(T,.3,.2,.02,gold,0,.17,.158,gl);
+ const rc=new THREE.Mesh(new THREE.CylinderGeometry(.075,.075,.03,16).rotateX(Math.PI/2),new THREE.MeshBasicMaterial({color:0xd8faff}));rc.position.set(0,.45,.165);T.add(rc);
+ const rr=new THREE.Mesh(new THREE.TorusGeometry(.1,.016,6,18),new THREE.MeshLambertMaterial({color:gold,emissive:gl}));rr.position.set(0,.45,.16);T.add(rr);
+ const rm=rgLzM(0x7fe6ff,.5),rgl=new THREE.Mesh(new THREE.CircleGeometry(.22,18),rm);rgl.position.set(0,.45,.18);T.add(rgl);
+ // 金色肩甲、前臂護甲、掌心推進器
+ for(const a of R0.ar){rgBox(a.S,.22,.1,.22,gold,0,-.01,0,gl);rgBox(a.E,.15,.22,.15,gold,0,-.3,0,gl);
+  const pm=new THREE.Mesh(new THREE.CylinderGeometry(.045,.045,.02,12),new THREE.MeshBasicMaterial({color:0xe8fcff}));pm.position.set(0,-.565,0);a.E.add(pm)}
+ // 雷射：兩道光束（核心＋光暈）、掌心光球、地板光斑、橫掃地板的掃描線
+ const lz=rgPiv(g,0,0,0),bg=new THREE.BoxGeometry(1,1,1),cg=new THREE.CircleGeometry(1,20).rotateX(-Math.PI/2),
+ cm=rgLzM(0xfff7b8,.95),gm=rgLzM(0xffc21a,.4),hm=rgLzM(0xffd21f,.6),mk=m=>{const q=new THREE.Mesh(bg,m);lz.add(q);return q};
+ lz.visible=false;
+ Object.assign(R0,{lz,cm,gm,hm,rm,t2:0,lw:0,
+  lb:[0,1].map(()=>[mk(cm),mk(gm)]),bar:[mk(cm),mk(gm)],hp:[0,1].map(()=>mk(hm)),
+  sp:[0,1].map(()=>{const q=new THREE.Mesh(cg,hm);lz.add(q);return q}),
+  v:[0,1,2,3,4,5].map(()=>new THREE.Vector3())})}
+function rgIronAnim(R0,spd,dt,cr){
+ rgRun(R0,spd,dt,cr);
+ const g=R0.g,S0=g.userData.st,on=S0&&S0.dr&&spd>5?1:0,ar=R0.ar,lg=R0.lg,T=R0.T,Hd=R0.Hd;
+ for(const a of ar){a.S.rotation.y=a.S.rotation.z=0}
+ R0.t2+=dt;R0.lw+=(on-R0.lw)*Math.min(1,dt*(on?14:8));const w=R0.lw,t=R0.t2;
+ R0.rm.opacity=(.3+.12*Math.sin(t*4)+.55*w)*(R0.gh?.5:1);
+ if(w<.02){R0.lz.visible=false;return}
+ const v=R0.v,H=[v[0],v[1]],B=[v[2],v[3]],W=v[4],Q=v[5];
+ // 姿勢：微蹲、上身前傾、雙臂指向前方地板
+ R0.P.position.y-=.16*w;T.rotation.y*=1-w;R0.P.rotation.y*=1-w;
+ for(let i=0;i<2;i++){const l=lg[i];l.H.rotation.x=rgL(l.H.rotation.x,-.7,w);l.K.rotation.x=rgL(l.K.rotation.x,1.1,w);l.An.rotation.x=rgL(l.An.rotation.x,-.22,w)}
+ T.rotation.x=rgL(T.rotation.x,.2,w);Hd.rotation.x=rgL(Hd.rotation.x,-.22,w);
+ g.updateWorldMatrix(true,true);
+ const L=8+Math.min(spd,60)*.1+Math.sin(t*5.3)*1.2,sw=(S0.dd||1)*(1.1+Math.sin(t*8.6)*1.5);
+ T.getWorldQuaternion(rgQ[0]).invert();
+ for(let i=0;i<2;i++){B[i].set(sw+(i?1.1:-1.1),.07,L);const a=ar[i];a.S.getWorldPosition(W);g.localToWorld(Q.copy(B[i]));
+  Q.sub(W).normalize().applyQuaternion(rgQ[0]);rgQ[1].setFromUnitVectors(rgNY,Q);a.S.quaternion.slerp(rgQ[1],w);a.E.rotation.x=rgL(a.E.rotation.x,-.04,w);
+  a.S.updateWorldMatrix(false,true);a.E.localToWorld(H[i].set(0,-.58,0));g.worldToLocal(H[i])}
+ // 畫雷射
+ const fl=.85+.15*Math.random();R0.lz.visible=true;
+ R0.cm.opacity=.95*w*fl;R0.gm.opacity=.4*w*fl;R0.hm.opacity=.6*w*fl;
+ for(let i=0;i<2;i++){rgSeg(R0.lb[i][0],H[i],B[i],.05*fl);rgSeg(R0.lb[i][1],H[i],B[i],.2*fl);
+  R0.hp[i].position.copy(H[i]);R0.hp[i].scale.setScalar(.3*fl);
+  R0.sp[i].position.set(B[i].x,.07,B[i].z);R0.sp[i].scale.setScalar(.8*fl+.15*Math.sin(t*20+i))}
+ Q.set(sw-2.2,.08,L);W.set(sw+2.2,.08,L);rgSeg(R0.bar[0],Q,W,.07);rgSeg(R0.bar[1],Q,W,.26);
+ // 地板火花
+ if(!R0.gh&&Math.random()<.9*w)for(let i=0;i<2;i++){g.localToWorld(W.copy(B[i]));
+  rgSp(W.x+(Math.random()-.5)*.6,W.y+.1,W.z+(Math.random()-.5)*.6,(Math.random()-.5)*6,2+Math.random()*4,(Math.random()-.5)*6,Math.random()<.5?0xffd21f:0xfff4a0,.3+Math.random()*.2,.13,-.4,1,.95)}}
+function rgPantherDeco(g,R0,o){
+ const T=R0.T,Hd=R0.Hd,pu=0x8a3cff,pe=0x5a1fc0,sv=0xc9ccd8;R0.k='pan';R0.fn=rgPantherAnim;
+ // 面罩：尖耳、白色斜眼
+ for(const s of[-1,1]){const e=rgBox(Hd,.075,.15,.075,o.skin,s*.12,.47,-.02);e.rotation.z=-s*.12;rgBox(Hd,.11,.045,.012,0xffffff,s*.085,.23,.172,0xd0d0ff).rotation.z=s*.35}
+ // 銀色項圈
+ for(let k=-2;k<=2;k++){const q=rgBox(T,.075,.1,.02,sv,k*.1,.62-Math.abs(k)*.035,.158,0x303040);q.rotation.z=-k*.22}
+ // 暗紫能量紋路：胸口 V 紋、手腳條紋、銀爪
+ for(const s of[-1,1])for(const a of[[.04,.52,.2,.42],[.04,.44,.2,.33],[.04,.36,.2,.24]])rgRodX(T,pu,s*a[0],a[1],s*a[2],a[3],.026,.159,pe);
+ rgBox(T,.026,.3,.02,pu,0,.3,.159,pe);
+ for(const a of R0.ar){rgBox(a.S,.03,.38,.03,pu,0,-.23,.083,pe);rgBox(a.E,.03,.34,.03,pu,0,-.22,.073,pe);
+  for(const x of[-.04,0,.04]){const c=rgBox(a.E,.016,.11,.016,sv,x,-.58,.04,0x303040);c.rotation.x=-.25}}
+ for(const l of R0.lg){rgBox(l.H,.03,.46,.03,pu,0,-.275,.118,pe);rgBox(l.K,.03,.46,.03,pu,0,-.275,.098,pe)}
+ // 暗紫色能量外殼：每個身體部位外包兩層半透明紫光（跟著關節一起動）
+ const nm=rgLzM(0x4a16a8,.3,1),am=rgLzM(0x8a4dff,.13),bg=new THREE.BoxGeometry(1,1,1),
+ add=(par,w,h,d,y)=>{for(const[m,k]of[[nm,1],[am,1.22]]){const q=new THREE.Mesh(bg,m);q.scale.set(w*k,h*k,d*k);q.position.set(0,y,0);par.add(q)}};
+ add(R0.P,.6,.36,.4,0);add(T,.66,.78,.4,.33);add(Hd,.42,.46,.42,.2);
+ for(const a of R0.ar){add(a.S,.25,.56,.25,-.23);add(a.E,.22,.56,.22,-.25)}
+ for(const l of R0.lg){add(l.H,.3,.64,.32,-.275);add(l.K,.26,.64,.28,-.275)}
+ // 腳下能量環（飄移／氮氣時出現）
+ const r1=new THREE.Mesh(new THREE.RingGeometry(1.1,1.5,32).rotateX(-Math.PI/2),rgLzM(0x8a3cff,.5)),
+ r2=new THREE.Mesh(new THREE.RingGeometry(.6,.85,32).rotateX(-Math.PI/2),rgLzM(0x4a16a8,.6,1));
+ r1.position.y=r2.position.y=.08;r1.visible=r2.visible=false;g.add(r1,r2);
+ Object.assign(R0,{nm,am,r1,r2,t2:0,pw:0,ac:0,v:new THREE.Vector3()})}
+function rgPantherAnim(R0,spd,dt,cr){
+ rgRun(R0,spd,dt,cr);
+ const g=R0.g,S0=g.userData.st,on=S0&&(S0.dr||S0.bo)&&spd>5?1:0,gh=R0.gh;
+ R0.t2+=dt;R0.pw+=(on-R0.pw)*Math.min(1,dt*(on?9:4));const w=R0.pw,t=R0.t2,fl=.85+.15*Math.sin(t*9)+.1*Math.random();
+ R0.nm.opacity=gh?0:(.22+.2*w)*fl;R0.am.opacity=gh?0:(.09+.2*w)*fl;
+ const vis=!gh&&w>.03;R0.r1.visible=R0.r2.visible=vis;
+ if(vis){const k=1+.2*Math.sin(t*10);R0.r1.scale.setScalar(k*(.9+.5*w));R0.r2.scale.setScalar((1.1+.4*w)*(2-k));R0.r1.rotation.y+=dt*3;R0.r1.material.opacity=.55*w;R0.r2.material.opacity=.6*w}
+ // 暗紫色能量火花從身上冒出
+ if(!gh&&g.visible){R0.ac+=(.25+1.6*w)*dt*60;const V=R0.v;if(R0.ac>=1)g.updateWorldMatrix(true,false);
+  while(R0.ac>=1){R0.ac--;g.localToWorld(V.set((Math.random()-.5)*.8,.1+Math.random()*2.3,(Math.random()-.5)*.5));
+   const c=[0x8a3cff,0x5a1fc0,0xb48cff,0x3a0f80][Math.random()*4|0];
+   rgSp(V.x,V.y,V.z,(Math.random()-.5)*1.5,.8+Math.random()*2.2+w*2,(Math.random()-.5)*1.5,c,.5+Math.random()*.35,.11+Math.random()*.1,-.45,c===0x8a3cff||c===0xb48cff?1:0,.85)}}}
+
 // ---------- 專屬尾流：蜘蛛人＝飄動的蛛絲，超人＝紅藍白氣流（氮氣時變寬變亮）----------
 const TRL=(()=>{const N=36,K=3,pos=new Float32Array(K*N*6),col=new Float32Array(K*N*6),ix=[];
  for(let k=0;k<K;k++)for(let i=0;i<N-1;i++){const a=(k*N+i)*2;ix.push(a,a+1,a+2,a+1,a+3,a+2)}
@@ -890,7 +997,7 @@ const TRL=(()=>{const N=36,K=3,pos=new Float32Array(K*N*6),col=new Float32Array(
  const m=new THREE.Mesh(g,new THREE.MeshBasicMaterial({vertexColors:true,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide}));
  m.frustumCulled=false;m.visible=false;S.add(m);return{N,K,pos,col,g,m,H:[],t:0}})(),
 TRC={web:[[-.45,1.15,.06,[1,1,1]],[0,1.45,.09,[1,1,1]],[.45,1.15,.06,[.8,.9,1]]],sup:[[-.4,1.35,.13,[1,.2,.22]],[.4,1.35,.13,[.22,.45,1]],[0,1.6,.1,[1,1,1]]]};
-Object.assign(TRC,{tail:[[-.7,.75,.08,[1,.1,.12]],[.7,.75,.08,[1,.1,.12]],[0,.75,.05,[1,.5,.2]]],neon:[[-.55,.7,.07,[0,.9,1]],[.55,.7,.07,[1,.15,.8]],[0,.9,.05,[1,.9,.3]]],flash:[[-.25,1.1,.12,[1,.85,.1]],[.25,1.1,.12,[1,.2,.1]],[0,1.3,.07,[1,1,1]]],rbw:[[-.5,1,.11,[1,.3,.5]],[0,1.15,.11,[1,.9,.3]],[.5,1,.11,[.3,.8,1]]],gh:[[-.3,1,.2,[.5,.6,1]],[.3,1,.2,[.7,.5,1]],[0,1.3,.14,[.8,.9,1]]],tp:[[-.4,1.2,.16,[1,1,1]],[.4,1.1,.16,[.95,.95,1]],[0,1.3,.16,[1,1,1]]],ufo:[[-.5,.5,.1,[.3,1,.7]],[.5,.5,.1,[.5,.4,1]],[0,.6,.14,[.7,1,1]]],ch:[[-.35,.7,.1,[1,.8,.2]],[.35,.7,.1,[1,.6,.1]],[0,.8,.08,[1,.9,.5]]]});
+Object.assign(TRC,{tail:[[-.7,.75,.08,[1,.1,.12]],[.7,.75,.08,[1,.1,.12]],[0,.75,.05,[1,.5,.2]]],neon:[[-.55,.7,.07,[0,.9,1]],[.55,.7,.07,[1,.15,.8]],[0,.9,.05,[1,.9,.3]]],flash:[[-.25,1.1,.12,[1,.85,.1]],[.25,1.1,.12,[1,.2,.1]],[0,1.3,.07,[1,1,1]]],rbw:[[-.5,1,.11,[1,.3,.5]],[0,1.15,.11,[1,.9,.3]],[.5,1,.11,[.3,.8,1]]],gh:[[-.3,1,.2,[.5,.6,1]],[.3,1,.2,[.7,.5,1]],[0,1.3,.14,[.8,.9,1]]],tp:[[-.4,1.2,.16,[1,1,1]],[.4,1.1,.16,[.95,.95,1]],[0,1.3,.16,[1,1,1]]],ufo:[[-.5,.5,.1,[.3,1,.7]],[.5,.5,.1,[.5,.4,1]],[0,.6,.14,[.7,1,1]]],ch:[[-.35,.7,.1,[1,.8,.2]],[.35,.7,.1,[1,.6,.1]],[0,.8,.08,[1,.9,.5]]],pan:[[-.4,1.2,.1,[.5,.15,1]],[.4,1.2,.1,[.5,.15,1]],[0,1.5,.09,[.75,.4,1]]]});
 function rgTrail(dt,spd){
  const T0=TRL,m=T0.m,key=VC.tr||(VFXM!==1&&VC.rb),on=key&&!GO&&crashT<=0&&(st==='race'||st==='count'||st==='fin')&&spd>10;
  if(!on){m.visible=false;T0.H.length=0;return}
@@ -966,7 +1073,7 @@ function setVeh(i){VI=VH[i]?i:0;VC=VH[VI];dress(body,VI,VC.c);fitSh(sh,body);app
  document.querySelectorAll('.gb').forEach(b=>b.textContent='車庫｜'+VC.n);$('gname').textContent=VC.n;$('gdesc').textContent=VC.d;
  $('gs').innerHTML=[['速度',VC.sp/1.3],['加速',VC.ac/1.3],['操控',VC.tn/1.45],['氮氣',VC.nt/2.2],['抓地',VC.gp/1.4],['重量',VC.ms/3],['穩定',VC.sb/1.8],['漂移',VC.dg/1.4]].map(a=>'<span>'+a[0]+'<i><u style="width:'+Math.round(Math.min(1,a[1])*100)+'%"></u></i></span>').join('');
  document.querySelectorAll('#gi .vc').forEach(b=>b.classList.toggle('on',+b.dataset.i===VI))}
-const VCAT=[['賽車',['街頭跑車','超級跑車','F1賽車','警車','卡丁車','拉力賽車','老爺車']],['兩輪',['腳踏車','摩托車','重機','滑板','滑板車','雪地摩托']],['人形疾走',['跑步選手','閃電俠','蜘蛛人','超人']],['越野重型',['越野吉普','拖拉機','推土機','坦克','怪獸卡車']],['商用大型',['小巴士','校車','垃圾車','冰淇淋車','熱狗車','消防車','計程車','救護車','貨櫃車','貨車']],['奇幻',['香蕉車','火箭','飛碟','甜甜圈車','西瓜車','獨角獸','幽靈','機器人']],['搞怪',['購物車','嘟嘟車','割草機','馬桶車','沙發','嬰兒車','浴缸','南瓜馬車','辦公椅','獨輪車']],['爆笑',['洗衣機','烤麵包機','大黃鴨','珍珠奶茶車','紙箱貓車','冰箱','睡床','披薩車','泡麵車','炸雞腿車','漢堡車','壽司車','鋼琴車']]];let GC=0;
+const VCAT=[['賽車',['街頭跑車','超級跑車','F1賽車','警車','卡丁車','拉力賽車','老爺車']],['兩輪',['腳踏車','摩托車','重機','滑板','滑板車','雪地摩托']],['人形疾走',['跑步選手','閃電俠','蜘蛛人','超人','鋼鐵人','黑豹']],['越野重型',['越野吉普','拖拉機','推土機','坦克','怪獸卡車']],['商用大型',['小巴士','校車','垃圾車','冰淇淋車','熱狗車','消防車','計程車','救護車','貨櫃車','貨車']],['奇幻',['香蕉車','火箭','飛碟','甜甜圈車','西瓜車','獨角獸','幽靈','機器人']],['搞怪',['購物車','嘟嘟車','割草機','馬桶車','沙發','嬰兒車','浴缸','南瓜馬車','辦公椅','獨輪車']],['爆笑',['洗衣機','烤麵包機','大黃鴨','珍珠奶茶車','紙箱貓車','冰箱','睡床','披薩車','泡麵車','炸雞腿車','漢堡車','壽司車','鋼琴車']]];let GC=0;
 function gList(){const L=VCAT[GC][1];$('gi').innerHTML=VH.map((v,i)=>L.includes(v.n)?'<button class="vc'+(i===VI?' on':'')+'" data-i="'+i+'" onclick="setVeh('+i+')"><i style="background:#'+v.c.toString(16).padStart(6,'0')+'"></i>'+v.n+'</button>':'').join('');$('gc').innerHTML=VCAT.map((c,i)=>'<button class="gcb'+(i===GC?' on':'')+'" onclick="setCat('+i+')">'+c[0]+'<small style="opacity:.6"> '+c[1].length+'</small></button>').join('')}
 function setCat(i){GC=i;gList();$('gi').scrollLeft=0}
 function openG(){GO=true;document.body.classList.add('garage');GC=Math.max(0,VCAT.findIndex(c=>c[1].includes(VC.n)));gList();setVeh(VI)}
@@ -1472,6 +1579,74 @@ const WT={
 '台北101':()=>{const P=wtPl(7,1.5,.6,.9,3);wtI(gh(new THREE.CylinderGeometry(.15,.15,6,5),6),L1(0x6a1a1a),P);wtI(new THREE.SphereGeometry(1,8,6).translate(0,1,0),B1(0xff2a1a),P,6,[1,1.3,1]);const S=wtC(wtPl(16,8,22,.45,6),[0xffb030,0xff5a8a,0xffe070,0xff7a3a]);wtI(gh(new THREE.BoxGeometry(4,2.6,3),2.6),B1(0xffffff),S);wtI(gh(new THREE.BoxGeometry(5,.4,4),.4),L1(0xc0281c),S,2.6);wtZebra();wtGate(.08,0xc0281c,0xffd62d,12);wtGate(.41,0xc0281c,0xffd62d,12);wtGate(.75,0xc0281c,0xffd62d,12)},
 '倫敦泰晤士':()=>{const P=wtPl(22,1.5,1,.8,3);wtI(gh(new THREE.BoxGeometry(1.3,2.8,1.3),2.8),L1(0xd01818),P);const Bs=wtPl(48,2,2.5,.8,5);wtI(gh(new THREE.BoxGeometry(3,3.6,10),3.6),L1(0xd01818),Bs);wtI(gh(new THREE.BoxGeometry(3.1,1,8),1),B1(0x2a3a4a),Bs,1.8);wtZebra();const e=wtPl(30,70,40,1,2)[0];if(e){const g=new THREE.Group();zMS(new THREE.TorusGeometry(46,.9,6,40),L1(0xf4f4f4),0,52,0,g);zMS(new THREE.TorusGeometry(22,.5,6,28),L1(0xf4f4f4),0,52,0,g);for(let k=0;k<20;k++){const a=k/20*6.283;zMS(new THREE.SphereGeometry(2,6,5),B1(0x9fd8ff),Math.cos(a)*46,52+Math.sin(a)*46,0,g)}for(const x of[-1,1])zMS(gh(new THREE.BoxGeometry(1.6,54,1.6),54),L1(0xdddddd),x*9,0,0,g).rotation.z=-x*.17;g.position.set(e[0],0,e[2]);g.rotation.y=Math.atan2(T[e[6]].x,T[e[6]].z);TG.add(g)}wtGate(.08,0x1d2a5c,0xc9a227,11);wtGate(.58,0x1d2a5c,0xc9a227,11)}};
 function wtDetail(d){const f=WT[d.n];if(f)try{f()}catch(e){console.warn('wt',d.n,e)}}
+// ===== 世界巡迴 v3：地標與沿路細節 =====
+{const T2=Math.PI*2,L=(g,c,x,y,z,p)=>zMS(g,zLM(c),x,y,z,p),B=(g,c,x,y,z,p)=>zMS(g,new THREE.MeshBasicMaterial({color:c}),x,y,z,p),Q=g=>g.rotateY(Math.PI/4),DS=m=>{m.material.side=THREE.DoubleSide;return m};
+zBP.tokyo=['#241c34','#ffb0e8','#1c1630',.55,4,9];
+zBF.tokyo=(g,r,t)=>{const w=12+r()*10,h=40+r()*90;zBX(g,t,w,h,w,0,0,0,[0xffffff,0xd8d0f0,0xf0d0e0][r()*3|0]);zMS(new THREE.BoxGeometry(w*.9,3,.6),new THREE.MeshBasicMaterial({color:[0xff2dff,0x00e5ff,0xffd62d,0xff4040][r()*4|0]}),0,h*.6,w/2+.4,g)};
+Object.assign(zLK,{
+rome:()=>{const g=new THREE.Group(),S=0xd8c49a,R=92;
+ for(let t=0;t<3;t++){const r=R*(1-t*.035);for(let i=0;i<40;i++){const a=i/40*T2;L(new THREE.BoxGeometry(5.2,19,4),S,Math.cos(a)*r,t*22+9.5,Math.sin(a)*r,g).rotation.y=Math.PI/2-a}L(new THREE.CylinderGeometry(r+1.4,r+1.4,3,40),S,0,t*22+20.5,0,g)}
+ DS(L(new THREE.CylinderGeometry(R-2,R-2,64,40,1,true),0x7a6648,0,32,0,g));DS(L(new THREE.CylinderGeometry(R-.5,R-.5,16,40,1,true),S,0,72,0,g));L(new THREE.CylinderGeometry(R*.62,R*.7,6,32),0xb89a62,0,3,0,g);g.scale.set(1,1,.78);TG.add(g);
+ const p=new THREE.Group();L(new THREE.CylinderGeometry(26,26,28,28),0xd0c4a8,0,14,0,p);L(new THREE.SphereGeometry(26,24,12,0,T2,0,Math.PI/2),0xb8b0a0,0,28,0,p);L(new THREE.BoxGeometry(40,4,12),0xd0c4a8,0,26,30,p);for(let i=0;i<8;i++)L(new THREE.CylinderGeometry(1.7,1.9,22,10),0xe8e0cc,-15+i*4.3,11,34,p);p.position.set(-290,0,110);p.rotation.y=.5;TG.add(p);
+ L(Q(new THREE.CylinderGeometry(1.6,3,64,4)),0xcdb890,210,32,-120);L(Q(new THREE.ConeGeometry(1.7,6,4)),0xf0c040,210,67,-120);L(new THREE.CylinderGeometry(4.6,5,70,14),0xe0d4b8,240,35,120);L(new THREE.SphereGeometry(3,8,6),0xb89a62,240,73,120)},
+tokyo:()=>{const g=new THREE.Group(),W={color:0xcfe4ff,emissive:0x1a2a44};
+ zMS(new THREE.CylinderGeometry(7,32,130,3,7,true),new THREE.MeshBasicMaterial({color:0x9fd8ff,wireframe:true}),0,65,0,g);L(new THREE.CylinderGeometry(4,5,230,12),W,0,245,0,g);
+ for(const[y,r]of[[290,14],[335,10]]){L(new THREE.CylinderGeometry(r,r*.65,9,20),W,0,y,0,g);B(new THREE.TorusGeometry(r+.5,.7,6,28),0x40e0ff,0,y,0,g).rotation.x=Math.PI/2}
+ L(new THREE.CylinderGeometry(.5,2.5,70,8),0xe8f0ff,0,395,0,g);B(new THREE.SphereGeometry(1.8,8,6),0xff4040,0,432,0,g);TG.add(g);
+ const t=new THREE.Group(),h=150;zMS(Q(new THREE.CylinderGeometry(3,30,h,4,6,true)),new THREE.MeshBasicMaterial({color:0xff4a2a,wireframe:true}),0,h/2,0,t);L(Q(new THREE.CylinderGeometry(1.4,12,h,4)),0xf4f4f4,0,h/2,0,t);L(new THREE.BoxGeometry(26,5,26),0xff6a2a,0,46,0,t);L(new THREE.BoxGeometry(12,4,12),0xff6a2a,0,100,0,t);L(new THREE.CylinderGeometry(.3,1.2,38,6),0xff4a2a,0,h+19,0,t);B(new THREE.SphereGeometry(1.3,8,6),0xffffff,0,h+40,0,t);t.position.set(-250,0,110);TG.add(t);
+ const q=new THREE.Group();for(let i=0;i<5;i++){L(new THREE.BoxGeometry(22-i*3.2,7,22-i*3.2),0xc0281c,0,i*10+3.5,0,q);L(Q(new THREE.ConeGeometry(16-i*2.2,3.2,4)),0x2a2a30,0,i*10+8.6,0,q)}L(new THREE.CylinderGeometry(.3,.8,12,5),0xffd62d,0,56,0,q);q.position.set(235,0,-120);TG.add(q)},
+syd:()=>{const g=new THREE.Group(),W=0xf6f2e8;L(new THREE.BoxGeometry(124,7,64),0xcfc6b4,0,3.5,0,g);
+ [[-38,26],[0,32],[40,20]].forEach(([x,r])=>{for(const s of[1,-1]){const m=L(new THREE.SphereGeometry(r,16,10,0,Math.PI,0,Math.PI/2),W,x,7,s*r*.34,g);m.scale.set(1,1.55,.7);m.rotation.y=s>0?0:Math.PI}});
+ for(const x of[-62,62])L(new THREE.SphereGeometry(11,12,8,0,Math.PI,0,Math.PI/2),W,x,7,0,g).scale.set(1,1.3,.8);g.position.set(30,0,10);g.rotation.y=-.3;g.scale.setScalar(1.25);TG.add(g);
+ const b=new THREE.Group(),A=250;L(new THREE.TorusGeometry(A,5,6,48,Math.PI),0x8a8f98,0,38,0,b).scale.y=.32;L(new THREE.BoxGeometry(2*A+30,4,20),0x6a6f78,0,36,0,b);
+ for(let i=-9;i<=9;i++){const h=Math.sqrt(1-Math.pow(i/10,2))*A*.32;L(new THREE.BoxGeometry(1,h,1),0x7a7f88,i*A/10,36+h/2,0,b)}
+ for(const s of[-1,1]){L(new THREE.BoxGeometry(14,64,16),0xb8a888,s*(A+8),32,0,b);L(Q(new THREE.ConeGeometry(11,12,4)),0x8a7a5a,s*(A+8),70,0,b)}b.position.set(0,0,-520);TG.add(b)},
+gg:()=>{const H=156,wd=WALL+6,c={color:0xd8451f,emissive:0x40140a},oc=zLM(c),
+ fx=(x,m)=>{let b=0,d=1e9;for(let i=0;i<N*m;i++){const e=Math.abs(pts[i].x-x);if(e<d){d=e;b=i}}return b},tw=i=>{const p=pts[i],n=Nm[i],g=new THREE.Group();for(const s of[1,-1]){L(new THREE.BoxGeometry(6.5,H*.58,8),c,s*wd,H*.29,0,g);L(new THREE.BoxGeometry(5.4,H*.44,7),c,s*wd,H*.8,0,g)}
+  for(const y of[46,76,104,128,H-3])L(new THREE.BoxGeometry(2*wd,y>120?6:4.6,5),c,0,y,0,g);L(new THREE.BoxGeometry(2*wd+9,3,9),c,0,H+1,0,g);g.position.set(p.x,0,p.z);g.rotation.y=Math.atan2(-n.z,n.x);TG.add(g);return i},
+ i1=tw(fx(-262,0.29)),i2=tw(fx(262,0.29)),V=(x,y,z)=>new THREE.Vector3(x,y,z),
+ cab=(A,Bp,sg)=>{const q=[];for(let k=0;k<=26;k++){const t=k/26;q.push(V(A.x+(Bp.x-A.x)*t,A.y+(Bp.y-A.y)*t-sg*4*t*(1-t),A.z+(Bp.z-A.z)*t))}return q},
+ on=(i,s,y)=>{const p=pts[i],n=Nm[i];return V(p.x+n.x*s*wd,y===undefined?p.y+1:y,p.z+n.z*s*wd)},sus=[],dy=pts[i1].y+1.4;
+ for(const s of[1,-1]){const A=on(i1,s,H),Bp=on(i2,s,H),q=cab(A,Bp,H-dy-10);zMS(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(q),26,1.5,6),oc,0,0,0);
+  q.forEach((v,k)=>{if(k>1&&k<25&&k%2===0)sus.push(v.x,v.y,v.z,v.x,dy,v.z)});
+  for(const[a,b2]of[[A,on(2,s)],[Bp,on(fx(525,0.31),s)]])zMS(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(cab(a,b2,0)),12,1.1,5),oc,0,0,0)}
+ const lg=new THREE.BufferGeometry();lg.setAttribute('position',new THREE.Float32BufferAttribute(sus,3));TG.add(new THREE.LineSegments(lg,new THREE.LineBasicMaterial({color:0xe8602a})));
+ const t=zBTf('ny');zMS(new THREE.PlaneGeometry(1500,170).rotateX(-Math.PI/2),zLM(0x6a6a60),0,.05,370);for(let i=0;i<16;i++){const w=22+(i*37%18),h=40+(i*53%90);zBX(TG,t,w,h,w,-560+i*72,0,330+(i%3)*40,0xffffff)}
+ zMS(Q(new THREE.ConeGeometry(11,130,4)),zLM(0xe8ecf2),-80,65,340);zMS(new THREE.CylinderGeometry(48,56,8,14),zLM({color:0x8a8478,flatShading:true}),-160,4,-380);zMS(new THREE.CylinderGeometry(2,3,22,6),zLM(0xf4f4f4),-160,19,-380)},
+taj:()=>{const g=new THREE.Group(),W=0xf4eee0,M=0xe6dccb,p=(w,h,d,x,y,z,c)=>L(new THREE.BoxGeometry(w,h,d),c||W,x,y+h/2,z,g);
+ p(150,6,150,0,0,0,0xcfc4b0);p(88,8,88,0,6,0,M);p(56,46,56,0,14,0);
+ for(let k=0;k<4;k++){const a=k*Math.PI/2,s=Math.sin(a),c=Math.cos(a);B(new THREE.BoxGeometry(14,30,1),0x8a7f6a,s*28.6,34,c*28.6,g).rotation.y=a}
+ L(new THREE.CylinderGeometry(17,19,10,24),W,0,65,0,g);L(new THREE.SphereGeometry(21,28,14,0,T2,0,Math.PI*.62),W,0,70,0,g).scale.y=1.25;L(new THREE.CylinderGeometry(.3,.9,12,6),0xf0c040,0,106,0,g);
+ for(const x of[-1,1])for(const z of[-1,1]){p(5,9,5,x*21,60,z*21,M);L(new THREE.SphereGeometry(5,10,6,0,T2,0,Math.PI/2),W,x*21,69,z*21,g);
+  L(new THREE.CylinderGeometry(2.8,3.4,70,14),W,x*68,41,z*68,g);L(new THREE.CylinderGeometry(3.9,3.9,1.6,14),M,x*68,52,z*68,g);L(new THREE.CylinderGeometry(3.9,3.9,1.6,14),M,x*68,68,z*68,g);L(new THREE.SphereGeometry(4.2,10,6,0,T2,0,Math.PI/2),W,x*68,76,z*68,g)}
+ zMS(new THREE.PlaneGeometry(16,200).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:0x7ac8e8}),0,.25,175,g);for(const s of[-1,1])L(new THREE.BoxGeometry(6,.3,200),0xd8cfbc,s*13,.15,175,g);
+ for(const s of[-1,1]){p(46,22,30,s*122,0,0,0xb5452e);for(let k=-1;k<=1;k++)L(new THREE.SphereGeometry(7,14,8,0,T2,0,Math.PI/2),0xf0e8d8,s*122+k*14,22,0,g)}
+ g.position.set(0,0,-30);TG.add(g)}});
+Object.assign(WT,{
+'羅馬競技場':()=>{const C=wtPl(5,2,1.2,.85,3);wtI(gh(new THREE.CylinderGeometry(.3,.5,2,5),2),L1(0x5a4030),C);wtI(new THREE.ConeGeometry(1.5,9,7).translate(0,6.5,0),L1(0x2f5a34),C,2);
+ const K=wtPl(22,1.6,.8,.9,5);wtI(gh(new THREE.CylinderGeometry(.9,1,8,10),8),L1(0xe0d4b8),K);wtI(gh(new THREE.BoxGeometry(2.8,.8,2.8),.8),L1(0xcdbf9c),K,8);
+ const V=wtC(wtPl(36,1.5,2.5,.8,7),[0xe8332a,0x2d9bff,0xf2c230,0xf4f4f4,0x2db84a]);wtI(gh(new THREE.BoxGeometry(1.1,1.3,2.8),1.3),L1(0xffffff),V,.4);wtI(gh(new THREE.BoxGeometry(1.2,.6,1.3),.6),L1(0xffffff),V,1.5);
+ const F=wtPl(14,1.4,.5,.8,9);wtI(gh(new THREE.CylinderGeometry(.1,.14,4.4,5),4.4),L1(0x4a3a2a),F);wtI(new THREE.SphereGeometry(.5,6,5).translate(0,.5,0),B1(0xff8a1e),F,4.6,[1,1.4,1]);
+ wtZebra();wtGate(.08,0xd8c49a,0x9e2230,12);wtGate(.41,0xd8c49a,0x9e2230,12);wtGate(.75,0xd8c49a,0x9e2230,12)},
+'東京晴空塔':()=>{const P=wtC(wtPl(8,1.5,1,.85,3),[0xff3a3a,0xff8a2d,0xffd62d,0xff4fd8]);wtI(gh(new THREE.CylinderGeometry(.1,.12,4.6,5),4.6),L1(0x222230),P);wtI(new THREE.SphereGeometry(.75,8,6).translate(0,.8,0),B1(0xffffff),P,4.6,[1,1.3,1]);
+ const S=wtC(wtPl(18,1.4,.6,.75,5),[0x6ae8ff,0xff6ad8,0xffe070]);wtI(gh(new THREE.BoxGeometry(1.4,2.6,1.1),2.6),B1(0xffffff),S);
+ const NS=wtC(wtPl(26,4,8,.6,7),[0xff2dff,0x00e5ff,0xffd62d,0xff5a3a,0x7cff4a]);wtI(gh(new THREE.CylinderGeometry(.3,.3,16,5),16),L1(0x444455),NS);wtI(gh(new THREE.BoxGeometry(10,5,.4),5),B1(0xffffff),NS,16);
+ const K=wtPl(11,2.2,2.8,.55,11);wtI(gh(new THREE.CylinderGeometry(.25,.4,3.2,5),3.2),L1(0x4a3228),K);wtI(new THREE.SphereGeometry(2.6,8,6).translate(0,1,0),L1(0xffb0d0),K,3.4);
+ wtZebra();wtGate(.06,0xd0202a,0x14141c,13);wtGate(.36,0xd0202a,0x14141c,13);wtGate(.66,0xd0202a,0x14141c,13);wtGate(.9,0x2a2a3a,0xff2dff,12)},
+'雪梨歌劇院':()=>{wtPalm(wtPl(6,2,3,.6,5));const Bo=wtC(wtPl(8,50,120,.5,3),[0xffffff,0xff5a3a,0x2d6bff,0xffd62d]);wtI(gh(new THREE.BoxGeometry(3.4,1.4,9),1.4),L1(0xf4f4f4),Bo);wtI(new THREE.ConeGeometry(2.6,11,3).translate(0,6.5,0),L1(0xffffff),Bo,1.4);
+ const U=wtC(wtPl(10,3,6,.5,7),[0xff5a3a,0xffd62d,0x2d9bff,0xff8ad8]);wtI(gh(new THREE.CylinderGeometry(.1,.1,3,5),3),L1(0xffffff),U);wtI(new THREE.ConeGeometry(2.4,1,8).translate(0,.5,0),L1(0xffffff),U,3);
+ const F=wtC(wtPl(8,1.4,.5,.7,9),[0x2d9bff,0xffd62d,0xf4f4f4]);wtI(gh(new THREE.CylinderGeometry(.12,.12,9,5),9),L1(0xdddddd),F);wtI(gh(new THREE.BoxGeometry(.1,1.6,2.6),1.6),B1(0xffffff),F,7.2);
+ wtZebra();wtGate(.08,0xf4f4f4,0x2d9bff,11);wtGate(.41,0xf4f4f4,0xffd62d,11);wtGate(.75,0xf4f4f4,0x2d9bff,11)},
+'舊金山金門大橋':()=>{const ok=a=>a[6]/N>.5,Bo=wtC(wtPl(8,60,150,.5,3),[0xffffff,0xff5a3a,0x2d6bff,0xffd62d]);wtI(gh(new THREE.BoxGeometry(3.4,1.4,9),1.4),L1(0xf4f4f4),Bo);wtI(new THREE.ConeGeometry(2.6,11,3).translate(0,6.5,0),L1(0xffffff),Bo,1.4);
+ const H=wtC(wtPl(14,2.4,2,.6,6).filter(ok),[0xf2a0b8,0x8ac8f0,0xf2e070,0xb8e0a0,0xe8a070]);wtI(gh(new THREE.BoxGeometry(5,6,5),6),L1(0xffffff),H);wtI(new THREE.ConeGeometry(4.2,3,4).rotateY(Math.PI/4).translate(0,7.5,0),L1(0x9a9aa0),H);
+ const P=wtPl(7,3,5,.55,4).filter(ok);wtI(gh(new THREE.CylinderGeometry(.25,.4,2.4,5),2.4),L1(0x5a4030),P);wtI(new THREE.ConeGeometry(1.8,10,7).translate(0,7,0),L1(0x2c5a3a),P,2);
+ wtGate(.2,0xd8451f,0xf4f4f4,12);wtGate(.52,0xd8451f,0xf4f4f4,11);wtGate(.76,0xd8451f,0xf4f4f4,11);wtZebra()},
+'泰姬陵':()=>{const C=wtPl(4,2,1,.85,3);wtI(gh(new THREE.CylinderGeometry(.25,.4,2,5),2),L1(0x5a4030),C);wtI(new THREE.ConeGeometry(1.3,10,7).translate(0,6.5,0),L1(0x2c5a34),C,2);
+ const F=wtC(wtPl(12,1.5,.5,.8,5),[0xff8a1e,0xffd62d,0xe8332a,0xff5a8a]);wtI(gh(new THREE.CylinderGeometry(.1,.12,7,5),7),L1(0xdddddd),F);wtI(gh(new THREE.BoxGeometry(.1,1.5,2.4),1.5),B1(0xffffff),F,5.4);
+ const E=wtPl(44,2.4,3,.9,7),G=0x8a8a92;wtI(gh(new THREE.BoxGeometry(3,3.4,6.4),3.4),L1(G),E,1.4);wtI(gh(new THREE.BoxGeometry(2.2,2.6,2.4),2.6).translate(0,0,3.9),L1(G),E,3.1);wtI(gh(new THREE.BoxGeometry(.8,3,.9),3).translate(0,0,5.6),L1(G),E,.4);wtI(gh(new THREE.BoxGeometry(3.4,.4,4),.4),L1(0xc83a5a),E,4.8);
+ const Lm=wtPl(9,1.4,.4,.8,9);wtI(gh(new THREE.CylinderGeometry(.1,.14,3.6,5),3.6),L1(0xc9a227),Lm);wtI(new THREE.SphereGeometry(.45,6,5).translate(0,.5,0),B1(0xffe9a0),Lm,3.7);
+ wtZebra();wtGate(.08,0xf4efe6,0xc9a227,12);wtGate(.41,0xf4efe6,0xc9a227,12);wtGate(.75,0xf4efe6,0xc9a227,12)}});
+}
 function decor(d){wtDetail(d);if(d.pier)piers();if(d.town)town(d);if(d.lk){zLK[d.lk](d.k||1.25);if(d.lk=='eiffel')zLK.arc()}if(d.row)for(const gp of d.row.g)zrowB(d.row.f,gp,d.row.s);
  if(d.cyl){const K=d.k||1.25,nt=TM[d.t].st;for(const[x,z,r,h,c,n]of d.cyl){const g=n?new THREE.ConeGeometry(r*K,h,n):new THREE.CylinderGeometry(r*K,r*K*1.08,h,28);let m;if(!n&&nt){const t=wt.clone();t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(10,h/14);t.needsUpdate=true;m=new THREE.MeshBasicMaterial({map:t,color:c})}else m=new THREE.MeshLambertMaterial({color:c});const b=new THREE.Mesh(g,m);b.position.set(x*K,h/2,z*K);TG.add(b);if(!n){const t=new THREE.Mesh(new THREE.CylinderGeometry(r*K*1.25,r*K*1.25,2.2,28),new THREE.MeshLambertMaterial({color:0xf0f0f0}));t.position.set(x*K,h+1,z*K);TG.add(t)}}}
  if(d.t=='aurora')for(let r=0;r<3;r++){const g=new THREE.PlaneGeometry(1,1,40,1),p=g.attributes.position,c=[];for(let i=0;i<p.count;i++){const u=p.getX(i)+.5,v=p.getY(i)+.5,an=r*2.1+.4+u*1.5,R=620+r*60+Math.sin(u*9+r)*40;p.setXYZ(i,Math.cos(an)*R,260+v*200+Math.sin(u*7)*25,Math.sin(an)*R);c.push(.15*(1-v),.95*(1-v),.55*(1-v))}g.setAttribute('color',new THREE.Float32BufferAttribute(c,3));const m=new THREE.Mesh(g,new THREE.MeshBasicMaterial({vertexColors:true,transparent:true,opacity:.6,side:THREE.DoubleSide,blending:THREE.AdditiveBlending,depthWrite:false,fog:false}));m.frustumCulled=false;TG.add(m)}
@@ -1577,7 +1752,7 @@ const SPDS=[.6,.8,1,1.25,1.5,2];
 function spHTML(){return cw('sp','速度','×'+SPD,SPDS.map(n=>'<button class="spb'+(n===SPD?' on':'')+'" onclick="setSpd('+n+')">×'+n+'</button>').join(''))}
 function setSpd(n){if(net&&!host)return;SPD=n;try{localStorage.setItem('drift_spd',n)}catch(e){}CO.sp=0;refC('sp');lbSync()}
 function setLaps(n){if(net&&!host)return;LAPS=n;try{localStorage.setItem('drift_laps',n)}catch(e){}CO.lp=0;refC('lp');lbSync()}
-const TCAT=[['入門經典','好上手、直線較多',['海岸經典','熱帶海灘','高速環道','空港直線']],['城市夜景','街道、小鎮、霓虹與大橋',['城市街道','宜蘭羅東鎮','霓虹夜市','跨海大橋']],['山地山道','連續彎道、高低起伏',['北海岸山路','櫻花山道','蛇行山脊','雪山盤旋']],['極限地形','特殊地形，難度較高',['沙漠峽谷','火山熔岩','極光冰原','古城長城','天空競技場']],['賽車場','仿真實賽車場：長賽道、連續甩尾圓環、高低差',['大鵬灣賽車場','紐博格林 GP','摩納哥港灣','富士山麓']],['世界巡迴','地標建築、立體交錯、8字／星形／三葉結造型賽道',['圓柱塔甩尾場','紐約曼哈頓','巴黎凱旋門','杜拜沙漠','埃及金字塔','里約熱帶','台北101','倫敦泰晤士']],['山間夜景','15 公里山道：商店街→休息景點區，上山、下山或無限跑山',['夜山登頂・上山','夜山登頂・下山','夜山登頂・無限跑山']]];
+const TCAT=[['入門經典','好上手、直線較多',['海岸經典','熱帶海灘','高速環道','空港直線']],['城市夜景','街道、小鎮、霓虹與大橋',['城市街道','宜蘭羅東鎮','霓虹夜市','跨海大橋']],['山地山道','連續彎道、高低起伏',['北海岸山路','櫻花山道','蛇行山脊','雪山盤旋']],['極限地形','特殊地形，難度較高',['沙漠峽谷','火山熔岩','極光冰原','古城長城','天空競技場']],['賽車場','仿真實賽車場：長賽道、連續甩尾圓環、高低差',['大鵬灣賽車場','紐博格林 GP','摩納哥港灣','富士山麓']],['世界巡迴','地標建築、立體交錯、8字／星形／三葉結造型賽道、世界名勝',['圓柱塔甩尾場','紐約曼哈頓','巴黎凱旋門','杜拜沙漠','埃及金字塔','里約熱帶','台北101','倫敦泰晤士','羅馬競技場','東京晴空塔','雪梨歌劇院','舊金山金門大橋','泰姬陵']],['山間夜景','15 公里山道：商店街→休息景點區，上山、下山或無限跑山',['夜山登頂・上山','夜山登頂・下山','夜山登頂・無限跑山']]];
 let TKO=false,TGO=[];const tcOf=i=>Math.max(0,TCAT.findIndex(c=>c[2].includes(TRK[i].n)));
 function tkHTML(){const cur=TRK[tk],info=d=>TM[d.t].nm+' '+'★'.repeat(d.df||2)+' '+plen(d);if(!TGO.length)TGO=[tcOf(tk)];
  const bt=i=>{const d=TRK[i];return '<button class="tk'+(i===tk?' on':'')+'" data-i="'+i+'" onclick="pick('+i+')">'+pv(d)+'<b>'+d.n+'</b><small>'+info(d)+'</small></button>'};
@@ -1623,8 +1798,18 @@ rpPt=e=>{const m=e[0],t=m.material;m.visible=e[10];m.position.set(e[1],e[2],e[3]
 rpPool=()=>{const a=[];for(const q of PL)if(q.m.visible)a.push(rpSn(q.m));for(const q of ES)if(q.s.visible)a.push(rpSn(q.s));return a},
 rpFl=()=>{const a=[flame];for(const k in RM)if(RM[k].fl)a.push(RM[k].fl);return a.map(m=>[m,m.visible,m.scale.x,m.scale.y,m.scale.z,m.material.color.getHex()])},
 rpFp=e=>{const m=e[0];m.visible=e[1];m.scale.set(e[2],e[3],e[4]);m.material.color.setHex(e[5])};
+// 人物動作／特效回放：記錄每個骨架（關節、光束、氣流、光暈）的姿態、可見度與透明度
+function rpRigNodes(R0,rt,root){if(R0.rpn)return R0.rpn;const a=[];if(root)a.push(rt);rt.traverse(o=>{if(o===rt||o.userData.sh)return;const m=o.material;if(!o.isMesh||(m&&!Array.isArray(m)&&m.transparent))a.push(o)});return R0.rpn=a}
+function rpRigs(o){return o.map(g=>{const rt=g===car?body:g,R0=rt.userData.rig;if(!R0)return null;const n=rpRigNodes(R0,rt,g===car);return{n,a:rpRigGet(n)}})}
+function rpRigGet(n){const a=new Float32Array(n.length*12);for(let i=0,k=0;i<n.length;i++,k+=12){const o=n[i],p=o.position,q=o.quaternion,s=o.scale,m=o.material;a[k]=p.x;a[k+1]=p.y;a[k+2]=p.z;a[k+3]=q.x;a[k+4]=q.y;a[k+5]=q.z;a[k+6]=q.w;a[k+7]=s.x;a[k+8]=s.y;a[k+9]=s.z;a[k+10]=o.visible?1:0;a[k+11]=m&&!Array.isArray(m)&&m.transparent?m.opacity:-1}return a}
+function rpRigPut(n,a,b,u){for(let i=0,k=0;i<n.length;i++,k+=12){const o=n[i],m=o.material;
+ if(!b){o.position.set(a[k],a[k+1],a[k+2]);o.quaternion.set(a[k+3],a[k+4],a[k+5],a[k+6]);o.scale.set(a[k+7],a[k+8],a[k+9]);if(a[k+11]>=0)m.opacity=a[k+11]}
+ else{const L=j=>a[k+j]+(b[k+j]-a[k+j])*u,sg=a[k+3]*b[k+3]+a[k+4]*b[k+4]+a[k+5]*b[k+5]+a[k+6]*b[k+6]<0?-1:1,
+  qx=a[k+3]+(sg*b[k+3]-a[k+3])*u,qy=a[k+4]+(sg*b[k+4]-a[k+4])*u,qz=a[k+5]+(sg*b[k+5]-a[k+5])*u,qw=a[k+6]+(sg*b[k+6]-a[k+6])*u,ql=Math.hypot(qx,qy,qz,qw)||1;
+  o.position.set(L(0),L(1),L(2));o.quaternion.set(qx/ql,qy/ql,qz/ql,qw/ql);o.scale.set(L(7),L(8),L(9));if(a[k+11]>=0)m.opacity=L(11)}
+ o.visible=a[k+10]>.5}}
 function rpRec(){if(RP.on)return;const t=performance.now()/1e3,o=[car];for(const b of BOTS)o.push(b.g);for(const k in RM)if(RM[k].g.visible)o.push(RM[k].g);
- const a=[];for(const g of o)a.push(g.position.x,g.position.y,g.position.z,g.rotation.x,g.rotation.y,g.rotation.z);RP.f.push({t,o,a,fx:rpPool(),fl:rpFl(),tr:TRL.m.visible?[TRL.pos.slice(),TRL.col.slice()]:null});while(RP.f.length>1&&t-RP.f[0].t>12)RP.f.shift()}
+ const a=[];for(const g of o)a.push(g.position.x,g.position.y,g.position.z,g.rotation.x,g.rotation.y,g.rotation.z);RP.f.push({t,o,a,fx:rpPool(),fl:rpFl(),rg:rpRigs(o),tr:TRL.m.visible?[TRL.pos.slice(),TRL.col.slice()]:null});while(RP.f.length>1&&t-RP.f[0].t>12)RP.f.shift()}
 function rpArm(){if(RP.f.length<30)return 0;RP.tF=performance.now()/1e3;RP.x=x;RP.y=gyS;RP.z=z;RP.h=h;RP.w=1.8;return 1}
 function rpStart(){RP.w=0;const f=RP.f;if(f.length<30){rpStop();return}RP.t1=f[f.length-1].t;RP.t=RP.t0=Math.max(f[0].t,RP.tF-8);RP.pu=0;RP.n=0;RP.ci=0;RP.pull=0;RP.bi=-1;RP.ca=undefined;rpOccBuild();RP.el=0;RP.i=0;RP.seg=-1;RP.on=1;document.body.classList.add('rp');$('rpo').style.display='block'}
 // 鏡頭方向取「賽道前進方向」並平滑，不跟著車的轉向／飄移一起轉
@@ -1657,6 +1842,8 @@ function rpStep(dt){const q=RP,d0=q.t-q.tF;q.el+=dt;
  const f=q.f;let i=q.i;while(i<f.length-2&&f[i+1].t<q.t)i++;q.i=i;const A=f[i],B=f[i+1]||A,u=B.t>A.t?Math.min(1,Math.max(0,(q.t-A.t)/(B.t-A.t))):0;
  const sv=A.o.map(g=>[g.position.x,g.position.y,g.position.z,g.rotation.x,g.rotation.y,g.rotation.z,g.visible]),svf=rpPool(),svl=rpFl(),svt=TRL.m.visible;
  A.o.forEach((g,j)=>{const a=A.a,b=B.o[j]===g?B.a:A.a,k=j*6;g.visible=true;g.position.set(a[k]+(b[k]-a[k])*u,a[k+1]+(b[k+1]-a[k+1])*u,a[k+2]+(b[k+2]-a[k+2])*u);g.rotation.set(a[k+3]+(b[k+3]-a[k+3])*u,a[k+4]+ad(a[k+4],b[k+4])*u,a[k+5]+(b[k+5]-a[k+5])*u)});
+ // 人物動作／特效回放：關節姿勢、蛛絲、氣流、雷射、紫色能量殼
+ const rsv=[];A.o.forEach((g,j)=>{const ra=A.rg&&A.rg[j];if(!ra)return;const rb=B.rg&&B.rg[j]&&B.rg[j].n===ra.n?B.rg[j]:null;rsv.push([ra.n,rpRigGet(ra.n)]);rpRigPut(ra.n,ra.a,rb&&rb.a,u)});
  // 特效回放：煙、火花、氮氣、噴焰、尾流
  for(const p of PL)p.m.visible=false;for(const p of ES)p.s.visible=false;
  const Bm=B.mp||(B.mp=new Map(B.fx.map(e=>[e[0],e])));
@@ -1668,6 +1855,7 @@ function rpStep(dt){const q=RP,d0=q.t-q.tF;q.el+=dt;
  q.pu=Math.max(0,q.pu-dt*2.2);$('rpf').style.opacity=q.pu*.55;
  {const th=rpDir(q,tx,tz);if(q.ca===undefined)q.ca=th;else q.ca+=ad(q.ca,th)*Math.min(1,dt*2.5)}q.dd=d;{const BD=[-8,-6,-4,-2.8,-.5,.15,.7,1.9],p0=Math.min(1,Math.max(0,(d-BD[s])/(BD[s+1]-BD[s])));q.se=p0*p0*(3-2*p0)}const P=rpCam(q,s,tx,ty,tz,q.ca);C.position.set(P[0],P[1],P[2]);C.lookAt(tx,ty+1,tz);C.fov=P[3]+q.pu*16;C.updateProjectionMatrix();SG.position.copy(OPN||ALN.on?C.position:ZR);R.render(S,C);
  A.o.forEach((g,j)=>{const v=sv[j];g.position.set(v[0],v[1],v[2]);g.rotation.set(v[3],v[4],v[5]);g.visible=v[6]});
+ for(const r of rsv)rpRigPut(r[0],r[1]);
  for(const p of PL)p.m.visible=false;for(const p of ES)p.s.visible=false;for(const e of svf)rpPt(e);for(const e of svl)rpFp(e);TRL.m.visible=svt}
 function rpStop(){const was=RP.on||RP.w>0;RP.on=0;RP.w=0;document.body.classList.remove('rp');$('rpo').style.display='none';if(was){C.fov=72;C.updateProjectionMatrix();if(st==='fin')$('fr').style.display='flex'}}
 $('rps').onclick=rpStop;addEventListener('keydown',e=>{if(RP.on&&(e.key===' '||e.key==='Enter'||e.key==='Escape'))rpStop()});
@@ -1705,6 +1893,7 @@ let lbS='';function netTick(dt){if(!net||st==='menu')return;rfPrep();const pr=la
   {const dx=x-r.x,dz=z-r.z,d=Math.hypot(dx,dz),md=4.2;if(st==='race'&&d<md&&d>.01&&crashT<=0&&inv<=0&&r.y<1.5){const nx=dx/d,nz=dz/d,ov=md-d,om=(VH[r.v]||VH[0]).ms,pk=1.2*om/(VC.ms+om);x+=nx*ov*pk;z+=nz*ov*pk;const rv=(vx-r.vx)*nx+(vz-r.vz)*nz;
    if(rv<0){const fsp=fastEnough();vx-=nx*rv*.75;vz-=nz*rv*.75;vx*=.97;vz*=.97;h+=Math.sign(Math.sin(h)*nz-Math.cos(h)*nx)*Math.min(.3,-rv*.012);flash=.2;if(-rv>flipC((VH[r.v]||VH[0]).ms)&&fsp)crash(nx,nz,-rv*.8);
     if(rv<-3)for(let q=0;q<10;q++)sp(x-nx*2,.8,z-nz*2,(Math.random()-.5)*16+nx*8,Math.random()*6,(Math.random()-.5)*16+nz*8,Math.random()<.5?0xffd060:0xffffff,.35,.3,-.7,1,1)}}}
+  if((VH[r.v]||VH[0]).st){const q=r.g.userData.st||(r.g.userData.st={dr:0,dd:1,bo:0});q.dr=r.d>0?1:0;q.bo=r.b?1:0}
   rgAnim(r.g,Math.hypot(r.vx,r.vz),dt,st==='count');rfx(r)}
  const lb=L.length>1?L.sort((a,b)=>b.p-a.p).slice(0,8).map((q,i)=>'<div'+(q.me?' class="me"':'')+'><u>'+(i+1)+'</u><i style="background:'+q.c+'"></i><span>'+esc(q.n)+'</span></div>').join(''):'';if(MODE===3){const sc=[0,0];L.forEach((q,i)=>{if(q.t!==undefined)sc[q.t]+=[10,8,6,5,4,3,2,1][i]||0});tsc=sc}setLb(L)}
 // ===== minimap (top-left, heading-up = camera direction) =====
